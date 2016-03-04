@@ -6,8 +6,8 @@ import site
 sys.stdout = sys.stderr
 
 site.addsitedir('/home/goat/app/venv/lib/python2.7/site-packages')
-sys.path.append('/home/goat/app/src/goat/')
+sys.path.append('/home/goat/app/src/')
 
-from goat import app as uwsgi_app
+from goat.app import application as uwsgi_app
 
 application = uwsgi_app

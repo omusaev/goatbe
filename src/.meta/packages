@@ -1,3 +1,4 @@
-falcon
-SQLAlchemy
-psycopg2
+falcon==0.3.0
+SQLAlchemy==1.0.12
+psycopg2==2.6.1
+ipython==4.1.2
