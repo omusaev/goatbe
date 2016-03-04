@@ -5,15 +5,16 @@
 # http://stackoverflow.com/a/4609718/410556
 
 
-: ${VIRTUALENV:=/home/goat/app/venv}
+: ${PATH_TO_THE_ROOT:=/home/goat}
+: ${VIRTUALENV:=${PATH_TO_THE_ROOT}/goat/venv}
 : ${PYTHON:=${VIRTUALENV}/bin/python}
 
-: ${APP_PATH:=/home/goat/app/venv/src}
+: ${APP_PATH:=${PATH_TO_THE_ROOT}/goat/app/}
 : ${APP_PY:=${APP_PATH}/app.py}
 
 : ${UWSGI:=${VIRTUALENV}/bin/uwsgi}
-: ${UWSGI_CONFIG:=/home/goat/app/wsgi/uwsgi.conf}
-: ${UWSGI_PIDFILE:=/home/goat/run/uwsgi.pid}
+: ${UWSGI_CONFIG:=${PATH_TO_THE_ROOT}/goat/wsgi/uwsgi.conf}
+: ${UWSGI_PIDFILE:=${PATH_TO_THE_ROOT}/run/uwsgi.pid}
 
 PID=`cat ${UWSGI_PIDFILE}`
 #if [[ $(echo 'import constants'|$PYTHON $APP_PY shell > /dev/null 2>&1)$? != 0 ]]; then
