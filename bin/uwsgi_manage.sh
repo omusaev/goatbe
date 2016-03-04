@@ -10,7 +10,7 @@
 : ${PYTHON:=${VIRTUALENV}/bin/python}
 
 : ${APP_PATH:=${PATH_TO_THE_ROOT}/goat/app/}
-: ${APP_PY:=${APP_PATH}/app.py}
+: ${APP_PY:=${APP_PATH}app.py}
 
 : ${UWSGI:=${VIRTUALENV}/bin/uwsgi}
 : ${UWSGI_CONFIG:=${PATH_TO_THE_ROOT}/goat/wsgi/uwsgi.conf}
