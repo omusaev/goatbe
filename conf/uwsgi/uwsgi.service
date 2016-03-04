@@ -3,7 +3,7 @@ Description=uWSGI instance to serve goat
 
 [Service]
 ExecStartPre=-/usr/bin/bash -c 'mkdir -p /home/goat/run;'
-ExecStart=/usr/bin/bash -c 'source /home/goat/goat/venv/bin/activate; /home/goat/goat/bin/uwsgi_manage.sh start'
+ExecStart=/usr/bin/bash -c 'source /home/goat/goat/venv/bin/activate; /home/goat/goat/bin/uwsgi_manage.sh restart'
 
 [Install]
 WantedBy=multi-user.target
