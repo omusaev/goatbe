@@ -1,5 +1,8 @@
-falcon==0.3.0
-SQLAlchemy==1.0.12
-psycopg2==2.6.1
-ipython==2.2.0
-uWSGI==2.0.12
+falcon
+SQLAlchemy
+psycopg2
+voluptuous
+uWSGI
+alembic
+requests
+ipython
