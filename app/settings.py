@@ -24,15 +24,3 @@ try:
     from settings_local import *
 except ImportError:
     pass
-
-
-from sqlalchemy import create_engine
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker, scoped_session
-
-engine = create_engine(DB_CONNECTION_URL)
-
-Base = declarative_base()
-Base.metadata.bind = engine
-
-DBSession = scoped_session(sessionmaker(bind=engine))

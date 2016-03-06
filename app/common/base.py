@@ -13,7 +13,6 @@ from common.exceptions import (
     MissingParameterException,
     InvalidParameterFormatException,
 )
-from settings import DBSession
 
 __all__ = (
     'BaseResource',
@@ -42,9 +41,6 @@ class BaseResource(object):
     @property
     def url(self):
         return self.url
-
-    def __init__(self):
-        self.db_session = DBSession()
 
     def handle_request(self, req, resp, *args, **kwargs):
         """
