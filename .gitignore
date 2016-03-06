@@ -2,3 +2,4 @@
 *.py[cod]
 *.directory
 /venv/*
+settings_local.py

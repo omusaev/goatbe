@@ -2,7 +2,7 @@
 
 import falcon
 
-from utils.helpers import collect_installed_resources
+from common.helpers import collect_installed_resources
 
 application = falcon.API()
 

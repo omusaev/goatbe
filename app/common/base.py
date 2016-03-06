@@ -3,9 +3,9 @@
 import json
 import falcon
 
-from utils.decorators import db_transaction
+from common.decorators import db_transaction
 
-from models import DBSession
+from settings import DBSession
 
 __ALL__ = (
     'BaseResource',

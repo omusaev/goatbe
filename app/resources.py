@@ -1,15 +1,10 @@
 # -*- coding: utf-8 -*-
 
 import json
-import falcon
-
-from utils.decorators import db_transaction
 
 from common.base import BaseResource
 
-from models import DBSession
-
-__ALL__ = (
+__all__ = (
     'Ping',
 )
 

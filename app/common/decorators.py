@@ -9,7 +9,7 @@ from functools import wraps
 
 from voluptuous import Schema, Invalid
 
-from models import DBSession
+from settings import DBSession
 
 
 __ALL__ = (
