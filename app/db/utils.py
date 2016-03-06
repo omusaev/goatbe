@@ -7,10 +7,10 @@ from db.base import db_session_factory
 import logging
 logger = logging.getLogger(__name__)
 
-
 __all__ = (
     'db_session',
 )
+
 
 def _db_session_raiser(*args, **kwarg):
     raise RuntimeError('Trying to use connection outside of db session context')
