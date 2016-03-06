@@ -11,8 +11,7 @@ from voluptuous import Schema, Invalid
 
 from settings import DBSession
 
-
-__ALL__ = (
+__all__ = (
     'db_transaction',
     'data_required',
 )

@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 
-import json
+from voluptuous import (
+    Optional, All, Range, Coerce,
+)
 
 from common.base import BaseResource
 
@@ -13,5 +15,9 @@ class Ping(BaseResource):
 
     url = '/ping/'
 
-    def get(self, req, resp):
-        resp.body = json.dumps('Pong')
+    data_schema = {
+        Optional('number'): All(Coerce(int), Range(min=1, max=10)),
+    }
+
+    def get(self):
+        self.response_data = 'Pong'

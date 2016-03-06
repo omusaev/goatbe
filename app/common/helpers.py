@@ -5,7 +5,7 @@ from importlib import import_module
 import settings as app_settings
 
 
-__ALL__ = (
+__all__ = (
     'import_by_path',
     'collect_installed_resources',
 )
