@@ -1,4 +1,5 @@
 .idea/*
+/app/.idea/*
 *.py[cod]
 *.directory
 /venv/*
