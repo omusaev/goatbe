@@ -6,3 +6,4 @@ uWSGI
 alembic
 requests
 ipython
+python-daemon

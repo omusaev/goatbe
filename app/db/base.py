@@ -4,7 +4,8 @@ from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
-from settings import DB_CONNECTION_URL
+import settings as app_settings
+
 
 __all__ = (
     'engine',
@@ -12,9 +13,16 @@ __all__ = (
     'db_session_factory',
 )
 
-engine = create_engine(DB_CONNECTION_URL)
+engine = create_engine(app_settings.DB_CONNECTION_URL)
 
 Base = declarative_base()
 Base.metadata.bind = engine
 
 db_session_factory = sessionmaker(bind=engine)
+
+
+def get_base_for_migrations():
+    # we have to import all models here to use auto generation of migrations feature
+    from common.sessions.models import Session
+
+    return Base

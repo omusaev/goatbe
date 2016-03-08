@@ -38,6 +38,8 @@ class BaseResource(object):
     response_data = None
     raised_exception = None
 
+    session = None
+
     @property
     def url(self):
         return self.url

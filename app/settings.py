@@ -2,6 +2,8 @@
 
 import os
 
+PROJECT_ROOT = os.path.dirname(os.path.realpath(__file__))
+
 DATABASE = {
     'DIALECT': 'postgresql',
     'DRIVER': 'psycopg2',
@@ -14,11 +16,18 @@ DATABASE = {
 
 DB_CONNECTION_URL = '%(DIALECT)s+%(DRIVER)s://%(USERNAME)s:%(PASSWORD)s@%(HOST)s:%(PORT)s/%(DATABASE)s' % DATABASE
 
+ALEMBIC_CONFIG_PATH = '%s/db/migrations/alembic.ini' % PROJECT_ROOT
+
 INSTALLED_RESOURCES = [
-    'resources.Ping',
+    'common.resources.Ping',
 ]
 
-PROJECT_ROOT = os.path.dirname(os.path.realpath(__file__))
+SESSION_TTL = 60 * 60 * 24 * 14  # 2 weeks
+SESSION_COOKIE_NAME = 'sessionid'
+
+WORKERS = {
+    'session_cleanup': {'sleep': 60 * 60},
+}
 
 try:
     from settings_local import *
