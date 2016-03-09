@@ -5,5 +5,5 @@ voluptuous
 uWSGI
 alembic
 requests
-ipython
+ipython==2.2.0
 python-daemon

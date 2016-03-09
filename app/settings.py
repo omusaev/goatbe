@@ -19,7 +19,7 @@ DB_CONNECTION_URL = '%(DIALECT)s+%(DRIVER)s://%(USERNAME)s:%(PASSWORD)s@%(HOST)s
 ALEMBIC_CONFIG_PATH = '%s/db/migrations/alembic.ini' % PROJECT_ROOT
 
 INSTALLED_RESOURCES = [
-    'common.resources.Ping',
+    'api.resources.Ping',
 ]
 
 SESSION_TTL = 60 * 60 * 24 * 14  # 2 weeks
