@@ -24,5 +24,6 @@ db_session_factory = sessionmaker(bind=engine)
 def get_base_for_migrations():
     # we have to import all models here to use auto generation of migrations feature
     from common.sessions.models import Session
+    from accounts.models import Account
 
     return Base

@@ -29,6 +29,10 @@ WORKERS = {
     'session_cleanup': {'sleep': 60 * 60},
 }
 
+AUTH_FB = 'FB'
+AUTH_ANONYM = 'ANONYM'
+AUTH_METHODS = (AUTH_FB, AUTH_ANONYM)
+
 try:
     from settings_local import *
 except ImportError:
