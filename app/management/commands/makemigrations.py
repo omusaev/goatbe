@@ -7,6 +7,7 @@ from management.commands import BaseCommand
 
 import settings as app_settings
 
+
 class Command(BaseCommand):
     help = 'Create new migration'
 

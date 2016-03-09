@@ -5,7 +5,7 @@ import falcon
 from common.helpers import collect_installed_resources
 from common.sessions.middlewares import SessionMiddleware
 
-application = falcon.API(middleware=[SessionMiddleware(),])
+application = falcon.API(middleware=[SessionMiddleware(), ])
 
 for resource in collect_installed_resources():
     application.add_route(resource.url, resource)

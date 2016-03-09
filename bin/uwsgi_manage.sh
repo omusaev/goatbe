@@ -17,12 +17,6 @@
 : ${UWSGI_PIDFILE:=${PATH_TO_THE_ROOT}/run/uwsgi.pid}
 
 PID=`cat ${UWSGI_PIDFILE}`
-#if [[ $(echo 'import constants'|$PYTHON $APP_PY shell > /dev/null 2>&1)$? != 0 ]]; then
-#    echo "ALERT"
-#    echo "constants.py seems to be broken, check it using"
-#    echo "now exiting..."
-#    exit
-#fi
 
 function start {
     if [ ! -f /proc/`cat $UWSGI_PIDFILE 2>/dev/null`/exe ]; then
