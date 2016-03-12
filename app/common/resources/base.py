@@ -9,7 +9,7 @@ from voluptuous import (
 
 from common.exceptions import (
     GoatBaseException,
-    UnsupportedResourceMethod,
+    UnsupportedResourceMethodException,
     MissingParameterException,
     InvalidParameterFormatException,
 )
@@ -80,7 +80,7 @@ class BaseResource(object):
         method = self.request.method.lower()
 
         if not hasattr(self, method):
-            raise UnsupportedResourceMethod
+            raise UnsupportedResourceMethodException
 
         self.validate_request(*args, **kwargs)
 
@@ -88,7 +88,7 @@ class BaseResource(object):
         getattr(self, method)(*args, **kwargs)
 
     # handle all requests by the one way
-    on_get = on_post = on_head = on_put = handle_request
+    on_get = on_post = on_head = on_put = on_patch = on_delete = handle_request
 
     def prepare_request(self, *args, **kwargs):
         """

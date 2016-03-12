@@ -4,9 +4,10 @@ from falcon import status_codes
 
 __all__ = (
     'GoatBaseException',
-    'UnsupportedResourceMethod',
+    'UnsupportedResourceMethodException',
     'MissingParameterException',
     'InvalidParameterFormatException',
+    'FacebookLoginException',
 )
 
 
@@ -16,7 +17,7 @@ class GoatBaseException(Exception):
     message = ''
 
 
-class UnsupportedResourceMethod(GoatBaseException):
+class UnsupportedResourceMethodException(GoatBaseException):
 
     status_code = status_codes.HTTP_405
     message = 'The request method is not allowed for this resource'
@@ -45,3 +46,9 @@ class InvalidParameterFormatException(GoatBaseException):
     @property
     def message(self):
         return self.message_template % (self.param_name, self.error_msg)
+
+
+class FacebookLoginException(GoatBaseException):
+
+    def __init__(self, message):
+        self.message = message
