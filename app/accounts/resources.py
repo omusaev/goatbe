@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 
+import uuid
+
 from facepy import GraphAPI, FacepyError, get_extended_access_token
-from voluptuous import Required, All
+from voluptuous import Required, Optional, All
 
 from accounts.models import Account
 from common.exceptions import FacebookLoginException
@@ -14,10 +16,40 @@ import settings as app_settings
 
 __all__ = (
     'AuthFacebook',
+    'AuthAnonym',
 )
 
 
-class AuthFacebook(BaseResource):
+class AuthResource(BaseResource):
+
+    account = None
+
+    def get(self, *args, **kwargs):
+
+        if self.session and self.session['account_info']:
+            self.response_data = {
+                'user_access_token': self.session['account_info'].user_access_token,
+                'session_id': self.session.id,
+            }
+
+            return
+
+        token = self._auth()
+
+        if self.session:
+            self.session.set_account(self.account.id)
+        else:
+            self.session = SessionManager.create_session(account_id=self.account.id)
+
+        self.response_data = {
+            'user_access_token': self.account.attributes['user_access_token'],
+        }
+
+    def _auth(self):
+        raise NotImplementedError
+
+
+class AuthFacebook(AuthResource):
 
     url = '/accounts/auth/facebook/'
 
@@ -25,13 +57,7 @@ class AuthFacebook(BaseResource):
         Required('user_access_token'): All(str),
     }
 
-    validators = []
-
-    def get(self, *args, **kwargs):
-
-        if self.session:
-            SessionManager.delete_session(self.session)
-
+    def _auth(self):
         user_access_token = self.request.get_param('user_access_token')
 
         try:
@@ -41,7 +67,6 @@ class AuthFacebook(BaseResource):
                                                 )
             graph = GraphAPI(oauth_token=fb_auth[0])
             fb_account = graph.get(path='/me')
-
         except FacepyError as e:
             raise FacebookLoginException(e.message)
 
@@ -52,23 +77,41 @@ class AuthFacebook(BaseResource):
         fb_name = fb_account.get('name')
 
         with db_session() as db:
-            account = db.query(Account).filter_by(identifier=str(fb_id), auth_method=app_settings.AUTH_FB).first()
+            self.account = db.query(Account).filter_by(identifier=str(fb_id),
+                                                       auth_method=app_settings.AUTH_FB).first()
 
-            if not account:
-                account = Account(name=fb_name,
-                                  identifier=str(fb_id),
-                                  auth_method=app_settings.AUTH_FB,
-                                  attributes=fb_account
-                                  )
+            if not self.account:
+                self.account = Account(name=fb_name,
+                                       identifier=str(fb_id),
+                                       auth_method=app_settings.AUTH_FB,
+                                       attributes=fb_account
+                                       )
 
-            account.attributes['user_access_token'] = long_term_user_access_token
-            account.attributes['expire_at'] = str(expire_at)
-            db.merge(account)
+            self.account.attributes['user_access_token'] = long_term_user_access_token
+            self.account.attributes['expire_at'] = str(expire_at)
+            db.merge(self.account)
 
-        self.session = SessionManager.create_session()
-        self.session['account_info'] = {'account_id': account.id}
 
-        self.response_data = {
-            'user_access_token': long_term_user_access_token,
-            'session_id': self.session.id,
-        }
+class AuthAnonym(AuthResource):
+
+    url = '/accounts/auth/anonym/'
+
+    data_schema = {
+        Optional('user_access_token'): All(str),
+    }
+
+    def _auth(self):
+        user_access_token = self.request.get_param('user_access_token')
+
+        with db_session() as db:
+            if user_access_token:
+                self.account = db.query(Account).filter_by(identifier=user_access_token,
+                                                           auth_method=app_settings.AUTH_ANONYM).first()
+            else:  # new user, let's register him
+                user_access_token = uuid.uuid4().hex
+                self.account = Account(name=user_access_token,
+                                       identifier=user_access_token,
+                                       auth_method=app_settings.AUTH_ANONYM,
+                                       attributes={'user_access_token': user_access_token}
+                                       )
+                db.merge(self.account)
