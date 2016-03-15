@@ -37,11 +37,15 @@ class BaseResource(object):
     response = None
 
     def __getattr__(self, name):
+        if hasattr(super(BaseResource, self), name):
+            return getattr(super(BaseResource, self), name)
+
         if self.request:
             return self.request.context.get(name)
 
     def __setattr__(self, name, value):
-        if hasattr(self, name):
+        # black science
+        if name in dir(self):
             return object.__setattr__(self, name, value)
 
         if self.request:
