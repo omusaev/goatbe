@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+
 class cached_property(object):
     """
     Decorator that converts a method with a single self argument into a
