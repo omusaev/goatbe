@@ -5,7 +5,6 @@ import uuid
 
 from sqlalchemy import Column, String, DateTime, PickleType
 
-from common.sessions import AccountInfo
 from db.base import Base
 from db.helpers import db_session
 
@@ -53,9 +52,6 @@ class Session(Base):
     def update(self, dict_):
         self.data.update(dict_)
 
-    def set_account(self, account_id):
-        self['account_info'] = AccountInfo(account_id)
-
 
 class SessionManager(object):
 
@@ -64,14 +60,11 @@ class SessionManager(object):
         return uuid.uuid4().hex
 
     @classmethod
-    def create_session(cls, account_id=None):
+    def create_session(cls):
         session = Session(
             id=cls.generate_session_id(),
             data={}
         )
-
-        if account_id:
-            session.set_account(account_id)
 
         return session
 

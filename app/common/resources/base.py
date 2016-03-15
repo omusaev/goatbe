@@ -39,6 +39,7 @@ class BaseResource(object):
     raised_exception = None
 
     session = None
+    account_info = None
 
     @property
     def url(self):

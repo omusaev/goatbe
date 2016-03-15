@@ -20,36 +20,27 @@ __all__ = (
 )
 
 
-class AuthResource(BaseResource):
+class AuthBaseResource(BaseResource):
 
     account = None
 
     def get(self, *args, **kwargs):
 
-        if self.session and self.session['account_info']:
+        if self.account_info:  # the user has already authenticated
             self.response_data = {
-                'user_access_token': self.session['account_info'].user_access_token,
-                'session_id': self.session.id,
+                'user_access_token': self.account_info.user_access_token,
             }
-
-            return
-
-        token = self._auth()
-
-        if self.session:
-            self.session.set_account(self.account.id)
         else:
-            self.session = SessionManager.create_session(account_id=self.account.id)
-
-        self.response_data = {
-            'user_access_token': self.account.attributes['user_access_token'],
-        }
+            self._auth()
+            self.response_data = {
+                'user_access_token': self.account.attributes['user_access_token'],
+            }
 
     def _auth(self):
         raise NotImplementedError
 
 
-class AuthFacebook(AuthResource):
+class AuthFacebook(AuthBaseResource):
 
     url = '/accounts/auth/facebook/'
 
@@ -92,7 +83,7 @@ class AuthFacebook(AuthResource):
             db.merge(self.account)
 
 
-class AuthAnonym(AuthResource):
+class AuthAnonym(AuthBaseResource):
 
     url = '/accounts/auth/anonym/'
 
