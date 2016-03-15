@@ -20,7 +20,7 @@ class SessionMiddleware(object):
             return
 
         session_id = req.cookies.get(app_settings.SESSION_COOKIE_NAME)
-        session = SessionManager.get_session(session_id) if session_id else SessionManager.create_session()
+        session = SessionManager.get_or_create_session(session_id)
 
         setattr(resource, 'session', session)
 

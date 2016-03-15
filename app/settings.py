@@ -21,6 +21,7 @@ ALEMBIC_CONFIG_PATH = '%s/db/migrations/alembic.ini' % PROJECT_ROOT
 INSTALLED_RESOURCES = [
     'api.resources.Ping',
     'accounts.resources.AuthFacebook',
+    'accounts.resources.AuthAnonym',
 ]
 
 SESSION_TTL = 60 * 60 * 24 * 14  # 2 weeks

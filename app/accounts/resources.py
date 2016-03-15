@@ -5,10 +5,10 @@ import uuid
 from facepy import GraphAPI, FacepyError, get_extended_access_token
 from voluptuous import Required, Optional, All
 
+from accounts import settings as account_settings
 from accounts.models import Account
 from common.exceptions import FacebookLoginException
 from common.resources.base import BaseResource
-from common.sessions.models import SessionManager
 from db.helpers import db_session
 
 import settings as app_settings
@@ -32,6 +32,7 @@ class AuthBaseResource(BaseResource):
             }
         else:
             self._auth()
+            self.session[account_settings.ACCOUNT_ID_SESSION_KEY] = self.account.id
             self.response_data = {
                 'user_access_token': self.account.attributes['user_access_token'],
             }
@@ -80,7 +81,7 @@ class AuthFacebook(AuthBaseResource):
 
             self.account.attributes['user_access_token'] = long_term_user_access_token
             self.account.attributes['expire_at'] = str(expire_at)
-            db.merge(self.account)
+            self.account = db.merge(self.account)
 
 
 class AuthAnonym(AuthBaseResource):
@@ -105,4 +106,4 @@ class AuthAnonym(AuthBaseResource):
                                        auth_method=app_settings.AUTH_ANONYM,
                                        attributes={'user_access_token': user_access_token}
                                        )
-                db.merge(self.account)
+                self.account = db.merge(self.account)

@@ -27,7 +27,7 @@ class AccountInfo(object):
         return account
 
     @property
-    def id(self):
+    def account_id(self):
         return self.account.id
 
     @property

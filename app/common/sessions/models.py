@@ -76,6 +76,18 @@ class SessionManager(object):
         return session if session else None
 
     @staticmethod
+    def get_or_create_session(session_id=None):
+        if not session_id:
+            return SessionManager.create_session()
+
+        session = SessionManager.get_session(session_id)
+
+        if not session:
+            session = SessionManager.create_session()
+
+        return session
+
+    @staticmethod
     def save_session(session):
         with db_session() as db:
             db.merge(session)
