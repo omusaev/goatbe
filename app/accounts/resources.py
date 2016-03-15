@@ -22,8 +22,6 @@ __all__ = (
 
 class AuthBaseResource(BaseResource):
 
-    account = None
-
     def get(self, *args, **kwargs):
 
         if self.account_info:  # the user has already authenticated
@@ -31,10 +29,10 @@ class AuthBaseResource(BaseResource):
                 'user_access_token': self.account_info.user_access_token,
             }
         else:
-            self._auth()
-            self.session[account_settings.ACCOUNT_ID_SESSION_KEY] = self.account.id
+            account = self._auth()
+            self.session[account_settings.ACCOUNT_ID_SESSION_KEY] = account.id
             self.response_data = {
-                'user_access_token': self.account.attributes['user_access_token'],
+                'user_access_token': account.attributes['user_access_token'],
             }
 
     def _auth(self):
@@ -50,7 +48,7 @@ class AuthFacebook(AuthBaseResource):
     }
 
     def _auth(self):
-        user_access_token = self.request.get_param('user_access_token')
+        user_access_token = self.get_param('user_access_token')
 
         try:
             fb_auth = get_extended_access_token(access_token=user_access_token,
@@ -69,19 +67,22 @@ class AuthFacebook(AuthBaseResource):
         fb_name = fb_account.get('name')
 
         with db_session() as db:
-            self.account = db.query(Account).filter_by(identifier=str(fb_id),
+            account = db.query(Account).filter_by(identifier=str(fb_id),
                                                        auth_method=app_settings.AUTH_FB).first()
 
-            if not self.account:
-                self.account = Account(name=fb_name,
-                                       identifier=str(fb_id),
-                                       auth_method=app_settings.AUTH_FB,
-                                       attributes=fb_account
-                                       )
+            if not account:
+                account = Account(
+                    name=fb_name,
+                    identifier=str(fb_id),
+                    auth_method=app_settings.AUTH_FB,
+                    attributes=fb_account
+                )
 
-            self.account.attributes['user_access_token'] = long_term_user_access_token
-            self.account.attributes['expire_at'] = str(expire_at)
-            self.account = db.merge(self.account)
+            account.attributes['user_access_token'] = long_term_user_access_token
+            account.attributes['expire_at'] = str(expire_at)
+            account = db.merge(account)
+
+        return account
 
 
 class AuthAnonym(AuthBaseResource):
@@ -93,17 +94,20 @@ class AuthAnonym(AuthBaseResource):
     }
 
     def _auth(self):
-        user_access_token = self.request.get_param('user_access_token')
+        user_access_token = self.get_param('user_access_token')
 
         with db_session() as db:
             if user_access_token:
-                self.account = db.query(Account).filter_by(identifier=user_access_token,
-                                                           auth_method=app_settings.AUTH_ANONYM).first()
+                account = db.query(Account).filter_by(identifier=user_access_token,
+                                                      auth_method=app_settings.AUTH_ANONYM).first()
             else:  # new user, let's register him
                 user_access_token = uuid.uuid4().hex
-                self.account = Account(name=user_access_token,
-                                       identifier=user_access_token,
-                                       auth_method=app_settings.AUTH_ANONYM,
-                                       attributes={'user_access_token': user_access_token}
-                                       )
-                self.account = db.merge(self.account)
+                account = Account(
+                    name=user_access_token,
+                    identifier=user_access_token,
+                    auth_method=app_settings.AUTH_ANONYM,
+                    attributes={'user_access_token': user_access_token}
+                )
+                account = db.merge(account)
+
+        return account

@@ -35,15 +35,33 @@ class BaseResource(object):
 
     request = None
     response = None
-    response_data = None
-    raised_exception = None
 
-    session = None
-    account_info = None
+    def __getattr__(self, name):
+        if self.request:
+            return self.request.context.get(name)
+
+    def __setattr__(self, name, value):
+        if hasattr(self, name):
+            return object.__setattr__(self, name, value)
+
+        if self.request:
+            self.request.context.update({name: value})
 
     @property
     def url(self):
         return self.url
+
+    def set_params(self, data):
+        if self.request:
+            self.request.context.update({'params': data})
+
+    def get_param(self, name):
+        if self.request:
+            return self.request.context.get('params', {}).get(name)
+
+    def get_params(self):
+        if self.request:
+            return self.request.context.get('params', {})
 
     def handle_request(self, req, resp, *args, **kwargs):
         """
@@ -54,8 +72,6 @@ class BaseResource(object):
         :param kwargs:
         :return:
         """
-        self.request = req
-        self.response = resp
 
         try:
             self.prepare_request(*args, **kwargs)
@@ -64,11 +80,6 @@ class BaseResource(object):
             self.raised_exception = e
 
         self.prepare_response()
-        self.clean()
-
-    def clean(self):
-        # we have to clean resource object fields because it may be used again without recreation
-        self.request = self.response = self.response_data = self.raised_exception = None
 
     def process_request(self, *args, **kwargs):
         """
@@ -98,7 +109,7 @@ class BaseResource(object):
         :param kwargs:
         :return:
         """
-        pass
+        self.set_params(self.request.params)
 
     def prepare_response(self, *args, **kwargs):
         """
@@ -128,7 +139,7 @@ class BaseResource(object):
         :return:
         """
         if self.data_schema:
-            params = self.request.params
+            params = self.get_params()
             schema_validator = Schema(self.data_schema)
 
             try:
@@ -143,9 +154,9 @@ class BaseResource(object):
                     raise InvalidParameterFormatException(parameter_name, error.message)
 
             # Rewrite the data because it may be changed by schema validator (converted to appropriate type for example)
-            self.request._params = params
+            self.set_params(params)
 
         # Now we can validate high level conditions like entity existing or something else that is more complex than
         # format validation
         for validator in self.validators:
-            validator(self.request, *args, **kwargs)
+            validator(self, *args, **kwargs)

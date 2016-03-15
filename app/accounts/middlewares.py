@@ -14,10 +14,10 @@ __all__ = (
 
 class AccountInfo(object):
 
-    account_id = None
+    _account_id = None
 
     def __init__(self, id):
-        self.account_id = id
+        self._account_id = id
 
     @cached_property
     def account(self):
@@ -28,7 +28,7 @@ class AccountInfo(object):
 
     @property
     def account_id(self):
-        return self.account.id
+        return self._account_id
 
     @property
     def user_access_token(self):
@@ -50,11 +50,7 @@ class AccountMiddleware(object):
         else:
             account_info = None
 
-        setattr(resource, 'account_info', account_info)
+        resource.account_info = account_info
 
     def process_response(self, req, resp, resource):
-
-        if not resource:
-            return
-
-        setattr(resource, 'account_info', None)
+        pass

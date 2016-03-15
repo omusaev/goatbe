@@ -22,18 +22,17 @@ class SessionMiddleware(object):
         session_id = req.cookies.get(app_settings.SESSION_COOKIE_NAME)
         session = SessionManager.get_or_create_session(session_id)
 
-        setattr(resource, 'session', session)
+        resource.session = session
 
     def process_response(self, req, resp, resource):
 
         if not resource:
             return
 
-        session = getattr(resource, 'session')
+        session = resource.session
         if not session:
             return
 
         SessionManager.save_session(session)
-        setattr(resource, 'session', None)
 
-        resp.set_cookie(app_settings.SESSION_COOKIE_NAME, session.id, secure=False)
+        resp.set_cookie(app_settings.SESSION_COOKIE_NAME, session.id, path=app_settings.SITE_PATH, secure=False)

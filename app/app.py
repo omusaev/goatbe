@@ -2,11 +2,14 @@
 
 import falcon
 
-from common.helpers import collect_installed_resources
-from accounts.middlewares import AccountMiddleware
-from common.sessions.middlewares import SessionMiddleware
+from common.helpers import collect_installed_resources, collect_middlewares
 
-application = falcon.API(middleware=[SessionMiddleware(), AccountMiddleware(), ])
+__all__ = (
+    'application',
+)
+
+
+application = falcon.API(middleware=list(collect_middlewares()))
 
 for resource in collect_installed_resources():
     application.add_route(resource.url, resource)

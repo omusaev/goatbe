@@ -4,6 +4,10 @@ import os
 
 PROJECT_ROOT = os.path.dirname(os.path.realpath(__file__))
 
+SITE_HOST = '162.243.219.249'
+SITE_PATH = '/'
+SITE_URL = '%s%s' % (SITE_HOST, SITE_PATH)
+
 DATABASE = {
     'DIALECT': 'postgresql',
     'DRIVER': 'psycopg2',
@@ -17,6 +21,12 @@ DATABASE = {
 DB_CONNECTION_URL = '%(DIALECT)s+%(DRIVER)s://%(USERNAME)s:%(PASSWORD)s@%(HOST)s:%(PORT)s/%(DATABASE)s' % DATABASE
 
 ALEMBIC_CONFIG_PATH = '%s/db/migrations/alembic.ini' % PROJECT_ROOT
+
+MIDDLEWARES = [
+    'common.resources.middlewares.ResourceSetupMiddleware',
+    'common.sessions.middlewares.SessionMiddleware',
+    'accounts.middlewares.AccountMiddleware'
+]
 
 INSTALLED_RESOURCES = [
     'api.resources.Ping',

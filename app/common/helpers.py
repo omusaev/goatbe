@@ -8,6 +8,7 @@ import settings as app_settings
 __all__ = (
     'import_by_path',
     'collect_installed_resources',
+    'collect_middlewares',
 )
 
 
@@ -39,3 +40,11 @@ def collect_installed_resources():
         resource_obj = resource()
 
         yield resource_obj
+
+
+def collect_middlewares():
+    for middleware_path in app_settings.MIDDLEWARES:
+        middleware = import_by_path(middleware_path)
+        middleware_obj = middleware()
+
+        yield middleware_obj
