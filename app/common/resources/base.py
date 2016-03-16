@@ -37,12 +37,12 @@ class BaseResource(object):
         # ok, field wasn't set. Just return None instead of exception raising
         return None
 
+    def _cleanup(self):
+        self.__dict__ = {}
+        
     @property
     def url(self):
         return self.url
-
-    def _cleanup(self):
-        self.__dict__ = {}
 
     def get_param(self, name, default=None):
         return self.params.get(name, default) if hasattr(self, 'params') else default
