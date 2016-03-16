@@ -33,17 +33,19 @@ class BaseResource(object):
     # Order matters! For example, to validate that the user has some permissions we firstly have to validate the user.
     validators = []
 
-    request = None
-    response = None
-    response_data = None
-    raised_exception = None
-
-    session = None
-    account_info = None
+    def __getattr__(self, item):
+        # ok, field wasn't set. Just return None instead of exception raising
+        return None
 
     @property
     def url(self):
         return self.url
+
+    def _cleanup(self):
+        self.__dict__ = {}
+
+    def get_param(self, name, default=None):
+        return self.params.get(name, default) if hasattr(self, 'params') else default
 
     def handle_request(self, req, resp, *args, **kwargs):
         """
@@ -54,8 +56,6 @@ class BaseResource(object):
         :param kwargs:
         :return:
         """
-        self.request = req
-        self.response = resp
 
         try:
             self.prepare_request(*args, **kwargs)
@@ -64,11 +64,6 @@ class BaseResource(object):
             self.raised_exception = e
 
         self.prepare_response()
-        self.clean()
-
-    def clean(self):
-        # we have to clean resource object fields because it may be used again without recreation
-        self.request = self.response = self.response_data = self.raised_exception = None
 
     def process_request(self, *args, **kwargs):
         """
@@ -98,7 +93,7 @@ class BaseResource(object):
         :param kwargs:
         :return:
         """
-        pass
+        self.params = self.request.params
 
     def prepare_response(self, *args, **kwargs):
         """
@@ -128,7 +123,7 @@ class BaseResource(object):
         :return:
         """
         if self.data_schema:
-            params = self.request.params
+            params = self.params
             schema_validator = Schema(self.data_schema)
 
             try:
@@ -143,9 +138,9 @@ class BaseResource(object):
                     raise InvalidParameterFormatException(parameter_name, error.message)
 
             # Rewrite the data because it may be changed by schema validator (converted to appropriate type for example)
-            self.request._params = params
+            self.params = params
 
         # Now we can validate high level conditions like entity existing or something else that is more complex than
         # format validation
         for validator in self.validators:
-            validator(self.request, *args, **kwargs)
+            validator(self, *args, **kwargs)

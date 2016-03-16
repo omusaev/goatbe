@@ -1,5 +1,9 @@
 # -*- coding: utf-8 -*-
 
+__all__ = (
+    'cached_property',
+)
+
 
 class cached_property(object):
     """
