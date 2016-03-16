@@ -8,6 +8,7 @@ __all__ = (
     'MissingParameterException',
     'InvalidParameterFormatException',
     'FacebookLoginException',
+    'AccountNotFoundException',
 )
 
 
@@ -52,3 +53,8 @@ class FacebookLoginException(GoatBaseException):
 
     def __init__(self, message):
         self.message = message
+
+
+class AccountNotFoundException(GoatBaseException):
+
+    message = 'Account not found'

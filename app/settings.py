@@ -8,6 +8,8 @@ SITE_HOST = '162.243.219.249'
 SITE_PATH = '/'
 SITE_URL = '%s%s' % (SITE_HOST, SITE_PATH)
 
+DEBUG = False
+
 DATABASE = {
     'DIALECT': 'postgresql',
     'DRIVER': 'psycopg2',
@@ -23,7 +25,7 @@ DB_CONNECTION_URL = '%(DIALECT)s+%(DRIVER)s://%(USERNAME)s:%(PASSWORD)s@%(HOST)s
 ALEMBIC_CONFIG_PATH = '%s/db/migrations/alembic.ini' % PROJECT_ROOT
 
 MIDDLEWARES = [
-    'common.resources.middlewares.ResourceSetupMiddleware',
+    'common.resources.ResourceSetupMiddleware',
     'common.sessions.middlewares.SessionMiddleware',
     'accounts.middlewares.AccountMiddleware'
 ]

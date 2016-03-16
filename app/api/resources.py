@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from common.resources.base import BaseResource
+from common.resources import BaseResource
 from voluptuous import (
     Optional, All, Range, Coerce,
 )

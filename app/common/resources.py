@@ -16,6 +16,7 @@ from common.exceptions import (
 
 __all__ = (
     'BaseResource',
+    'ResourceSetupMiddleware',
 )
 
 
@@ -33,13 +34,9 @@ class BaseResource(object):
     # Order matters! For example, to validate that the user has some permissions we firstly have to validate the user.
     validators = []
 
-    def __getattr__(self, item):
-        # ok, field wasn't set. Just return None instead of exception raising
-        return None
-
     def _cleanup(self):
         self.__dict__ = {}
-        
+
     @property
     def url(self):
         return self.url
@@ -75,7 +72,7 @@ class BaseResource(object):
 
         method = self.request.method.lower()
 
-        if not hasattr(self, method):
+        if not getattr(self, method):
             raise UnsupportedResourceMethodException
 
         self.validate_request(*args, **kwargs)
@@ -88,12 +85,23 @@ class BaseResource(object):
 
     def prepare_request(self, *args, **kwargs):
         """
-        Prepares request before process. For example, you can decode json-ed request.stream and set data to _params field
         :param args:
         :param kwargs:
         :return:
         """
-        self.params = self.request.params
+        self.params = {}
+
+        if self.request.content_length in (None, 0):
+            return
+
+        body = self.request.stream.read()
+        if not body:
+            return
+
+        try:
+            self.params = json.loads(body.decode('utf-8'))
+        except (ValueError, UnicodeDecodeError):
+            return
 
     def prepare_response(self, *args, **kwargs):
         """
@@ -102,15 +110,15 @@ class BaseResource(object):
         :param kwargs:
         :return:
         """
-        exception = self.raised_exception
-
+        exception = self.raised_exception if hasattr(self, 'raised_exception') else None
         if exception:
             self.response.body = exception.message
             self.response.status = exception.status_code
             return
 
         # if you want to do response with some data instead of string just set self.response_data field
-        if self.response_data:
+        response_data = self.response_data if hasattr(self, 'response_data') else None
+        if response_data:
             self.response.body = json.dumps(self.response_data)
             return
 
@@ -144,3 +152,23 @@ class BaseResource(object):
         # format validation
         for validator in self.validators:
             validator(self, *args, **kwargs)
+
+
+
+class ResourceSetupMiddleware(object):
+
+    def process_request(self, req, resp):
+        pass
+
+    def process_resource(self, req, resp, resource):
+
+        if not resource:
+            return
+
+        resource._cleanup()
+
+        resource.request = req
+        resource.response = resp
+
+    def process_response(self, req, resp, resource):
+        pass

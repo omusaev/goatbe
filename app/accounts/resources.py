@@ -7,8 +7,8 @@ from voluptuous import Required, Optional, All
 
 from accounts import settings as account_settings
 from accounts.models import Account
-from common.exceptions import FacebookLoginException
-from common.resources.base import BaseResource
+from common.exceptions import FacebookLoginException, AccountNotFoundException
+from common.resources import BaseResource
 from db.helpers import db_session
 
 import settings as app_settings
@@ -30,10 +30,14 @@ class AuthBaseResource(BaseResource):
             }
         else:
             account = self._auth()
-            self.session[account_settings.ACCOUNT_ID_SESSION_KEY] = account.id
-            self.response_data = {
-                'user_access_token': account.attributes['user_access_token'],
-            }
+
+            if account:
+                self.session[account_settings.ACCOUNT_ID_SESSION_KEY] = account.id
+                self.response_data = {
+                    'user_access_token': account.attributes['user_access_token'],
+                }
+            else:
+                raise AccountNotFoundException
 
     def _auth(self):
         raise NotImplementedError
@@ -44,7 +48,7 @@ class AuthFacebook(AuthBaseResource):
     url = '/accounts/auth/facebook/'
 
     data_schema = {
-        Required('user_access_token'): All(str),
+        Required('user_access_token'): All(unicode),
     }
 
     def _auth(self):
@@ -90,7 +94,7 @@ class AuthAnonym(AuthBaseResource):
     url = '/accounts/auth/anonym/'
 
     data_schema = {
-        Optional('user_access_token'): All(str),
+        Optional('user_access_token'): All(unicode),
     }
 
     def _auth(self):

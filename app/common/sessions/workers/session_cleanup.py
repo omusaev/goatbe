@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from common.sessions.models import SessionManager
-from common.workers.base import BaseWorker
+from common.workers import BaseWorker
 
 import logging
 logger = logging.getLogger(__name__)
