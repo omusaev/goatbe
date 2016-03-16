@@ -51,10 +51,11 @@ class AuthFacebook(AuthBaseResource):
         user_access_token = self.get_param('user_access_token')
 
         try:
-            fb_auth = get_extended_access_token(access_token=user_access_token,
-                                                application_id=app_settings.FB_APP_ID,
-                                                application_secret_key=app_settings.FB_APP_SECRET
-                                                )
+            fb_auth = get_extended_access_token(
+                access_token=user_access_token,
+                application_id=app_settings.FB_APP_ID,
+                application_secret_key=app_settings.FB_APP_SECRET
+            )
             graph = GraphAPI(oauth_token=fb_auth[0])
             fb_account = graph.get(path='/me')
         except FacepyError as e:
@@ -67,8 +68,7 @@ class AuthFacebook(AuthBaseResource):
         fb_name = fb_account.get('name')
 
         with db_session() as db:
-            account = db.query(Account).filter_by(identifier=str(fb_id),
-                                                       auth_method=app_settings.AUTH_FB).first()
+            account = db.query(Account).filter_by(identifier=str(fb_id), auth_method=app_settings.AUTH_FB).first()
 
             if not account:
                 account = Account(

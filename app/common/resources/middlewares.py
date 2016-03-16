@@ -15,6 +15,8 @@ class ResourceSetupMiddleware(object):
         if not resource:
             return
 
+        resource._cleanup()
+
         resource.request = req
         resource.response = resp
 

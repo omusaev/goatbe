@@ -33,39 +33,19 @@ class BaseResource(object):
     # Order matters! For example, to validate that the user has some permissions we firstly have to validate the user.
     validators = []
 
-    request = None
-    response = None
-
-    def __getattr__(self, name):
-        if hasattr(super(BaseResource, self), name):
-            return getattr(super(BaseResource, self), name)
-
-        if self.request:
-            return self.request.context.get(name)
-
-    def __setattr__(self, name, value):
-        # black science
-        if name in dir(self):
-            return object.__setattr__(self, name, value)
-
-        if self.request:
-            self.request.context.update({name: value})
+    def __getattr__(self, item):
+        # ok, field wasn't set. Just return None instead of exception raising
+        return None
 
     @property
     def url(self):
         return self.url
 
-    def set_params(self, data):
-        if self.request:
-            self.request.context.update({'params': data})
+    def _cleanup(self):
+        self.__dict__ = {}
 
-    def get_param(self, name):
-        if self.request:
-            return self.request.context.get('params', {}).get(name)
-
-    def get_params(self):
-        if self.request:
-            return self.request.context.get('params', {})
+    def get_param(self, name, default=None):
+        return self.params.get(name, default) if hasattr(self, 'params') else default
 
     def handle_request(self, req, resp, *args, **kwargs):
         """
@@ -113,7 +93,7 @@ class BaseResource(object):
         :param kwargs:
         :return:
         """
-        self.set_params(self.request.params)
+        self.params = self.request.params
 
     def prepare_response(self, *args, **kwargs):
         """
@@ -143,7 +123,7 @@ class BaseResource(object):
         :return:
         """
         if self.data_schema:
-            params = self.get_params()
+            params = self.params
             schema_validator = Schema(self.data_schema)
 
             try:
@@ -158,7 +138,7 @@ class BaseResource(object):
                     raise InvalidParameterFormatException(parameter_name, error.message)
 
             # Rewrite the data because it may be changed by schema validator (converted to appropriate type for example)
-            self.set_params(params)
+            self.params = params
 
         # Now we can validate high level conditions like entity existing or something else that is more complex than
         # format validation
