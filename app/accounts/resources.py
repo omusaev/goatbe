@@ -8,11 +8,10 @@ from voluptuous import Required, Optional, All
 from accounts import settings as account_settings
 from accounts.models import Account
 from common.exceptions import FacebookLoginException, AccountNotFoundException
-from common.resources import BaseResource
+from common.resources.base import BaseResource
 from db.helpers import db_session
 
 import settings as app_settings
-
 
 __all__ = (
     'AuthFacebook',

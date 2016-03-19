@@ -26,7 +26,7 @@ DB_CONNECTION_URL = '%(DIALECT)s+%(DRIVER)s://%(USERNAME)s:%(PASSWORD)s@%(HOST)s
 ALEMBIC_CONFIG_PATH = '%s/db/migrations/alembic.ini' % PROJECT_ROOT
 
 MIDDLEWARES = [
-    'common.resources.ResourceSetupMiddleware',
+    'common.resources.middlewares.ResourceSetupMiddleware',
     'common.sessions.middlewares.SessionMiddleware',
     'accounts.middlewares.AccountMiddleware'
 ]

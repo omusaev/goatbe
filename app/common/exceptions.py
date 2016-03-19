@@ -14,18 +14,20 @@ __all__ = (
 
 class GoatBaseException(Exception):
 
-    status_code = status_codes.HTTP_409
+    status_code = status_codes.HTTP_200
+    error_code = 'INTERNAL_ERROR'
     message = ''
 
 
 class UnsupportedResourceMethodException(GoatBaseException):
 
-    status_code = status_codes.HTTP_405
+    error_code = 'METHOD_IS_NOT_ALLOWED'
     message = 'The request method is not allowed for this resource'
 
 
 class MissingParameterException(GoatBaseException):
 
+    error_code = 'MISSING_PARAMETER'
     message_template = 'Missing parameter: %s'
 
     def __init__(self, param_name):
@@ -38,6 +40,7 @@ class MissingParameterException(GoatBaseException):
 
 class InvalidParameterFormatException(GoatBaseException):
 
+    error_code = 'INVALID_PARAMETER'
     message_template = 'Invalid parameter format: %s: %s'
 
     def __init__(self, param_name, error_msg):
@@ -51,10 +54,13 @@ class InvalidParameterFormatException(GoatBaseException):
 
 class FacebookLoginException(GoatBaseException):
 
+    error_code = 'FACEBOOK_LOGIN_FAILED'
+
     def __init__(self, message):
         self.message = message
 
 
 class AccountNotFoundException(GoatBaseException):
 
+    error_code = 'ACCOUNT_NOT_FOUND'
     message = 'Account not found'

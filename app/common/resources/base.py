@@ -16,7 +16,6 @@ from common.exceptions import (
 
 __all__ = (
     'BaseResource',
-    'ResourceSetupMiddleware',
 )
 
 
@@ -110,17 +109,28 @@ class BaseResource(object):
         :param kwargs:
         :return:
         """
-        exception = self.raised_exception if hasattr(self, 'raised_exception') else None
-        if exception:
-            self.response.body = exception.message
-            self.response.status = exception.status_code
-            return
+        response_body = {
+            'status': 'ok',
+            'data': {},
+        }
 
-        # if you want to do response with some data instead of string just set self.response_data field
-        response_data = self.response_data if hasattr(self, 'response_data') else None
-        if response_data:
-            self.response.body = json.dumps(self.response_data)
-            return
+        exception = self.raised_exception if hasattr(self, 'raised_exception') else None
+
+        if exception:
+            response_body.update({
+                'status': 'error',
+                'error_code': exception.error_code,
+                'error_message': exception.message,
+            })
+            self.response.status = exception.status_code
+        else:
+            # if you want to do response with some data instead of string just set self.response_data field
+            response_data = self.response_data if hasattr(self, 'response_data') else {}
+            response_body.update({
+                'data': response_data,
+            })
+
+        self.response.body = json.dumps(response_body)
 
     def validate_request(self, *args, **kwargs):
         """
@@ -152,23 +162,3 @@ class BaseResource(object):
         # format validation
         for validator in self.validators:
             validator(self, *args, **kwargs)
-
-
-
-class ResourceSetupMiddleware(object):
-
-    def process_request(self, req, resp):
-        pass
-
-    def process_resource(self, req, resp, resource):
-
-        if not resource:
-            return
-
-        resource._cleanup()
-
-        resource.request = req
-        resource.response = resp
-
-    def process_response(self, req, resp, resource):
-        pass
