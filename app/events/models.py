@@ -2,7 +2,7 @@
 
 import datetime
 
-from sqlalchemy import Column, BigInteger, String, DateTime, Enum, Text, ForeignKey, Boolean
+from sqlalchemy import Column, BigInteger, String, DateTime, Text, ForeignKey, Boolean
 from sqlalchemy.dialects.postgresql import JSON
 from sqlalchemy.sql.schema import UniqueConstraint
 
@@ -38,7 +38,7 @@ class Event(Base):
     id = Column(BigInteger, primary_key=True, nullable=False)
     title = Column(String(255), nullable=False, default='')
     description = Column(Text(), nullable=False, default='')
-    status = Column(Enum(*STATUS.ALL, name='event_status'), nullable=False, default=STATUS.PREPARATION)
+    status = Column(String(255), nullable=False, default=STATUS.PREPARATION)
     created_at = Column(DateTime, default=datetime.datetime.now)
     updated_at = Column(DateTime, onupdate=datetime.datetime.now)
     start_date = Column(DateTime, nullable=False)
@@ -64,7 +64,7 @@ class Step(Base):
     id = Column(BigInteger, primary_key=True, nullable=False)
     title = Column(String(255), nullable=False, default='')
     description = Column(Text(), nullable=False, default='')
-    type = Column(Enum(*Type.ALL, name='step_type'), nullable=False, default=Type.COMMON)
+    type = Column(String(255), nullable=False, default=Type.COMMON)
     created_at = Column(DateTime, default=datetime.datetime.now)
     updated_at = Column(DateTime, onupdate=datetime.datetime.now)
     event_id = Column(
@@ -115,7 +115,7 @@ class Participant(Base):
     )
     created_at = Column(DateTime, default=datetime.datetime.now)
     updated_at = Column(DateTime, onupdate=datetime.datetime.now)
-    status = Column(Enum(*STATUS.ALL, name='participant_status'), nullable=False, default=STATUS.ACTIVE)
+    status = Column(String(255), nullable=False, default=STATUS.ACTIVE)
     permissions = Column(JSON)
     is_owner = Column(Boolean, nullable=False, default=False)
 
@@ -159,6 +159,6 @@ class Assignee(Base):
     )
     created_at = Column(DateTime, default=datetime.datetime.now)
     updated_at = Column(DateTime, onupdate=datetime.datetime.now)
-    resolution = Column(Enum(*RESOLUTION.ALL, name='assignee_resolution'), nullable=False, default=RESOLUTION.OPEN)
+    resolution = Column(String(255), nullable=False, default=RESOLUTION.OPEN)
 
     UniqueConstraint('account_id', 'step_id', name='account_id_step_id')
