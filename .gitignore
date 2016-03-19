@@ -1,5 +1,6 @@
 .idea/*
 /app/.idea/*
+/app/logs/*
 *.py[cod]
 *.directory
 *local.*

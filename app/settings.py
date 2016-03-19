@@ -3,6 +3,7 @@
 import os
 
 PROJECT_ROOT = os.path.dirname(os.path.realpath(__file__))
+LOG_PATH = '%s/logs/' % PROJECT_ROOT
 
 SITE_HOST = '162.243.219.249'
 SITE_PATH = '/'
@@ -54,3 +55,113 @@ try:
     from settings_local import *
 except ImportError:
     pass
+
+
+import logging
+
+class LevelFilter(logging.Filter):
+
+    def __init__(self, level):
+        self.level = level
+
+    def filter(self, record):
+        return record.levelno == self.level
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'simple': {
+            'format': '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+        }
+    },
+
+    'filters': {
+        'CriticalLevelFilter': {
+            '()' : LevelFilter,
+            'level' : logging.CRITICAL,
+        },
+        'ErrorLevelFilter': {
+            '()' : LevelFilter,
+            'level' : logging.ERROR,
+        },
+        'WarningLevelFilter': {
+            '()' : LevelFilter,
+            'level' : logging.WARNING,
+        },
+        'InfoLevelFilter': {
+            '()' : LevelFilter,
+            'level' : logging.INFO,
+        },
+        'DebugLevelFilter': {
+            '()' : LevelFilter,
+            'level' : logging.DEBUG,
+        },
+      },
+
+    'handlers': {
+        'critical_file_handler': {
+            'class': 'logging.handlers.RotatingFileHandler',
+            'level': logging.CRITICAL,
+            'formatter': 'simple',
+            'filename': '%serror.log' % LOG_PATH,
+            'maxBytes': 10485760,
+            'backupCount': 3,
+            'encoding': 'utf8',
+            'filters': ['CriticalLevelFilter']
+        },
+
+        'error_file_handler': {
+            'class': 'logging.handlers.RotatingFileHandler',
+            'level': logging.ERROR,
+            'formatter': 'simple',
+            'filename': '%serror.log' % LOG_PATH,
+            'maxBytes': 10485760,
+            'backupCount': 3,
+            'encoding': 'utf8',
+            'filters': ['ErrorLevelFilter']
+        },
+
+        'warning_file_handler': {
+            'class': 'logging.handlers.RotatingFileHandler',
+            'level': logging.WARNING,
+            'formatter': 'simple',
+            'filename': '%serror.log' % LOG_PATH,
+            'maxBytes': 10485760,
+            'backupCount': 3,
+            'encoding': 'utf8',
+            'filters': ['WarningLevelFilter']
+        },
+
+        'info_file_handler': {
+            'class': 'logging.handlers.RotatingFileHandler',
+            'level': logging.INFO,
+            'formatter': 'simple',
+            'filename': '%sinfo.log' % LOG_PATH,
+            'maxBytes': 10485760,
+            'backupCount': 3,
+            'encoding': 'utf8',
+            'filters': ['InfoLevelFilter']
+        },
+
+        'debug_file_handler': {
+            'class': 'logging.handlers.RotatingFileHandler',
+            'level': logging.DEBUG,
+            'formatter': 'simple',
+            'filename': '%sdebug.log' % LOG_PATH,
+            'maxBytes': 10485760,
+            'backupCount': 3,
+            'encoding': 'utf8',
+            'filters': ['DebugLevelFilter']
+        }
+    },
+
+    'root': {
+        'level': logging.DEBUG if DEBUG else logging.WARNING ,
+        'handlers': ['info_file_handler', 'error_file_handler', 'warning_file_handler', 'debug_file_handler'],
+    }
+}
+
+
+import logging.config
+logging.config.dictConfig(LOGGING)
