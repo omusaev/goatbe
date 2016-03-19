@@ -8,6 +8,7 @@ from sqlalchemy.sql.schema import UniqueConstraint
 
 from accounts.models import Account
 from db.base import Base
+from db.mixins import GoatModelMixin
 
 
 __all__ = (
@@ -18,7 +19,7 @@ __all__ = (
 )
 
 
-class Event(Base):
+class Event(Base, GoatModelMixin):
 
     __tablename__ = 'event'
 
@@ -39,14 +40,12 @@ class Event(Base):
     title = Column(String(255), nullable=False, default='')
     description = Column(Text(), nullable=False, default='')
     status = Column(String(255), nullable=False, default=STATUS.PREPARATION)
-    created_at = Column(DateTime, default=datetime.datetime.now)
-    updated_at = Column(DateTime, onupdate=datetime.datetime.now)
     start_date = Column(DateTime, nullable=False)
     finish_date = Column(DateTime, nullable=False)
     attributes = Column(JSON)
 
 
-class Step(Base):
+class Step(Base, GoatModelMixin):
 
     __tablename__ = 'step'
 
@@ -65,8 +64,6 @@ class Step(Base):
     title = Column(String(255), nullable=False, default='')
     description = Column(Text(), nullable=False, default='')
     type = Column(String(255), nullable=False, default=Type.COMMON)
-    created_at = Column(DateTime, default=datetime.datetime.now)
-    updated_at = Column(DateTime, onupdate=datetime.datetime.now)
     event_id = Column(
         BigInteger,
         ForeignKey(
@@ -80,7 +77,7 @@ class Step(Base):
     attributes = Column(JSON)
 
 
-class Participant(Base):
+class Participant(Base, GoatModelMixin):
 
     __tablename__ = 'participant'
 
@@ -113,8 +110,6 @@ class Participant(Base):
         ),
         nullable=False
     )
-    created_at = Column(DateTime, default=datetime.datetime.now)
-    updated_at = Column(DateTime, onupdate=datetime.datetime.now)
     status = Column(String(255), nullable=False, default=STATUS.ACTIVE)
     permissions = Column(JSON)
     is_owner = Column(Boolean, nullable=False, default=False)
@@ -122,7 +117,7 @@ class Participant(Base):
     UniqueConstraint('account_id', 'event_id', name='account_id_event_id')
 
 
-class Assignee(Base):
+class Assignee(Base, GoatModelMixin):
 
     __tablename__ = 'assignee'
 
@@ -157,8 +152,6 @@ class Assignee(Base):
         ),
         nullable=False
     )
-    created_at = Column(DateTime, default=datetime.datetime.now)
-    updated_at = Column(DateTime, onupdate=datetime.datetime.now)
     resolution = Column(String(255), nullable=False, default=RESOLUTION.OPEN)
 
     UniqueConstraint('account_id', 'step_id', name='account_id_step_id')

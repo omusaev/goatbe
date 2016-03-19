@@ -1,12 +1,11 @@
 # -*- coding: utf-8 -*-
 
-import datetime
-
-from sqlalchemy import Column, BigInteger, String, DateTime
+from sqlalchemy import Column, BigInteger, String
 from sqlalchemy.dialects.postgresql import JSON
 from sqlalchemy.sql.schema import UniqueConstraint
 
 from db.base import Base
+from db.mixins import GoatModelMixin
 
 
 __all__ = (
@@ -14,7 +13,7 @@ __all__ = (
 )
 
 
-class Account(Base):
+class Account(Base, GoatModelMixin):
 
     __tablename__ = 'account'
 
@@ -40,8 +39,6 @@ class Account(Base):
     name = Column(String(255), nullable=False, default='')
     status = Column(String(255), nullable=False, default=STATUS.ACTIVE)
     avatar_url = Column(String(255), nullable=False, default='')
-    created_at = Column(DateTime, default=datetime.datetime.now)
-    updated_at = Column(DateTime, onupdate=datetime.datetime.now)
     auth_method = Column(String(255), nullable=False)
     identifier = Column(String(255), nullable=False)
     attributes = Column(JSON)
