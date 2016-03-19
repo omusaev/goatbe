@@ -25,5 +25,6 @@ def get_base_for_migrations():
     # we have to import all models here to use auto generation of migrations feature
     from common.sessions.models import Session
     from accounts.models import Account
+    from events.models import Event, Step, Participant, Assignee
 
     return Base
