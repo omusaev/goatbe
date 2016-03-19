@@ -36,9 +36,9 @@ class Account(Base, GoatModelMixin):
         )
 
     id = Column(BigInteger, primary_key=True, nullable=False)
-    name = Column(String(255), nullable=False, default='')
-    status = Column(String(255), nullable=False, default=STATUS.ACTIVE)
-    avatar_url = Column(String(255), nullable=False, default='')
+    name = Column(String(255), nullable=False, default='', server_default='')
+    status = Column(String(255), nullable=False, default=STATUS.ACTIVE, server_default=STATUS.ACTIVE)
+    avatar_url = Column(String(255), nullable=False, default='', server_default='')
     auth_method = Column(String(255), nullable=False)
     identifier = Column(String(255), nullable=False)
     attributes = Column(JSON)

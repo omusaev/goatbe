@@ -1,10 +1,8 @@
 # -*- coding: utf-8 -*-
 
-import datetime
-
+import sqlalchemy as sa
 from sqlalchemy import Column, BigInteger, String, DateTime, Text, ForeignKey, Boolean
 from sqlalchemy.dialects.postgresql import JSON
-from sqlalchemy.sql.schema import UniqueConstraint
 
 from accounts.models import Account
 from db.base import Base
@@ -37,9 +35,9 @@ class Event(Base, GoatModelMixin):
         )
 
     id = Column(BigInteger, primary_key=True, nullable=False)
-    title = Column(String(255), nullable=False, default='')
-    description = Column(Text(), nullable=False, default='')
-    status = Column(String(255), nullable=False, default=STATUS.PREPARATION)
+    title = Column(String(255), nullable=False, default='', server_default='')
+    description = Column(Text(), nullable=False, default='', server_default='')
+    status = Column(String(255), nullable=False, default=STATUS.PREPARATION, server_default=STATUS.PREPARATION)
     start_date = Column(DateTime, nullable=False)
     finish_date = Column(DateTime, nullable=False)
     attributes = Column(JSON)
@@ -61,9 +59,9 @@ class Step(Base, GoatModelMixin):
         )
 
     id = Column(BigInteger, primary_key=True, nullable=False)
-    title = Column(String(255), nullable=False, default='')
-    description = Column(Text(), nullable=False, default='')
-    type = Column(String(255), nullable=False, default=Type.COMMON)
+    title = Column(String(255), nullable=False, default='', server_default='')
+    description = Column(Text(), nullable=False, default='', server_default='')
+    type = Column(String(255), nullable=False, default=Type.COMMON, server_default=Type.COMMON)
     event_id = Column(
         BigInteger,
         ForeignKey(
@@ -98,6 +96,7 @@ class Participant(Base, GoatModelMixin):
             name='participant_account_id',
             ondelete='CASCADE'
         ),
+        primary_key=True,
         nullable=False
     )
     event_id = Column(
@@ -108,13 +107,12 @@ class Participant(Base, GoatModelMixin):
             name='participant_event_id',
             ondelete='CASCADE'
         ),
+        primary_key=True,
         nullable=False
     )
-    status = Column(String(255), nullable=False, default=STATUS.ACTIVE)
+    status = Column(String(255), nullable=False, default=STATUS.ACTIVE, server_default=STATUS.ACTIVE)
     permissions = Column(JSON)
-    is_owner = Column(Boolean, nullable=False, default=False)
-
-    UniqueConstraint('account_id', 'event_id', name='account_id_event_id')
+    is_owner = Column(Boolean, nullable=False, default=False, server_default=sa.sql.expression.false())
 
 
 class Assignee(Base, GoatModelMixin):
@@ -140,6 +138,7 @@ class Assignee(Base, GoatModelMixin):
             name='assignee_account_id',
             ondelete='CASCADE'
         ),
+        primary_key=True,
         nullable=False
     )
     step_id = Column(
@@ -150,8 +149,7 @@ class Assignee(Base, GoatModelMixin):
             name='assignee_step_id',
             ondelete='CASCADE'
         ),
+        primary_key=True,
         nullable=False
     )
-    resolution = Column(String(255), nullable=False, default=RESOLUTION.OPEN)
-
-    UniqueConstraint('account_id', 'step_id', name='account_id_step_id')
+    resolution = Column(String(255), nullable=False, default=RESOLUTION.OPEN, server_default=RESOLUTION.OPEN)
