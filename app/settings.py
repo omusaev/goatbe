@@ -46,10 +46,6 @@ WORKERS = {
 FB_APP_ID = '1000652553335107'
 FB_APP_SECRET = 'f7b5a32a886d31b3cfd6d22d55e75d4c'
 
-AUTH_FB = 'FB'
-AUTH_ANONYM = 'ANONYM'
-AUTH_METHODS = (AUTH_FB, AUTH_ANONYM)
-
 try:
     from settings_local import *
 except ImportError:

@@ -72,13 +72,13 @@ class AuthFacebook(AuthBaseResource):
         fb_name = fb_account.get('name')
 
         with db_session() as db:
-            account = db.query(Account).filter_by(identifier=str(fb_id), auth_method=app_settings.AUTH_FB).first()
+            account = db.query(Account).filter_by(identifier=str(fb_id), auth_method=Account.AUTH_METHOD.FB).first()
 
             if not account:
                 account = Account(
                     name=fb_name,
                     identifier=str(fb_id),
-                    auth_method=app_settings.AUTH_FB,
+                    auth_method=Account.AUTH_METHOD.FB,
                     attributes=fb_account
                 )
 
@@ -103,13 +103,13 @@ class AuthAnonym(AuthBaseResource):
         with db_session() as db:
             if user_access_token:
                 account = db.query(Account).filter_by(identifier=user_access_token,
-                                                      auth_method=app_settings.AUTH_ANONYM).first()
+                                                      auth_method=Account.AUTH_METHOD.ANONYM).first()
             else:  # new user, let's register him
                 user_access_token = uuid.uuid4().hex
                 account = Account(
                     name=user_access_token,
                     identifier=user_access_token,
-                    auth_method=app_settings.AUTH_ANONYM,
+                    auth_method=Account.AUTH_METHOD.ANONYM,
                     attributes={'user_access_token': user_access_token}
                 )
                 account = db.merge(account)

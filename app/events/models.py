@@ -1,0 +1,164 @@
+# -*- coding: utf-8 -*-
+
+import datetime
+
+from sqlalchemy import Column, BigInteger, String, DateTime, Enum, Text, ForeignKey, Boolean
+from sqlalchemy.dialects.postgresql import JSON
+from sqlalchemy.sql.schema import UniqueConstraint
+
+from accounts.models import Account
+from db.base import Base
+
+
+__all__ = (
+    'Event',
+    'Step',
+    'Participant',
+    'Assignee',
+)
+
+
+class Event(Base):
+
+    __tablename__ = 'event'
+
+    class STATUS:
+        PREPARATION = 'PREPARATION'
+        READY = 'READY'
+        IN_PROGRESS = 'IN_PROGRESS'
+        FINISHED = 'FINISHED'
+
+        ALL = (
+            PREPARATION,
+            READY,
+            IN_PROGRESS,
+            FINISHED,
+        )
+
+    id = Column(BigInteger, primary_key=True, nullable=False)
+    title = Column(String(255), nullable=False, default='')
+    description = Column(Text(), nullable=False, default='')
+    status = Column(Enum(*STATUS.ALL, name='event_status'), nullable=False, default=STATUS.PREPARATION)
+    created_at = Column(DateTime, default=datetime.datetime.now)
+    updated_at = Column(DateTime, onupdate=datetime.datetime.now)
+    start_date = Column(DateTime, nullable=False)
+    finish_date = Column(DateTime, nullable=False)
+    attributes = Column(JSON)
+
+
+class Step(Base):
+
+    __tablename__ = 'step'
+
+    class Type:
+        COMMON = 'COMMON'
+        BACKPACK = 'BACKPACK'
+        CUSTOM = 'CUSTOM'
+
+        ALL = (
+            COMMON,
+            BACKPACK,
+            CUSTOM,
+        )
+
+    id = Column(BigInteger, primary_key=True, nullable=False)
+    title = Column(String(255), nullable=False, default='')
+    description = Column(Text(), nullable=False, default='')
+    type = Column(Enum(*Type.ALL, name='step_type'), nullable=False, default=Type.COMMON)
+    created_at = Column(DateTime, default=datetime.datetime.now)
+    updated_at = Column(DateTime, onupdate=datetime.datetime.now)
+    event_id = Column(
+        BigInteger,
+        ForeignKey(
+            Event.id,
+            use_alter=True,
+            name='step_event_id',
+            ondelete='CASCADE'
+        ),
+        nullable=False
+    )
+    attributes = Column(JSON)
+
+
+class Participant(Base):
+
+    __tablename__ = 'participant'
+
+    class STATUS:
+        ACTIVE = 'ACTIVE'
+        INACTIVE = 'INACTIVE'
+
+        ALL = (
+            ACTIVE,
+            INACTIVE,
+        )
+
+    account_id = Column(
+        BigInteger,
+        ForeignKey(
+            Account.id,
+            use_alter=True,
+            name='participant_account_id',
+            ondelete='CASCADE'
+        ),
+        nullable=False
+    )
+    event_id = Column(
+        BigInteger,
+        ForeignKey(
+            Event.id,
+            use_alter=True,
+            name='participant_event_id',
+            ondelete='CASCADE'
+        ),
+        nullable=False
+    )
+    created_at = Column(DateTime, default=datetime.datetime.now)
+    updated_at = Column(DateTime, onupdate=datetime.datetime.now)
+    status = Column(Enum(*STATUS.ALL, name='participant_status'), nullable=False, default=STATUS.ACTIVE)
+    permissions = Column(JSON)
+    is_owner = Column(Boolean, nullable=False, default=False)
+
+    UniqueConstraint('account_id', 'event_id', name='account_id_event_id')
+
+
+class Assignee(Base):
+
+    __tablename__ = 'assignee'
+
+    class RESOLUTION:
+        OPEN = 'OPEN'
+        RESOLVED = 'RESOLVED'
+        SKIPPED = 'SKIPPED'
+
+        ALL = (
+            OPEN,
+            RESOLVED,
+            SKIPPED,
+        )
+
+    account_id = Column(
+        BigInteger,
+        ForeignKey(
+            Account.id,
+            use_alter=True,
+            name='assignee_account_id',
+            ondelete='CASCADE'
+        ),
+        nullable=False
+    )
+    step_id = Column(
+        BigInteger,
+        ForeignKey(
+            Step.id,
+            use_alter=True,
+            name='assignee_step_id',
+            ondelete='CASCADE'
+        ),
+        nullable=False
+    )
+    created_at = Column(DateTime, default=datetime.datetime.now)
+    updated_at = Column(DateTime, onupdate=datetime.datetime.now)
+    resolution = Column(Enum(*RESOLUTION.ALL, name='assignee_resolution'), nullable=False, default=RESOLUTION.OPEN)
+
+    UniqueConstraint('account_id', 'step_id', name='account_id_step_id')
