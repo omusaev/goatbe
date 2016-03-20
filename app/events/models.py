@@ -6,7 +6,7 @@ from sqlalchemy.dialects.postgresql import JSON
 
 from accounts.models import Account
 from db.base import Base
-from db.mixins import GoatModelMixin
+from db.mixins import GoatModelMixin, GoatBasicModelMixin
 
 
 __all__ = (
@@ -17,7 +17,7 @@ __all__ = (
 )
 
 
-class Event(Base, GoatModelMixin):
+class Event(Base, GoatBasicModelMixin):
 
     __tablename__ = 'event'
 
@@ -34,16 +34,15 @@ class Event(Base, GoatModelMixin):
             FINISHED,
         )
 
-    id = Column(BigInteger, primary_key=True, nullable=False)
     title = Column(String(255), nullable=False, default='', server_default='')
+    destination = Column(String(255), nullable=False, default='', server_default='')
     description = Column(Text(), nullable=False, default='', server_default='')
     status = Column(String(255), nullable=False, default=STATUS.PREPARATION, server_default=STATUS.PREPARATION)
     start_date = Column(DateTime, nullable=False)
     finish_date = Column(DateTime, nullable=False)
-    attributes = Column(JSON)
 
 
-class Step(Base, GoatModelMixin):
+class Step(Base, GoatBasicModelMixin):
 
     __tablename__ = 'step'
 
@@ -58,7 +57,6 @@ class Step(Base, GoatModelMixin):
             CUSTOM,
         )
 
-    id = Column(BigInteger, primary_key=True, nullable=False)
     title = Column(String(255), nullable=False, default='', server_default='')
     description = Column(Text(), nullable=False, default='', server_default='')
     type = Column(String(255), nullable=False, default=Type.COMMON, server_default=Type.COMMON)
@@ -72,7 +70,6 @@ class Step(Base, GoatModelMixin):
         ),
         nullable=False
     )
-    attributes = Column(JSON)
 
 
 class Participant(Base, GoatModelMixin):

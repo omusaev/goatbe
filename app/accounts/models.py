@@ -5,7 +5,7 @@ from sqlalchemy.dialects.postgresql import JSON
 from sqlalchemy.sql.schema import UniqueConstraint
 
 from db.base import Base
-from db.mixins import GoatModelMixin
+from db.mixins import GoatBasicModelMixin
 
 
 __all__ = (
@@ -13,7 +13,7 @@ __all__ = (
 )
 
 
-class Account(Base, GoatModelMixin):
+class Account(Base, GoatBasicModelMixin):
 
     __tablename__ = 'account'
 
@@ -35,12 +35,10 @@ class Account(Base, GoatModelMixin):
             ANONYM,
         )
 
-    id = Column(BigInteger, primary_key=True, nullable=False)
     name = Column(String(255), nullable=False, default='', server_default='')
     status = Column(String(255), nullable=False, default=STATUS.ACTIVE, server_default=STATUS.ACTIVE)
     avatar_url = Column(String(255), nullable=False, default='', server_default='')
     auth_method = Column(String(255), nullable=False)
     identifier = Column(String(255), nullable=False)
-    attributes = Column(JSON)
 
     UniqueConstraint('auth_method', 'identifier', name='auth_method_identifier')

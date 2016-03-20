@@ -25,6 +25,7 @@ def upgrade():
     sa.Column('type', sa.String(length=255), server_default='COMMON', nullable=False),
     sa.Column('event_id', sa.BigInteger(), nullable=False),
     sa.Column('attributes', postgresql.JSON(), nullable=True),
+    sa.Column('is_deleted', sa.Boolean(), server_default=sa.text(u'false'), nullable=False),
     sa.ForeignKeyConstraint(['event_id'], [u'event.id'], name='step_event_id', ondelete='CASCADE', use_alter=True),
     sa.PrimaryKeyConstraint('id')
     )

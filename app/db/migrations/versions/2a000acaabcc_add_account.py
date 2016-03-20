@@ -26,6 +26,7 @@ def upgrade():
     sa.Column('auth_method', sa.String(length=255), nullable=False),
     sa.Column('identifier', sa.String(length=255), nullable=False),
     sa.Column('attributes', postgresql.JSON(), nullable=True),
+    sa.Column('is_deleted', sa.Boolean(), server_default=sa.text(u'false'), nullable=False),
     sa.PrimaryKeyConstraint('id')
     )
     ### end Alembic commands ###

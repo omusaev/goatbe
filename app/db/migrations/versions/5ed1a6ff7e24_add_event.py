@@ -22,10 +22,12 @@ def upgrade():
     sa.Column('id', sa.BigInteger(), nullable=False),
     sa.Column('title', sa.String(length=255), server_default='', nullable=False),
     sa.Column('description', sa.Text(), server_default='', nullable=False),
+    sa.Column('destination', sa.String(length=255), server_default='', nullable=False),
     sa.Column('status', sa.String(length=255), server_default='PREPARATION', nullable=False),
     sa.Column('start_date', sa.DateTime(), nullable=False),
     sa.Column('finish_date', sa.DateTime(), nullable=False),
     sa.Column('attributes', postgresql.JSON(), nullable=True),
+    sa.Column('is_deleted', sa.Boolean(), server_default=sa.text(u'false'), nullable=False),
     sa.PrimaryKeyConstraint('id')
     )
     ### end Alembic commands ###
