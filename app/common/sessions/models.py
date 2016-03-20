@@ -7,6 +7,7 @@ from sqlalchemy import Column, String, DateTime, PickleType
 
 from db.base import Base
 from db.helpers import db_session
+from db.mixins import GoatModelMixin
 
 import settings as app_settings
 
@@ -16,20 +17,17 @@ __all__ = (
 )
 
 
-class Session(Base):
+class Session(Base, GoatModelMixin):
 
     __tablename__ = 'session'
 
     id = Column(String(32), primary_key=True)
     data = Column(PickleType, default={})
-
-    expire_at = Column(DateTime,
-                       default=datetime.datetime.now() + datetime.timedelta(seconds=app_settings.SESSION_TTL),
-                       onupdate=datetime.datetime.now() + datetime.timedelta(seconds=app_settings.SESSION_TTL)
-                       )
-
-    created_at = Column(DateTime, default=datetime.datetime.now)
-    updated_at = Column(DateTime, onupdate=datetime.datetime.now)
+    expire_at = Column(
+        DateTime,
+        default=datetime.datetime.now() + datetime.timedelta(seconds=app_settings.SESSION_TTL),
+        onupdate=datetime.datetime.now() + datetime.timedelta(seconds=app_settings.SESSION_TTL)
+    )
 
     def __contains__(self, key):
         return key in self.data

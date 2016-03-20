@@ -1,16 +1,11 @@
 # -*- coding: utf-8 -*-
 
-import datetime
-import logging
-
-from sqlalchemy import Column, BigInteger, String, DateTime, Enum
+from sqlalchemy import Column, BigInteger, String
 from sqlalchemy.dialects.postgresql import JSON
 from sqlalchemy.sql.schema import UniqueConstraint
 
 from db.base import Base
-import settings as app_settings
-
-logger = logging.getLogger(__name__)
+from db.mixins import GoatBasicModelMixin
 
 
 __all__ = (
@@ -18,29 +13,32 @@ __all__ = (
 )
 
 
-class Account(Base):
+class Account(Base, GoatBasicModelMixin):
 
     __tablename__ = 'account'
 
     class STATUS:
-        ACTIVE = 'active'
-        INACTIVE = 'inactive'
+        ACTIVE = 'ACTIVE'
+        INACTIVE = 'INACTIVE'
 
-        FIELDS = (
+        ALL = (
             ACTIVE,
             INACTIVE,
         )
 
-    id = Column(BigInteger, primary_key=True, nullable=False)
-    name = Column(String(255), nullable=False, default='')
-    status = Column(Enum(*STATUS.FIELDS, name='account_status'), nullable=False, default=STATUS.ACTIVE)
-    created_at = Column(DateTime, default=datetime.datetime.now)
-    updated_at = Column(DateTime, onupdate=datetime.datetime.now)
-    auth_method = Column(
-        Enum(*app_settings.AUTH_METHODS, name='account_auth_method'),
-        nullable=False,
-    )
-    identifier = Column(String(255), nullable=False)
-    attributes = Column(JSON)
+    class AUTH_METHOD:
+        FB = 'FB'
+        ANONYM = 'ANONYM'
 
-    UniqueConstraint('auth_method', 'identifier', name='auth_provider_user')
+        ALL = (
+            FB,
+            ANONYM,
+        )
+
+    name = Column(String(255), nullable=False, default='', server_default='')
+    status = Column(String(255), nullable=False, default=STATUS.ACTIVE, server_default=STATUS.ACTIVE)
+    avatar_url = Column(String(255), nullable=False, default='', server_default='')
+    auth_method = Column(String(255), nullable=False)
+    identifier = Column(String(255), nullable=False)
+
+    UniqueConstraint('auth_method', 'identifier', name='auth_method_identifier')
