@@ -16,7 +16,7 @@ __all__ = (
 
 class EventTypes(BaseResource):
 
-    url = '/event/types/'
+    url = '/events/types/'
 
     data_schema = {
         Required('lang'): All(unicode),
