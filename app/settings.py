@@ -36,7 +36,7 @@ INSTALLED_RESOURCES = [
     'accounts.resources.AuthFacebook',
     'accounts.resources.AuthAnonym',
 
-    'events.resources.EventTypes',
+    'events.resources.EventsTypes',
 ]
 
 SESSION_TTL = 60 * 60 * 24 * 14  # 2 weeks

@@ -10,11 +10,11 @@ from common.resources.base import BaseResource
 from events import EVENT_TYPES
 
 __all__ = (
-    'EventTypes',
+    'EventsTypes',
 )
 
 
-class EventTypes(BaseResource):
+class EventsTypes(BaseResource):
 
     url = '/events/types/'
 
