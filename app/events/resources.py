@@ -4,7 +4,8 @@ from voluptuous import (
     Required, All,
 )
 
-from common.exceptions import AuthenticationRequiredException
+from accounts.validators import AuthRequiredValidator
+
 from common.resources.base import BaseResource
 
 from events import EVENT_TYPES
@@ -22,10 +23,11 @@ class EventsTypes(BaseResource):
         Required('lang'): All(unicode),
     }
 
+    validators = [
+        AuthRequiredValidator(),
+    ]
+
     def get(self):
-        # TODO: create auth_required validator or decorator
-        if not self.account_info:
-            raise AuthenticationRequiredException
 
         lang = self.get_param('lang')
         response_data = {}
