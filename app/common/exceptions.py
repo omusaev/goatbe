@@ -9,6 +9,7 @@ __all__ = (
     'InvalidParameterFormatException',
     'FacebookLoginException',
     'AccountNotFoundException',
+    'AuthenticationRequiredException',
 )
 
 
@@ -64,3 +65,9 @@ class AccountNotFoundException(GoatBaseException):
 
     error_code = 'ACCOUNT_NOT_FOUND'
     message = 'Account not found'
+
+
+class AuthenticationRequiredException(GoatBaseException):
+
+    error_code = 'AUTH_REQUIRED'
+    message = 'Authentication required'

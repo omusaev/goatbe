@@ -35,6 +35,8 @@ INSTALLED_RESOURCES = [
     'api.resources.Ping',
     'accounts.resources.AuthFacebook',
     'accounts.resources.AuthAnonym',
+
+    'events.resources.EventsTypes',
 ]
 
 SESSION_TTL = 60 * 60 * 24 * 14  # 2 weeks
