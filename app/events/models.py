@@ -34,12 +34,22 @@ class Event(Base, GoatBasicModelMixin):
             FINISHED,
         )
 
+    class TYPE:
+        HIKING = 'HIKING'
+        JOURNEY = 'JOURNEY'
+
+        ALL = (
+            HIKING,
+            JOURNEY,
+        )
+
     title = Column(String(255), nullable=False, default='', server_default='')
     destination = Column(String(255), nullable=False, default='', server_default='')
     description = Column(Text(), nullable=False, default='', server_default='')
-    status = Column(String(255), nullable=False, default=STATUS.PREPARATION, server_default=STATUS.PREPARATION)
-    start_date = Column(DateTime, nullable=False)
-    finish_date = Column(DateTime, nullable=False)
+    status = Column(String(32), nullable=False, default=STATUS.PREPARATION, server_default=STATUS.PREPARATION)
+    type = Column(String(64), nullable=False)
+    start_at = Column(DateTime, nullable=False)
+    finish_at = Column(DateTime, nullable=False)
 
 
 class Step(Base, GoatBasicModelMixin):

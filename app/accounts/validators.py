@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from common.exceptions import AuthenticationRequiredException
-from common.resources.validators import BaseValidator
+from common.validators import BaseValidator
 
 __all__ = (
     'AuthRequiredValidator',

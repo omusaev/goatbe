@@ -1,14 +1,14 @@
 # -*- coding: utf-8 -*-
 
-from events.models import Step
+from events.models import Step, Event
 
 __all__ = (
-    'EVENT_TYPES',
+    'EVENT_TYPES_DESCRIPTION',
 )
 
 
-EVENT_TYPES = {
-    'hiking': {
+EVENT_TYPES_DESCRIPTION = {
+    Event.TYPE.HIKING: {
         'en_EN': {
             'title': u'Hiking',
             'description': u'',
@@ -202,7 +202,7 @@ EVENT_TYPES = {
             ]
         },
     },
-    'journey': {
+    Event.TYPE.JOURNEY: {
         'en_EN': {
             'title': u'Journey',
             'description': u'',
