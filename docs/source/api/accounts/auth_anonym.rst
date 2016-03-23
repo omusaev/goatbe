@@ -27,6 +27,7 @@ Parameter              Default  Type  Required  Description
 Possible errors:
 
 * INTERNAL_ERROR
+* ACCOUNT_NOT_FOUND
 
 Request example:
 

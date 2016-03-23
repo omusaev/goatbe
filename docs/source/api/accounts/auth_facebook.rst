@@ -1,7 +1,7 @@
 auth_facebook
 =============
 
-Аутентификация или создание аккаунта через facebook.
+Аутентификация или создание аккаунта через facebook (OAuth2).
 
 Если пользователя нет в приложении, он добавляется. Затем происходит аутентификация.
 
@@ -28,6 +28,7 @@ Possible errors:
 
 * FACEBOOK_LOGIN_FAILED
 * INTERNAL_ERROR
+* ACCOUNT_NOT_FOUND
 
 Request example:
 
