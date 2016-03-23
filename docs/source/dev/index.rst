@@ -14,3 +14,4 @@ Contents:
    commands.rst
    models.rst
    settings.rst
+   documentation.rst
