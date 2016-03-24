@@ -3,6 +3,7 @@
 import sqlalchemy as sa
 from sqlalchemy import Column, BigInteger, String, DateTime, Text, ForeignKey, Boolean
 from sqlalchemy.dialects.postgresql import JSON
+from sqlalchemy.orm import relationship, backref
 
 from accounts.models import Account
 from db.base import Base
@@ -51,6 +52,18 @@ class Event(Base, GoatBasicModelMixin):
     start_at = Column(DateTime, nullable=False)
     finish_at = Column(DateTime, nullable=False)
 
+    steps = relationship(
+        'Step',
+        backref=backref('event'),
+        cascade='all, delete-orphan',
+    )
+
+    participants = relationship(
+        'Participant',
+        backref=backref('event'),
+        cascade='all, delete-orphan',
+    )
+
 
 class Step(Base, GoatBasicModelMixin):
 
@@ -81,6 +94,12 @@ class Step(Base, GoatBasicModelMixin):
         nullable=False
     )
 
+    assignees = relationship(
+        'Assignee',
+        backref=backref('step'),
+        cascade='all, delete-orphan',
+    )
+
 
 class Participant(Base, GoatModelMixin):
 
@@ -106,6 +125,9 @@ class Participant(Base, GoatModelMixin):
         primary_key=True,
         nullable=False
     )
+
+    account = relationship('Account')
+
     event_id = Column(
         BigInteger,
         ForeignKey(
@@ -148,6 +170,9 @@ class Assignee(Base, GoatModelMixin):
         primary_key=True,
         nullable=False
     )
+
+    account = relationship('Account')
+
     step_id = Column(
         BigInteger,
         ForeignKey(

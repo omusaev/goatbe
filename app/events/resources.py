@@ -11,7 +11,7 @@ from common.resources.base import BaseResource
 from db.helpers import db_session
 
 from events import EVENT_TYPES_DESCRIPTION
-from events.models import Event
+from events.models import Event, Participant, Step, Assignee
 
 __all__ = (
     'EventsTypes',
@@ -53,6 +53,7 @@ class CreateEvent(BaseResource):
     url = '/events/create/'
 
     data_schema = {
+        Required('lang'): All(unicode),
         Required('title'): All(unicode, Length(min=1, max=255)),
         Optional('description'): All(unicode, Length(min=1, max=2000)),
         Optional('destination'): All(unicode, Length(min=1, max=255)),
@@ -67,6 +68,12 @@ class CreateEvent(BaseResource):
 
     def post(self):
 
+        # todo: add lang validator or get lang from account attrs
+        lang = self.get_param('lang')
+        event_type = self.get_param('type')
+
+        account = self.account_info.account
+
         with db_session() as db:
             event = Event(
                 title=self.get_param('title'),
@@ -74,10 +81,34 @@ class CreateEvent(BaseResource):
                 destination=self.get_param('destination'),
                 start_at=self.get_param('start_at'),
                 finish_at=self.get_param('finish_at'),
-                type=self.get_param('type'),
+                type=event_type,
             )
-            event = db.merge(event)
+            db.add(event)
+
+            predefined_steps = EVENT_TYPES_DESCRIPTION.get(event_type, {}).get(lang, {}).get('steps', [])
+
+            for predefined_step in predefined_steps:
+                step = Step(
+                    title=predefined_step.get('title'),
+                    description=predefined_step.get('description'),
+                    type=predefined_step.get('type'),
+                    event=event,
+                )
+                db.add(step)
+
+                assignee = Assignee(
+                    account=account,
+                    step=step,
+                )
+                db.add(assignee)
+
+            participant = Participant(
+                account=account,
+                event=event,
+                is_owner=True,
+            )
+            db.add(participant)
 
         self.response_data = {
-            'id': event.id,
+            'event_id': event.id,
         }
