@@ -35,6 +35,7 @@ INSTALLED_RESOURCES = [
     'api.resources.Ping',
     'accounts.resources.AuthFacebook',
     'accounts.resources.AuthAnonym',
+    'accounts.resources.Logout',
 
     'events.resources.EventsTypes',
     'events.resources.CreateEvent',

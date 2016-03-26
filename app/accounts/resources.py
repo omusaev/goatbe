@@ -7,6 +7,7 @@ from voluptuous import Required, Optional, All
 
 from accounts import settings as account_settings
 from accounts.models import Account
+from common.sessions.models import SessionManager
 from common.exceptions import FacebookLoginException, AccountNotFoundException
 from common.resources.base import BaseResource
 from db.helpers import db_session
@@ -16,6 +17,7 @@ import settings as app_settings
 __all__ = (
     'AuthFacebook',
     'AuthAnonym',
+    'Logout',
 )
 
 
@@ -114,3 +116,13 @@ class AuthAnonym(AuthBaseResource):
                 account = db.merge(account)
 
         return account
+
+
+class Logout(BaseResource):
+
+    url = '/v1/accounts/logout/'
+
+    def get(self, *args, **kwargs):
+        self.response_data = {}
+        SessionManager.delete_session(self.session)
+        self.session = None

@@ -3,7 +3,7 @@
 import datetime
 import uuid
 
-from sqlalchemy import Column, String, DateTime, PickleType
+from sqlalchemy import Column, String, DateTime, PickleType, inspect
 
 from db.base import Base
 from db.helpers import db_session
@@ -80,10 +80,13 @@ class SessionManager(object):
 
         session = SessionManager.get_session(session_id)
 
-        if not session:
-            session = SessionManager.create_session()
+        return session or SessionManager.create_session()
 
-        return session
+    @staticmethod
+    def is_session_exist(session):
+        insp = inspect(session)
+        is_exist = True if not insp.transient else False
+        return is_exist
 
     @staticmethod
     def save_session(session):
@@ -92,8 +95,9 @@ class SessionManager(object):
 
     @staticmethod
     def delete_session(session):
-        with db_session() as db:
-            db.delete(session)
+        if SessionManager.is_session_exist(session):
+            with db_session() as db:
+                db.delete(session)
 
     @staticmethod
     def clear_expired():
