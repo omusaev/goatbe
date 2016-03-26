@@ -59,6 +59,7 @@ except ImportError:
 
 import logging
 
+
 class LevelFilter(logging.Filter):
 
     def __init__(self, level):
@@ -78,26 +79,26 @@ LOGGING = {
 
     'filters': {
         'CriticalLevelFilter': {
-            '()' : LevelFilter,
-            'level' : logging.CRITICAL,
+            '()': LevelFilter,
+            'level': logging.CRITICAL,
         },
         'ErrorLevelFilter': {
-            '()' : LevelFilter,
-            'level' : logging.ERROR,
+            '()': LevelFilter,
+            'level': logging.ERROR,
         },
         'WarningLevelFilter': {
-            '()' : LevelFilter,
-            'level' : logging.WARNING,
+            '()': LevelFilter,
+            'level': logging.WARNING,
         },
         'InfoLevelFilter': {
-            '()' : LevelFilter,
-            'level' : logging.INFO,
+            '()': LevelFilter,
+            'level': logging.INFO,
         },
         'DebugLevelFilter': {
-            '()' : LevelFilter,
-            'level' : logging.DEBUG,
+            '()': LevelFilter,
+            'level': logging.DEBUG,
         },
-      },
+    },
 
     'handlers': {
         'critical_file_handler': {
@@ -157,7 +158,7 @@ LOGGING = {
     },
 
     'root': {
-        'level': logging.DEBUG if DEBUG else logging.WARNING ,
+        'level': logging.DEBUG if DEBUG else logging.WARNING,
         'handlers': ['info_file_handler', 'error_file_handler', 'warning_file_handler', 'debug_file_handler'],
     }
 }
