@@ -44,7 +44,7 @@ class AuthBaseResource(BaseResource):
 
 class AuthFacebook(AuthBaseResource):
 
-    url = '/accounts/auth/facebook/'
+    url = '/v1/accounts/auth/facebook/'
 
     data_schema = {
         Required('user_access_token'): All(unicode),
@@ -90,7 +90,7 @@ class AuthFacebook(AuthBaseResource):
 
 class AuthAnonym(AuthBaseResource):
 
-    url = '/accounts/auth/anonym/'
+    url = '/v1/accounts/auth/anonym/'
 
     data_schema = {
         Optional('user_access_token'): All(unicode),

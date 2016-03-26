@@ -21,7 +21,7 @@ __all__ = (
 
 class EventsTypes(BaseResource):
 
-    url = '/events/types/'
+    url = '/v1/events/types/'
 
     data_schema = {
         Required('lang'): All(unicode),
@@ -50,7 +50,7 @@ class EventsTypes(BaseResource):
 
 class CreateEvent(BaseResource):
 
-    url = '/events/create/'
+    url = '/v1/events/create/'
 
     data_schema = {
         Required('lang'): All(unicode),
