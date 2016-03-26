@@ -127,6 +127,7 @@ class BaseResource(object):
             # if you want to do response with some data instead of string just set self.response_data field
             response_data = self.response_data if hasattr(self, 'response_data') else {}
             response_body.update({
+                'status': 'ok',
                 'data': response_data,
             })
 
