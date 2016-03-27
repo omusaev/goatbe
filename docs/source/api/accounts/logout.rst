@@ -24,7 +24,6 @@ logout
 **Возможные ошибки**
 
 * INTERNAL_ERROR
-* ACCOUNT_NOT_FOUND
 
 **Пример ответа**
 
