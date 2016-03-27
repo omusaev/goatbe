@@ -109,27 +109,22 @@ class BaseResource(object):
         :param kwargs:
         :return:
         """
-        response_body = {
-            'status': 'ok',
-            'data': {},
-        }
-
         exception = self.raised_exception if hasattr(self, 'raised_exception') else None
 
         if exception:
-            response_body.update({
+            response_body = {
                 'status': 'error',
                 'error_code': exception.error_code,
                 'error_message': exception.message,
-            })
+            }
             self.response.status = exception.status_code
         else:
             # if you want to do response with some data instead of string just set self.response_data field
             response_data = self.response_data if hasattr(self, 'response_data') else {}
-            response_body.update({
+            response_body = {
                 'status': 'ok',
                 'data': response_data,
-            })
+            }
 
         self.response.body = json.dumps(response_body)
 
