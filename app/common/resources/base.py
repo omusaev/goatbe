@@ -93,7 +93,7 @@ class BaseResource(object):
         if self.request.content_length in (None, 0):
             return
 
-        body = self.request.stream.read()
+        body = self.request.stream.read(self.request.content_length)
         if not body:
             return
 
