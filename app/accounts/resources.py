@@ -23,7 +23,7 @@ __all__ = (
 
 class AuthBaseResource(BaseResource):
 
-    def get(self, *args, **kwargs):
+    def post(self, *args, **kwargs):
 
         if self.account_info:  # the user has already authenticated
             self.response_data = {
@@ -122,7 +122,7 @@ class Logout(BaseResource):
 
     url = '/v1/accounts/logout/'
 
-    def get(self, *args, **kwargs):
+    def post(self, *args, **kwargs):
         self.response_data = {}
         SessionManager.delete_session(self.session)
         self.session = None
