@@ -10,6 +10,7 @@ __all__ = (
     'FacebookLoginException',
     'AccountNotFoundException',
     'AuthenticationRequiredException',
+    'AlreadyLoggedInException',
 )
 
 
@@ -71,3 +72,9 @@ class AuthenticationRequiredException(GoatBaseException):
 
     error_code = 'AUTH_REQUIRED'
     message = 'Authentication required'
+
+
+class AlreadyLoggedInException(GoatBaseException):
+
+    error_code = 'ALREADY_LOGGED_IN'
+    message = 'Already logged in'

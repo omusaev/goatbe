@@ -12,7 +12,7 @@ __all__ = (
 
 class Ping(BaseResource):
 
-    url = '/ping/'
+    url = '/v1/ping/'
 
     data_schema = {
         Optional('number'): All(Coerce(int), Range(min=1, max=10)),

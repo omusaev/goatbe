@@ -8,7 +8,7 @@ from voluptuous import Required, Optional, All
 from accounts import settings as account_settings
 from accounts.models import Account
 from common.sessions.models import SessionManager
-from common.exceptions import FacebookLoginException, AccountNotFoundException
+from common.exceptions import FacebookLoginException, AccountNotFoundException, AlreadyLoggedInException
 from common.resources.base import BaseResource
 from db.helpers import db_session
 
@@ -26,9 +26,7 @@ class AuthBaseResource(BaseResource):
     def post(self, *args, **kwargs):
 
         if self.account_info:  # the user has already authenticated
-            self.response_data = {
-                'user_access_token': self.account_info.user_access_token,
-            }
+            raise AlreadyLoggedInException
         else:
             account = self._auth()
 
@@ -36,6 +34,7 @@ class AuthBaseResource(BaseResource):
                 self.session[account_settings.ACCOUNT_ID_SESSION_KEY] = account.id
                 self.response_data = {
                     'user_access_token': account.attributes['user_access_token'],
+                    'account_id': account.id,
                 }
             else:
                 raise AccountNotFoundException

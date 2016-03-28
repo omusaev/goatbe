@@ -6,10 +6,7 @@ auth_facebook
 Если пользователя нет в приложении, он добавляется. Затем происходит аутентификация.
 
 Метод возвращает новый долгосрочный токен пользователя.
-Этот токен нужно использовать на клиенте в дальнейшем для аутентификации или для работы с facebook api/sdk.
-
-Если пользователь уже аутентифицирован, метод возвращает токен этого пользователя.
-Чтобы залогиниться другим пользователем, необходимо сначала разлогиниться.
+Этот токен нужно использовать на клиенте в дальнейшем для аутентификации или для работы с facebook api/sdk(если есть такая возможность).
 
 **URL**::
 
@@ -33,13 +30,17 @@ Parameter              Default  Type  Required  Description
 Parameter              Type  Description
 =====================  ====  =====================
 ``user_access_token``  str   FB Токен пользователя
+``account_id``         int   Id Пользователя
 =====================  ====  =====================
 
 **Возможные ошибки**
 
-* FACEBOOK_LOGIN_FAILED
 * INTERNAL_ERROR
+* MISSING_PARAMETER
+* INVALID_PARAMETER
 * ACCOUNT_NOT_FOUND
+* ALREADY_LOGGED_IN
+* FACEBOOK_LOGIN_FAILED
 
 **Пример запроса**
 
@@ -56,6 +57,7 @@ Parameter              Type  Description
     {
         "status": "ok",
         "data": {
-            "user_access_token": "KU8PZCINKjQB6730dXscqpUmplgZBq"
+            "user_access_token": "KU8PZCINKjQB6730dXscqpUmplgZBq",
+            "account_id": 20
         }
     }

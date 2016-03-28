@@ -8,9 +8,6 @@ auth_anonym
 
 Метод возвращает токен пользователя. Этот токен нужно использовать на клиенте в дальнейшем для аутентификации.
 
-Если пользователь уже аутентифицирован, метод возвращает токен этого пользователя.
-Чтобы залогиниться другим пользователем, необходимо сначала разлогиниться.
-
 **URL**::
 
     /{v}/accounts/auth/anonym/
@@ -33,12 +30,15 @@ Parameter              Default  Type  Required  Description
 Parameter              Type  Description
 =====================  ====  ==================
 ``user_access_token``  str   Токен пользователя
+``account_id``         int   Id Пользователя
 =====================  ====  ==================
 
 **Возможные ошибки**
 
 * INTERNAL_ERROR
+* INVALID_PARAMETER
 * ACCOUNT_NOT_FOUND
+* ALREADY_LOGGED_IN
 
 **Пример запроса**
 
@@ -55,6 +55,7 @@ Parameter              Type  Description
     {
         "status": "ok",
         "data": {
-            "user_access_token": "3d34f6e82aad48c3909ea46ac2c33ccf"
+            "user_access_token": "3d34f6e82aad48c3909ea46ac2c33ccf",
+            "account_id": 10
         }
     }
