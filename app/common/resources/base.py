@@ -71,7 +71,7 @@ class BaseResource(object):
 
         method = self.request.method.lower()
 
-        if not getattr(self, method):
+        if not hasattr(self, method):
             raise UnsupportedResourceMethodException
 
         self.validate_request(*args, **kwargs)
