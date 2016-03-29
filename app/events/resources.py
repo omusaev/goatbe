@@ -34,15 +34,14 @@ class EventsTypes(BaseResource):
     def get(self):
 
         lang = self.get_param('lang')
-        response_data = {}
+        response_data = []
 
         # TODO: create admin panel
         for event_type, data in EVENT_TYPES_DESCRIPTION.iteritems():
-            response_data.update({
-                event_type: {
-                    'title': data.get(lang, {}).get('title'),
-                    'description': data.get(lang, {}).get('description'),
-                }
+            response_data.append({
+                'type': event_type,
+                'title': data.get(lang, {}).get('title'),
+                'description': data.get(lang, {}).get('description'),
             })
 
         self.response_data = response_data
