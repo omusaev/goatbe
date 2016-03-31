@@ -6,6 +6,7 @@ from voluptuous import (
 
 from accounts.validators import AuthRequiredValidator
 
+from common.permissions import PERMISSION
 from common.resources.base import BaseResource
 
 from db.helpers import db_session
@@ -107,6 +108,7 @@ class CreateEvent(BaseResource):
                 account=account,
                 event=event,
                 is_owner=True,
+                permissions=PERMISSION.DEFAULT_OWNER_SET,
             )
             db.add(participant)
 

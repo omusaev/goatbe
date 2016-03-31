@@ -37,3 +37,5 @@ class AccountIsEventParticipantValidator(BaseValidator):
 
         if not participant:
             raise UserIsNotEventParticipant
+
+        resource.data['participant'] = participant
