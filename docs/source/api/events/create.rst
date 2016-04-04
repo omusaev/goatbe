@@ -1,7 +1,7 @@
 create event
 ============
 
-Создание Event-a.
+Создание ивента.
 
 **URL**::
 
@@ -32,7 +32,7 @@ Parameter        Default  Type     Format                   Required  Descriptio
 ============  ====  ===========
 Parameter     Type  Description
 ============  ====  ===========
-``event_id``  int   Id Event-a
+``event_id``  int   Id ивента
 ============  ====  ===========
 
 **Возможные ошибки**
@@ -53,7 +53,7 @@ Parameter     Type  Description
         "description": "How about a trip to the georgia mountains, friends?!",
         "destination": "Georgia",
         "start_at": "2016-06-27 16:30:00",
-        "finish_at": "2016-07-11 18:30:00",
+        "finish_at": "2016-07-11 18:30:00"
     }
 
 **Пример ответа**
