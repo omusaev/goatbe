@@ -10,12 +10,14 @@ from common.resources.base import BaseResource
 
 from db.helpers import db_session
 
-from events import EVENT_TYPES_DESCRIPTION
+from events import EVENT_TYPES_DESCRIPTION, DATE_FORMAT
 from events.models import Event, Participant, Step, Assignee
+from events.validators import EventExistenceValidator, AccountIsEventParticipantValidator
 
 __all__ = (
     'EventsTypes',
     'CreateEvent',
+    'Details',
 )
 
 
@@ -56,8 +58,8 @@ class CreateEvent(BaseResource):
         Required('title'): All(unicode, Length(min=1, max=255)),
         Optional('description'): All(unicode, Length(min=1, max=2000)),
         Optional('destination'): All(unicode, Length(min=1, max=255)),
-        Required('start_at'): All(Datetime(format='%Y-%m-%d %H:%M:%S')),
-        Required('finish_at'): All(Datetime(format='%Y-%m-%d %H:%M:%S')),
+        Required('start_at'): All(Datetime(format=DATE_FORMAT)),
+        Required('finish_at'): All(Datetime(format=DATE_FORMAT)),
         Required('type'): All(Upper, In(Event.TYPE.ALL)),
     }
 
@@ -111,3 +113,61 @@ class CreateEvent(BaseResource):
         self.response_data = {
             'event_id': event.id,
         }
+
+
+class Details(BaseResource):
+
+    url = '/v1/events/'
+
+    data_schema = {
+        Required('event_id'): All(int),
+    }
+
+    validators = [
+        AuthRequiredValidator(),
+        EventExistenceValidator(),
+        AccountIsEventParticipantValidator(),
+    ]
+
+    def get(self):
+
+        event = self.data['event']
+
+        self.response_data = {
+            'title': event.title,
+            'destination': event.destination,
+            'description': event.description,
+            'status': event.status,
+            'start_at': event.start_at.strftime(DATE_FORMAT),
+            'finish_at': event.finish_at.strftime(DATE_FORMAT),
+            'participants_count': len(event.participants),
+        }
+
+        self.response_data.update({'participants': []})
+
+        for participant in event.participants:
+            self.response_data['participants'].append({
+                'account_id': participant.account_id,
+                'status': participant.status,
+                'permissions': participant.permissions,
+                'is_owner': participant.is_owner,
+            })
+
+        self.response_data.update({'steps': []})
+
+        for step in event.steps:
+            full_step = {
+                'title': step.title,
+                'description': step.description,
+                'type': step.type,
+            }
+
+            full_step.update({'assignees': []})
+
+            for assignee in step.assignees:
+                full_step['assignees'].append({
+                    'account_id': assignee.account_id,
+                    'resolution': assignee.resolution,
+                })
+
+            self.response_data['steps'].append(full_step)
