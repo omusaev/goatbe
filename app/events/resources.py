@@ -11,7 +11,7 @@ from common.resources.base import BaseResource
 
 from db.helpers import db_session
 
-from events import EVENT_TYPES_DESCRIPTION, DATE_FORMAT
+from events import EVENT_TYPES_DESCRIPTION, EVENT_DATES_FORMAT
 from events.models import Event, Participant, Step, Assignee
 from events.validators import EventExistenceValidator, AccountIsEventParticipantValidator
 
@@ -59,8 +59,8 @@ class CreateEvent(BaseResource):
         Required('title'): All(unicode, Length(min=1, max=255)),
         Optional('description'): All(unicode, Length(min=1, max=2000)),
         Optional('destination'): All(unicode, Length(min=1, max=255)),
-        Required('start_at'): All(Datetime(format=DATE_FORMAT)),
-        Required('finish_at'): All(Datetime(format=DATE_FORMAT)),
+        Required('start_at'): All(Datetime(format=EVENT_DATES_FORMAT)),
+        Required('finish_at'): All(Datetime(format=EVENT_DATES_FORMAT)),
         Required('type'): All(Upper, In(Event.TYPE.ALL)),
     }
 
@@ -134,28 +134,28 @@ class Details(BaseResource):
     def get(self):
 
         event = self.data['event']
-
-        self.response_data = {
+        
+        event_data = {
             'title': event.title,
             'destination': event.destination,
             'description': event.description,
             'status': event.status,
-            'start_at': event.start_at.strftime(DATE_FORMAT),
-            'finish_at': event.finish_at.strftime(DATE_FORMAT),
+            'start_at': event.start_at.strftime(EVENT_DATES_FORMAT),
+            'finish_at': event.finish_at.strftime(EVENT_DATES_FORMAT),
             'participants_count': len(event.participants),
         }
 
-        self.response_data.update({'participants': []})
+        event_data.update({'participants': []})
 
         for participant in event.participants:
-            self.response_data['participants'].append({
+            event_data['participants'].append({
                 'account_id': participant.account_id,
                 'status': participant.status,
                 'permissions': participant.permissions,
                 'is_owner': participant.is_owner,
             })
 
-        self.response_data.update({'steps': []})
+        event_data.update({'steps': []})
 
         for step in event.steps:
             full_step = {
@@ -172,4 +172,6 @@ class Details(BaseResource):
                     'resolution': assignee.resolution,
                 })
 
-            self.response_data['steps'].append(full_step)
+            event_data['steps'].append(full_step)
+
+        self.response_data = event_data
