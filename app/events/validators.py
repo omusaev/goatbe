@@ -27,6 +27,9 @@ class EventExistenceValidator(BaseValidator):
 
 
 class AccountIsEventParticipantValidator(BaseValidator):
+    '''
+    Needs EventExistenceValidator
+    '''
 
     def run(self, resource, *args, **kwargs):
         account_id = resource.account_info.account_id

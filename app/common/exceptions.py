@@ -13,6 +13,7 @@ __all__ = (
     'AlreadyLoggedInException',
     'EventNotFoundException',
     'UserIsNotEventParticipant',
+    'PermissionDeniedException',
 )
 
 
@@ -98,4 +99,3 @@ class PermissionDeniedException(GoatBaseException):
 
     error_code = 'PERMISSION_DENIED'
     message = 'Permission denied'
-

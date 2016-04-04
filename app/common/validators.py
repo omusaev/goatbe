@@ -18,16 +18,15 @@ class BaseValidator(object):
 
 
 class PermissionValidator(BaseValidator):
+    '''
+    Needs AccountIsEventParticipantValidator
+    '''
 
     def __init__(self, permissions):
         self.permissions = permissions
 
     def run(self, resource, *args, **kwargs):
-        participant = resource.data.get('participant')
-
-        if not participant:
-            raise PermissionDeniedException
-
+        participant = resource.data['participant']
         participant_permissions = participant.permissions
 
         if not set(self.permissions).issubset(set(participant_permissions)):
