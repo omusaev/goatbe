@@ -89,6 +89,7 @@ class BaseResource(object):
         :return:
         """
         self.params = {}
+        self.data = {}
 
         if self.request.content_length in (None, 0):
             return

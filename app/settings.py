@@ -39,6 +39,7 @@ INSTALLED_RESOURCES = [
 
     'events.resources.EventsTypes',
     'events.resources.CreateEvent',
+    'events.resources.Details',
 ]
 
 SESSION_TTL = 60 * 60 * 24 * 14  # 2 weeks

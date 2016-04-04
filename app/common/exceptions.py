@@ -11,6 +11,8 @@ __all__ = (
     'AccountNotFoundException',
     'AuthenticationRequiredException',
     'AlreadyLoggedInException',
+    'EventNotFoundException',
+    'UserIsNotEventParticipant',
 )
 
 
@@ -78,3 +80,15 @@ class AlreadyLoggedInException(GoatBaseException):
 
     error_code = 'ALREADY_LOGGED_IN'
     message = 'Already logged in'
+
+
+class EventNotFoundException(GoatBaseException):
+
+    error_code = 'EVENT_NOT_FOUND'
+    message = 'Event not found'
+
+
+class UserIsNotEventParticipant(GoatBaseException):
+
+    error_code = 'USER_IS_NOT_EVENT_PARTICIPANT'
+    message = 'User is not event participant'
