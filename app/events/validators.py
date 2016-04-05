@@ -2,7 +2,7 @@
 
 from sqlalchemy.orm import joinedload
 
-from common.exceptions import EventNotFoundException, UserIsNotEventParticipant
+from common.exceptions import EventNotFoundException, UserIsNotEventParticipant, PermissionDeniedException
 from common.validators import BaseValidator
 from db.helpers import db_session
 from events.models import Event, Participant
@@ -10,6 +10,7 @@ from events.models import Event, Participant
 __all__ = (
     'EventExistenceValidator',
     'AccountIsEventParticipantValidator',
+    'PermissionValidator',
 )
 
 
@@ -42,3 +43,19 @@ class AccountIsEventParticipantValidator(BaseValidator):
             raise UserIsNotEventParticipant
 
         resource.data['participant'] = participant
+
+
+class PermissionValidator(BaseValidator):
+    '''
+    Needs AccountIsEventParticipantValidator
+    '''
+
+    def __init__(self, permissions):
+        self.permissions = permissions
+
+    def run(self, resource, *args, **kwargs):
+        participant = resource.data['participant']
+        participant_permissions = participant.permissions
+
+        if not set(self.permissions).issubset(set(participant_permissions)):
+            raise PermissionDeniedException

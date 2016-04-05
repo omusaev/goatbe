@@ -6,13 +6,13 @@ from voluptuous import (
 
 from accounts.validators import AuthRequiredValidator
 
-from common.permissions import PERMISSION
 from common.resources.base import BaseResource
 
 from db.helpers import db_session
 
 from events import EVENT_TYPES_DESCRIPTION, EVENT_DATES_FORMAT
 from events.models import Event, Participant, Step, Assignee
+from events.permissions import PERMISSION
 from events.validators import EventExistenceValidator, AccountIsEventParticipantValidator
 
 __all__ = (
@@ -134,7 +134,7 @@ class Details(BaseResource):
     def get(self):
 
         event = self.data['event']
-        
+
         event_data = {
             'title': event.title,
             'destination': event.destination,
