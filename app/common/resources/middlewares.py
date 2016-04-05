@@ -20,5 +20,7 @@ class ResourceSetupMiddleware(object):
         resource.request = req
         resource.response = resp
 
+        resource.data = {}
+
     def process_response(self, req, resp, resource):
         pass
