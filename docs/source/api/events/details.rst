@@ -5,7 +5,7 @@ event details
 
 **URL**::
 
-    /{v}/events/
+    /{v}/events/details/
 
 **Method**::
 
@@ -74,6 +74,7 @@ Parameter        Type  Description
 * AUTH_REQUIRED
 * EVENT_NOT_FOUND
 * USER_IS_NOT_EVENT_PARTICIPANT
+* PERMISSION_DENIED
 
 **Пример запроса**
 
@@ -143,7 +144,6 @@ Parameter        Type  Description
                 "type":"BACKPACK",
                 "description":"Надо бы составить списочек",
                 "title":"Составить список снаряжения"
-
              }
           ]
        }

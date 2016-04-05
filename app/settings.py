@@ -37,9 +37,10 @@ INSTALLED_RESOURCES = [
     'accounts.resources.AuthAnonym',
     'accounts.resources.Logout',
 
-    'events.resources.EventsTypes',
+    'events.resources.EventTypes',
     'events.resources.CreateEvent',
-    'events.resources.Details',
+    'events.resources.EventDetails',
+    'events.resources.EventList',
 ]
 
 SESSION_TTL = 60 * 60 * 24 * 14  # 2 weeks
