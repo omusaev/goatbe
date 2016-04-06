@@ -13,16 +13,17 @@ from db.helpers import db_session
 from events import EVENT_TYPES_DESCRIPTION, EVENT_DATES_FORMAT
 from events.models import Event, Participant, Step, Assignee
 from events.permissions import PERMISSION
-from events.validators import EventExistenceValidator, AccountIsEventParticipantValidator
+from events.validators import EventExistenceValidator, AccountIsEventParticipantValidator, PermissionValidator
 
 __all__ = (
-    'EventsTypes',
+    'EventTypes',
     'CreateEvent',
-    'Details',
+    'EventDetails',
+    'EventList',
 )
 
 
-class EventsTypes(BaseResource):
+class EventTypes(BaseResource):
 
     url = '/v1/events/types/'
 
@@ -117,9 +118,9 @@ class CreateEvent(BaseResource):
         }
 
 
-class Details(BaseResource):
+class EventDetails(BaseResource):
 
-    url = '/v1/events/'
+    url = '/v1/events/details/'
 
     data_schema = {
         Required('event_id'): All(int),
@@ -129,6 +130,7 @@ class Details(BaseResource):
         AuthRequiredValidator(),
         EventExistenceValidator(),
         AccountIsEventParticipantValidator(),
+        PermissionValidator(permissions=[PERMISSION.READ_EVENT_DETAILS,])
     ]
 
     def get(self):
@@ -175,3 +177,40 @@ class Details(BaseResource):
             event_data['steps'].append(full_step)
 
         self.response_data = event_data
+
+
+class EventList(BaseResource):
+
+    url = '/v1/events/list/'
+
+    validators = [
+        AuthRequiredValidator(),
+    ]
+
+    def get(self):
+
+        response_data = []
+        account_id = self.account_info.account_id
+
+        with db_session() as db:
+            # todo: add deleted==false condition
+            participants = db.query(Participant).filter_by(account_id=account_id)
+
+            for participant in participants:
+                event = participant.event
+
+                event_data = {
+                    'id': event.id,
+                    'title': event.title,
+                    'destination': event.destination,
+                    'description': event.description,
+                    'status': event.status,
+                    'start_at': event.start_at.strftime(EVENT_DATES_FORMAT),
+                    'finish_at': event.finish_at.strftime(EVENT_DATES_FORMAT),
+                    'participant_status': participant.status,
+                    'is_owner': participant.is_owner
+                }
+
+                response_data.append(event_data)
+
+        self.response_data = response_data

@@ -18,6 +18,7 @@ class EventExistenceValidator(BaseValidator):
 
     def run(self, resource, *args, **kwargs):
         event_id = resource.get_param('event_id')
+
         with db_session() as db:
             event = db.query(Event).options(joinedload('*')).get(event_id)
 
