@@ -24,10 +24,10 @@ Parameter        Default  Type     Required  Description
 ======================  ====  =====================
 Parameter               Type  Description
 ======================  ====  =====================
-``status``              str   Статус
+``status``              str   Статус ивента
 ``start_at``            str   Дата старта
-``description``         str   Описание
-``title``               str   Название
+``description``         str   Описание ивента
+``title``               str   Название ивента
 ``destination``         str   Место проведения
 ``finish_at``           str   Дата конца
 ``participants_count``  int   Количество участников
@@ -37,25 +37,25 @@ Parameter               Type  Description
 
 Элементы ``participants`` имеют следующую структуру.
 
-===============  ====  ====================
+===============  ====  =============================================
 Parameter        Type  Description
-===============  ====  ====================
+===============  ====  =============================================
 ``status``       str   Статус
-``is_owner``     bool  Владелец ивента
+``is_owner``     bool  Является ли участник владельцем ивента
 ``account_id``   int   Id пользователя
-``permissions``  list  Права (в разработке)
-===============  ====  ====================
+``permissions``  list  Список :doc:`прав <../permissions>` участника
+===============  ====  =============================================
 
 Элементы ``steps`` имеют следующую структуру.
 
-===============  ====  ===========
+===============  ====  =============
 Parameter        Type  Description
-===============  ====  ===========
+===============  ====  =============
 ``assignees``    list  Асайни
 ``type``         str   Тип
-``description``  str   Описание
-``title``        str   Название
-===============  ====  ===========
+``description``  str   Описание шага
+``title``        str   Название шага
+===============  ====  =============
 
 Элементы ``assignees`` имеют следующую структуру.
 
@@ -103,19 +103,29 @@ Parameter        Type  Description
                 "status":"ACTIVE",
                 "is_owner":true,
                 "account_id":15,
-                "permissions":null
+                "permissions":[
+                   "edit_event_details",
+                   "read_event_details",
+                   "delete_event"
+                ]
              },
              {
                 "status":"ACTIVE",
                 "is_owner":false,
                 "account_id":16,
-                "permissions":null
+                "permissions":[
+                   "invite_event_participant",
+                   "delete_event_participant"
+                ]
              },
              {
                 "status":"INACTIVE",
                 "is_owner":false,
                 "account_id":17,
-                "permissions":null
+                "permissions":[
+                   "add_event_step",
+                   "add_step_assignee"
+                ]
              }
           ],
           "steps":[

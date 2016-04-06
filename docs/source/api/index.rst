@@ -71,3 +71,5 @@ Status     Description
    :maxdepth: 2
 
    errors.rst
+   language_codes.rst
+   permissions.rst
