@@ -1,11 +1,11 @@
-/steps
-======
+/events/steps
+=============
 
-апишка по степам
+API для работы с шагами подготовки ивента
 
 
 .. toctree::
    :maxdepth: 1
 
-   add.rst
+   create.rst
    update.rst
