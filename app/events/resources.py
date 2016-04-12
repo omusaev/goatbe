@@ -188,7 +188,7 @@ class EventDetails(BaseResource):
         AuthRequiredValidator(),
         EventExistenceValidator(),
         AccountIsEventParticipantValidator(),
-        PermissionValidator(permissions=[PERMISSION.READ_EVENT_DETAILS,])
+        PermissionValidator(permissions=[PERMISSION.READ_EVENT_DETAILS, ])
     ]
 
     def get(self):
@@ -312,16 +312,7 @@ class CreateEventStep(BaseResource):
             db.add(assignee)
 
         self.response_data = {
-            'id': step.id,
-            'title': step.title,
-            'description': step.description,
-            'type': step.type,
-            'assignees': [
-                {
-                    'account_id': assignee.account_id,
-                    'resolution': assignee.resolution,
-                }
-            ]
+            'step_id': step.id,
         }
 
 
