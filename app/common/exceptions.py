@@ -14,6 +14,7 @@ __all__ = (
     'EventNotFoundException',
     'UserIsNotEventParticipant',
     'PermissionDeniedException',
+    'StepNotFoundException',
 )
 
 
@@ -99,3 +100,9 @@ class PermissionDeniedException(GoatBaseException):
 
     error_code = 'PERMISSION_DENIED'
     message = 'Permission denied'
+
+
+class StepNotFoundException(GoatBaseException):
+
+    error_code = 'STEP_NOT_FOUND'
+    message = 'Step not found'

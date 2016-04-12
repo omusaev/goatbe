@@ -1,11 +1,11 @@
-update step
+create step
 ===========
 
-Редактирование шага подготовки
+Создание шага подготовки
 
 **URL**::
 
-    /{v}/events/steps/update/
+    /{v}/events/steps/create/
 
 **Method**::
 
@@ -17,14 +17,17 @@ update step
 Parameter        Default  Type     Format                   Required  Description
 ===============  =======  =======  =======================  ========  ===========
 ``event_id``              int                               true      Id ивента
-``step_id``               int                               true      Id шага
-``title``                 unicode  Length(min=1, max=255)   false     Заголовок
-``description``           unicode  Length(min=1, max=2000)  false     Описание
+``title``                 unicode  Length(min=1, max=255)   true      Заголовок
+``description``  ''       unicode  Length(min=1, max=2000)  false     Описание
 ===============  =======  =======  =======================  ========  ===========
 
 **Структура data**
 
-Пустой словарь.
+===============  ====  ===========
+Parameter        Type  Description
+===============  ====  ===========
+``step_id``      int   Id шага
+===============  ====  ===========
 
 **Возможные ошибки**
 
@@ -34,7 +37,6 @@ Parameter        Default  Type     Format                   Required  Descriptio
 * AUTH_REQUIRED
 * EVENT_NOT_FOUND
 * USER_IS_NOT_EVENT_PARTICIPANT
-* STEP_NOT_FOUND
 * PERMISSION_DENIED
 
 **Пример запроса**
@@ -43,8 +45,8 @@ Parameter        Default  Type     Format                   Required  Descriptio
 
     {
         "event_id": 1,
-        "step_id": 2,
-        "title": "Buy a knife!"
+        "title": "Buy a balloon",
+        "description": "Just for fun"
     }
 
 **Пример ответа**
@@ -53,5 +55,7 @@ Parameter        Default  Type     Format                   Required  Descriptio
 
     {
         "status": "ok",
-        "data": {}
+        "data": {
+            "step_id": 63
+        }
     }

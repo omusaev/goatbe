@@ -51,6 +51,7 @@ Parameter        Type  Description
 ===============  ====  =============
 Parameter        Type  Description
 ===============  ====  =============
+``id``           int   Id шага
 ``assignees``    list  Асайни
 ``type``         str   Тип
 ``description``  str   Описание шага
@@ -104,7 +105,7 @@ Parameter        Type  Description
                 "is_owner":true,
                 "account_id":15,
                 "permissions":[
-                   "edit_event_details",
+                   "update_event_details",
                    "read_event_details",
                    "delete_event"
                 ]
@@ -123,8 +124,8 @@ Parameter        Type  Description
                 "is_owner":false,
                 "account_id":17,
                 "permissions":[
-                   "add_event_step",
-                   "add_step_assignee"
+                   "create_event_step",
+                   "create_step_assignee"
                 ]
              }
           ],
@@ -140,6 +141,7 @@ Parameter        Type  Description
                       "account_id":16
                    }
                 ],
+                "id":1,
                 "type":"COMMON",
                 "description":"Надо бы заполнить информацию",
                 "title":"Заполнить информацию о походе"
@@ -151,6 +153,7 @@ Parameter        Type  Description
                       "account_id":15
                    }
                 ],
+                "id":2,
                 "type":"BACKPACK",
                 "description":"Надо бы составить списочек",
                 "title":"Составить список снаряжения"

@@ -13,13 +13,20 @@ from db.helpers import db_session
 from events import EVENT_TYPES_DESCRIPTION, EVENT_DATES_FORMAT
 from events.models import Event, Participant, Step, Assignee
 from events.permissions import PERMISSION
-from events.validators import EventExistenceValidator, AccountIsEventParticipantValidator, PermissionValidator
+from events.validators import (
+    EventExistenceValidator, AccountIsEventParticipantValidator,
+    StepExistenceValidator, PermissionValidator
+)
 
 __all__ = (
     'EventTypes',
     'CreateEvent',
+    'UpdateEvent',
     'EventDetails',
     'EventList',
+
+    'CreateEventStep',
+    'UpdateEventStep',
 )
 
 
@@ -118,6 +125,57 @@ class CreateEvent(BaseResource):
         }
 
 
+class UpdateEvent(BaseResource):
+
+    url = '/v1/events/update/'
+
+    data_schema = {
+        Required('event_id'): All(int),
+        Optional('title'): All(unicode, Length(min=1, max=255)),
+        Optional('description'): All(unicode, Length(min=1, max=2000)),
+        Optional('destination'): All(unicode, Length(min=1, max=255)),
+        Optional('start_at'): All(Datetime(format=EVENT_DATES_FORMAT)),
+        Optional('finish_at'): All(Datetime(format=EVENT_DATES_FORMAT)),
+    }
+
+    validators = [
+        AuthRequiredValidator(),
+        EventExistenceValidator(),
+        AccountIsEventParticipantValidator(),
+        PermissionValidator(permissions=[PERMISSION.UPDATE_EVENT_DETAILS, ])
+    ]
+
+    def post(self):
+
+        event = self.data.get('event')
+
+        title = self.get_param('title')
+        description = self.get_param('description')
+        destination = self.get_param('destination')
+        start_at = self.get_param('start_at')
+        finish_at = self.get_param('finish_at')
+
+        if title:
+            event.title = title
+
+        if description:
+            event.description = description
+
+        if destination:
+            event.destination = destination
+
+        if start_at:
+            event.start_at = start_at
+
+        if finish_at:
+            event.finish_at = finish_at
+
+        with db_session() as db:
+            db.merge(event)
+
+        self.response_data = {}
+
+
 class EventDetails(BaseResource):
 
     url = '/v1/events/details/'
@@ -130,12 +188,12 @@ class EventDetails(BaseResource):
         AuthRequiredValidator(),
         EventExistenceValidator(),
         AccountIsEventParticipantValidator(),
-        PermissionValidator(permissions=[PERMISSION.READ_EVENT_DETAILS,])
+        PermissionValidator(permissions=[PERMISSION.READ_EVENT_DETAILS, ])
     ]
 
     def get(self):
 
-        event = self.data['event']
+        event = self.data.get('event')
 
         event_data = {
             'title': event.title,
@@ -161,6 +219,7 @@ class EventDetails(BaseResource):
 
         for step in event.steps:
             full_step = {
+                'id': step.id,
                 'title': step.title,
                 'description': step.description,
                 'type': step.type,
@@ -193,7 +252,6 @@ class EventList(BaseResource):
         account_id = self.account_info.account_id
 
         with db_session() as db:
-            # todo: add deleted==false condition
             participants = db.query(Participant).filter_by(account_id=account_id)
 
             for participant in participants:
@@ -214,3 +272,83 @@ class EventList(BaseResource):
                 response_data.append(event_data)
 
         self.response_data = response_data
+
+
+class CreateEventStep(BaseResource):
+
+    url = '/v1/events/steps/create/'
+
+    data_schema = {
+        Required('event_id'): All(int),
+        Required('title'): All(unicode, Length(min=1, max=255)),
+        Optional('description'): All(unicode, Length(min=1, max=2000)),
+    }
+
+    validators = [
+        AuthRequiredValidator(),
+        EventExistenceValidator(),
+        AccountIsEventParticipantValidator(),
+        PermissionValidator(permissions=[PERMISSION.CREATE_EVENT_STEP, ])
+    ]
+
+    def post(self):
+
+        event = self.data.get('event')
+        account_id = self.account_info.account_id
+
+        with db_session() as db:
+            step = Step(
+                title=self.get_param('title'),
+                description=self.get_param('description'),
+                type=Step.Type.CUSTOM,
+                event=event,
+            )
+            db.add(step)
+
+            assignee = Assignee(
+                account_id=account_id,
+                step=step,
+            )
+            db.add(assignee)
+
+        self.response_data = {
+            'step_id': step.id,
+        }
+
+
+class UpdateEventStep(BaseResource):
+
+    url = '/v1/events/steps/update/'
+
+    data_schema = {
+        Required('event_id'): All(int),
+        Required('step_id'): All(int),
+        Optional('title'): All(unicode, Length(min=1, max=255)),
+        Optional('description'): All(unicode, Length(min=1, max=2000)),
+    }
+
+    validators = [
+        AuthRequiredValidator(),
+        EventExistenceValidator(),
+        AccountIsEventParticipantValidator(),
+        PermissionValidator(permissions=[PERMISSION.UPDATE_EVENT_STEP, ]),
+        StepExistenceValidator(),
+    ]
+
+    def post(self):
+
+        step = self.data.get('step')
+
+        title = self.get_param('title')
+        description = self.get_param('description')
+
+        if title:
+            step.title = title
+
+        if description:
+            step.description = description
+
+        with db_session() as db:
+            db.merge(step)
+
+        self.response_data = {}

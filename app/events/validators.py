@@ -2,13 +2,17 @@
 
 from sqlalchemy.orm import joinedload
 
-from common.exceptions import EventNotFoundException, UserIsNotEventParticipant, PermissionDeniedException
+from common.exceptions import (
+    EventNotFoundException, UserIsNotEventParticipant,
+    StepNotFoundException, PermissionDeniedException
+)
 from common.validators import BaseValidator
 from db.helpers import db_session
-from events.models import Event, Participant
+from events.models import Event, Participant, Step
 
 __all__ = (
     'EventExistenceValidator',
+    'StepExistenceValidator',
     'AccountIsEventParticipantValidator',
     'PermissionValidator',
 )
@@ -20,12 +24,27 @@ class EventExistenceValidator(BaseValidator):
         event_id = resource.get_param('event_id')
 
         with db_session() as db:
+            # todo: add is_deleted==false condition
             event = db.query(Event).options(joinedload('*')).get(event_id)
 
         if not event:
             raise EventNotFoundException
 
         resource.data['event'] = event
+
+
+class StepExistenceValidator(BaseValidator):
+
+    def run(self, resource, *args, **kwargs):
+        step_id = resource.get_param('step_id')
+
+        with db_session() as db:
+            step = db.query(Step).options(joinedload('*')).get(step_id)
+
+        if not step:
+            raise StepNotFoundException
+
+        resource.data['step'] = step
 
 
 class AccountIsEventParticipantValidator(BaseValidator):

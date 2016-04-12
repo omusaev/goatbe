@@ -8,5 +8,6 @@ API для работы с ивентами
 
    types.rst
    create.rst
+   update.rst
    details.rst
    list.rst
