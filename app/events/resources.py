@@ -27,6 +27,7 @@ __all__ = (
 
     'CreateEventStep',
     'UpdateEventStep',
+    'StepDetails',
 )
 
 
@@ -203,19 +204,21 @@ class EventDetails(BaseResource):
             'start_at': event.start_at.strftime(EVENT_DATES_FORMAT),
             'finish_at': event.finish_at.strftime(EVENT_DATES_FORMAT),
             'participants_count': len(event.participants),
+            'participants': [],
+            'steps': [],
         }
-
-        event_data.update({'participants': []})
 
         for participant in event.participants:
             event_data['participants'].append({
-                'account_id': participant.account_id,
+                'account': {
+                    'id': participant.account.id,
+                    'name': participant.account.name,
+                    'avatar_url': participant.account.avatar_url,
+                },
                 'status': participant.status,
                 'permissions': participant.permissions,
                 'is_owner': participant.is_owner,
             })
-
-        event_data.update({'steps': []})
 
         for step in event.steps:
             full_step = {
@@ -223,13 +226,16 @@ class EventDetails(BaseResource):
                 'title': step.title,
                 'description': step.description,
                 'type': step.type,
+                'assignees': [],
             }
-
-            full_step.update({'assignees': []})
 
             for assignee in step.assignees:
                 full_step['assignees'].append({
-                    'account_id': assignee.account_id,
+                    'account': {
+                        'id': assignee.account.id,
+                        'name': assignee.account.name,
+                        'avatar_url': assignee.account.avatar_url,
+                    },
                     'resolution': assignee.resolution,
                 })
 
@@ -282,6 +288,7 @@ class CreateEventStep(BaseResource):
         Required('event_id'): All(int),
         Required('title'): All(unicode, Length(min=1, max=255)),
         Optional('description'): All(unicode, Length(min=1, max=2000)),
+        Optional('type', default=Step.TYPE.CUSTOM): All(Upper, In(Step.TYPE.ALL)),
     }
 
     validators = [
@@ -300,7 +307,7 @@ class CreateEventStep(BaseResource):
             step = Step(
                 title=self.get_param('title'),
                 description=self.get_param('description'),
-                type=Step.Type.CUSTOM,
+                type=self.get_param('type'),
                 event=event,
             )
             db.add(step)
@@ -352,3 +359,45 @@ class UpdateEventStep(BaseResource):
             db.merge(step)
 
         self.response_data = {}
+
+
+class StepDetails(BaseResource):
+
+    url = '/v1/events/steps/details/'
+
+    data_schema = {
+        Required('event_id'): All(int),
+        Required('step_id'): All(int),
+    }
+
+    validators = [
+        AuthRequiredValidator(),
+        EventExistenceValidator(),
+        AccountIsEventParticipantValidator(),
+        PermissionValidator(permissions=[PERMISSION.READ_STEP_DETAILS, ]),
+        StepExistenceValidator(),
+    ]
+
+    def get(self):
+
+        step = self.data.get('step')
+
+        step_data = {
+            'id': step.id,
+            'title': step.title,
+            'description': step.description,
+            'type': step.type,
+            'assignees': [],
+        }
+
+        for assignee in step.assignees:
+            step_data['assignees'].append({
+                'account': {
+                    'id': assignee.account.id,
+                    'name': assignee.account.name,
+                    'avatar_url': assignee.account.avatar_url,
+                },
+                'resolution': assignee.resolution,
+            })
+
+        self.response_data = step_data

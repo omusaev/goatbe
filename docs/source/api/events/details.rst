@@ -42,7 +42,7 @@ Parameter        Type  Description
 ===============  ====  =============================================
 ``status``       str   Статус
 ``is_owner``     bool  Является ли участник владельцем ивента
-``account_id``   int   Id пользователя
+``account``      dict  Пользователь
 ``permissions``  list  Список :doc:`прав <../permissions>` участника
 ===============  ====  =============================================
 
@@ -60,12 +60,22 @@ Parameter        Type  Description
 
 Элементы ``assignees`` имеют следующую структуру.
 
-===============  ====  ===============
-Parameter        Type  Description
-===============  ====  ===============
-``resolution``   str   Резолюция
-``account_id``   int   Id пользователя
-===============  ====  ===============
+==============  ====  ============
+Parameter       Type  Description
+==============  ====  ============
+``resolution``  str   Резолюция
+``account``     dict  Пользователь
+==============  ====  ============
+
+``account`` имеют следующую структуру.
+
+==============  ====  ========================
+Parameter       Type  Description
+==============  ====  ========================
+``id``          int   Id пользователя
+``name``        str   Имя пользователя
+``avatar_url``  str   url аватара пользователя
+==============  ====  ========================
 
 **Возможные ошибки**
 
@@ -103,7 +113,11 @@ Parameter        Type  Description
              {
                 "status":"ACTIVE",
                 "is_owner":true,
-                "account_id":15,
+                "account":{
+                   "id":15,
+                   "name":"Jerry",
+                   "avatar_url":"http://avatars.com/123.png"
+                },
                 "permissions":[
                    "update_event_details",
                    "read_event_details",
@@ -113,7 +127,11 @@ Parameter        Type  Description
              {
                 "status":"ACTIVE",
                 "is_owner":false,
-                "account_id":16,
+                "account":{
+                   "id":16,
+                   "name":"Tom",
+                   "avatar_url":"http://avatars.com/456.png"
+                },
                 "permissions":[
                    "invite_event_participant",
                    "delete_event_participant"
@@ -134,11 +152,19 @@ Parameter        Type  Description
                 "assignees":[
                    {
                       "resolution":"OPEN",
-                      "account_id":15
+                      "account":{
+                         "id":15,
+                         "name":"Jerry",
+                         "avatar_url":"http://avatars.com/123.png"
+                      }
                    },
                    {
                       "resolution":"SKIPPED",
-                      "account_id":16
+                      "account":{
+                         "id":16,
+                         "name":"Tom",
+                         "avatar_url":"http://avatars.com/456.png"
+                      }
                    }
                 ],
                 "id":1,

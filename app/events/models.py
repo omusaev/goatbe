@@ -69,7 +69,7 @@ class Step(Base, GoatBasicModelMixin):
 
     __tablename__ = 'step'
 
-    class Type:
+    class TYPE:
         COMMON = 'COMMON'
         BACKPACK = 'BACKPACK'
         CUSTOM = 'CUSTOM'
@@ -82,7 +82,7 @@ class Step(Base, GoatBasicModelMixin):
 
     title = Column(String(255), nullable=False, default='', server_default='')
     description = Column(Text(), nullable=False, default='', server_default='')
-    type = Column(String(255), nullable=False, default=Type.COMMON, server_default=Type.COMMON)
+    type = Column(String(255), nullable=False, default=TYPE.COMMON, server_default=TYPE.COMMON)
     event_id = Column(
         BigInteger,
         ForeignKey(

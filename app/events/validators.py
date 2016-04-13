@@ -4,7 +4,8 @@ from sqlalchemy.orm import joinedload
 
 from common.exceptions import (
     EventNotFoundException, UserIsNotEventParticipant,
-    StepNotFoundException, PermissionDeniedException
+    StepNotFoundException, PermissionDeniedException,
+    StepIsNotInEventException
 )
 from common.validators import BaseValidator
 from db.helpers import db_session
@@ -34,15 +35,22 @@ class EventExistenceValidator(BaseValidator):
 
 
 class StepExistenceValidator(BaseValidator):
+    '''
+    Needs EventExistenceValidator
+    '''
 
     def run(self, resource, *args, **kwargs):
         step_id = resource.get_param('step_id')
+        event = resource.data['event']
 
         with db_session() as db:
             step = db.query(Step).options(joinedload('*')).get(step_id)
 
         if not step:
             raise StepNotFoundException
+
+        if step.event_id != event.id:
+            raise StepIsNotInEventException
 
         resource.data['step'] = step
 

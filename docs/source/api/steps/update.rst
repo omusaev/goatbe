@@ -35,6 +35,7 @@ Parameter        Default  Type     Format                   Required  Descriptio
 * EVENT_NOT_FOUND
 * USER_IS_NOT_EVENT_PARTICIPANT
 * STEP_NOT_FOUND
+* STEP_IS_NOT_IN_EVENT
 * PERMISSION_DENIED
 
 **Пример запроса**

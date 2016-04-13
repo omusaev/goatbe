@@ -106,3 +106,9 @@ class StepNotFoundException(GoatBaseException):
 
     error_code = 'STEP_NOT_FOUND'
     message = 'Step not found'
+
+
+class StepIsNotInEventException(GoatBaseException):
+
+    error_code = 'STEP_IS_NOT_IN_EVENT'
+    message = 'Step is not in event'
