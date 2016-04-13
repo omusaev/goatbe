@@ -6,7 +6,7 @@ __all__ = (
     'GoatBaseException',
     'UnsupportedResourceMethodException',
     'MissingParameterException',
-    'InvalidParameterFormatException',
+    'InvalidParameterException',
     'FacebookLoginException',
     'AccountNotFoundException',
     'AuthenticationRequiredException',
@@ -44,18 +44,12 @@ class MissingParameterException(GoatBaseException):
         return self.message_template % self.param_name
 
 
-class InvalidParameterFormatException(GoatBaseException):
+class InvalidParameterException(GoatBaseException):
 
     error_code = 'INVALID_PARAMETER'
-    message_template = 'Invalid parameter format: %s: %s'
 
-    def __init__(self, param_name, error_msg):
-        self.param_name = param_name
-        self.error_msg = error_msg
-
-    @property
-    def message(self):
-        return self.message_template % (self.param_name, self.error_msg)
+    def __init__(self, message):
+        self.message = message
 
 
 class FacebookLoginException(GoatBaseException):

@@ -11,7 +11,7 @@ from common.exceptions import (
     GoatBaseException,
     UnsupportedResourceMethodException,
     MissingParameterException,
-    InvalidParameterFormatException,
+    InvalidParameterException,
 )
 
 __all__ = (
@@ -149,7 +149,8 @@ class BaseResource(object):
                 if isinstance(error, RequiredFieldInvalid):
                     raise MissingParameterException(parameter_name)
                 else:
-                    raise InvalidParameterFormatException(parameter_name, error.message)
+                    msg = 'Invalid parameter format: %s: %s' % (parameter_name, error.message)
+                    raise InvalidParameterException(msg)
 
             # Rewrite the data because it may be changed by schema validator (converted to appropriate type for example)
             self.params = params

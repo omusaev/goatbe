@@ -1,11 +1,11 @@
 update step
 ===========
 
-Редактирование шага подготовки
+Редактирование шага.
 
 **URL**::
 
-    /{v}/events/steps/update/
+    /{v}/steps/update/
 
 **Method**::
 
