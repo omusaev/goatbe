@@ -9,3 +9,4 @@ API для работы с шагами подготовки ивента
 
    create.rst
    update.rst
+   details.rst

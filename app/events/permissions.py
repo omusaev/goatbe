@@ -15,6 +15,7 @@ class PERMISSION(object):
     CREATE_EVENT_STEP = 'create_event_step'
     DELETE_EVENT_STEP = 'delete_event_step'
     UPDATE_EVENT_STEP = 'update_event_step'
+    READ_STEP_DETAILS = 'read_step_details'
     CREATE_STEP_ASSIGNEE = 'create_step_assignee'
     DELETE_STEP_ASSIGNEE = 'delete_step_assignee'
     UPDATE_STEP_RESOLUTION = 'update_step_resolution'

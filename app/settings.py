@@ -45,6 +45,7 @@ INSTALLED_RESOURCES = [
 
     'events.resources.CreateEventStep',
     'events.resources.UpdateEventStep',
+    'events.resources.StepDetails',
 ]
 
 SESSION_TTL = 60 * 60 * 24 * 14  # 2 weeks
