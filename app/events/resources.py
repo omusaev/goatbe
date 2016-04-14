@@ -6,6 +6,7 @@ from voluptuous import (
 
 from accounts.validators import AuthRequiredValidator
 
+from common.schemas import ListOf
 from common.resources.base import BaseResource
 
 from db.helpers import db_session
@@ -15,7 +16,7 @@ from events.models import Event, Participant, Step, Assignee
 from events.permissions import PERMISSION
 from events.validators import (
     EventExistenceValidator, AccountIsEventParticipantValidator,
-    StepExistenceValidator, PermissionValidator
+    StepExistenceValidator, PermissionValidator, UpdateAssigneesValidator
 )
 
 __all__ = (
@@ -25,9 +26,11 @@ __all__ = (
     'EventDetails',
     'EventList',
 
-    'CreateEventStep',
-    'UpdateEventStep',
+    'CreateStep',
+    'UpdateStep',
     'StepDetails',
+
+    'UpdateStepAssignees',
 )
 
 
@@ -106,12 +109,6 @@ class CreateEvent(BaseResource):
                     event=event,
                 )
                 db.add(step)
-
-                assignee = Assignee(
-                    account=account,
-                    step=step,
-                )
-                db.add(assignee)
 
             participant = Participant(
                 account=account,
@@ -280,9 +277,9 @@ class EventList(BaseResource):
         self.response_data = response_data
 
 
-class CreateEventStep(BaseResource):
+class CreateStep(BaseResource):
 
-    url = '/v1/events/steps/create/'
+    url = '/v1/steps/create/'
 
     data_schema = {
         Required('event_id'): All(int),
@@ -301,7 +298,6 @@ class CreateEventStep(BaseResource):
     def post(self):
 
         event = self.data.get('event')
-        account_id = self.account_info.account_id
 
         with db_session() as db:
             step = Step(
@@ -312,20 +308,14 @@ class CreateEventStep(BaseResource):
             )
             db.add(step)
 
-            assignee = Assignee(
-                account_id=account_id,
-                step=step,
-            )
-            db.add(assignee)
-
         self.response_data = {
             'step_id': step.id,
         }
 
 
-class UpdateEventStep(BaseResource):
+class UpdateStep(BaseResource):
 
-    url = '/v1/events/steps/update/'
+    url = '/v1/steps/update/'
 
     data_schema = {
         Required('event_id'): All(int),
@@ -363,7 +353,7 @@ class UpdateEventStep(BaseResource):
 
 class StepDetails(BaseResource):
 
-    url = '/v1/events/steps/details/'
+    url = '/v1/steps/details/'
 
     data_schema = {
         Required('event_id'): All(int),
@@ -401,3 +391,46 @@ class StepDetails(BaseResource):
             })
 
         self.response_data = step_data
+
+
+class UpdateStepAssignees(BaseResource):
+
+    url = '/v1/assignees/update/'
+
+    data_schema = {
+        Required('event_id'): All(int),
+        Required('step_id'): All(int),
+        Optional('assign_accounts_ids', default=[]): ListOf(int),
+        Optional('unassign_accounts_ids', default=[]): ListOf(int),
+    }
+
+    validators = [
+        AuthRequiredValidator(),
+        EventExistenceValidator(),
+        AccountIsEventParticipantValidator(),
+        StepExistenceValidator(),
+        UpdateAssigneesValidator(),
+    ]
+
+    def post(self):
+
+        step = self.data.get('step')
+
+        with db_session() as db:
+
+            for account_id in self.get_param('assign_accounts_ids'):
+                assignee = db.query(Assignee).filter_by(account_id=account_id, step_id=step.id).first()
+
+                if not assignee:
+                    new_assignee = Assignee(
+                        account_id=account_id,
+                        step=step,
+                    )
+                    db.add(new_assignee)
+
+            old_ids = self.get_param('unassign_accounts_ids')
+
+            if old_ids:
+                db.query(Assignee).filter(Assignee.account_id.in_(old_ids), Assignee.step_id == step.id).delete(synchronize_session=False)
+
+        self.response_data = {}

@@ -1,4 +1,4 @@
-auth_facebook
+auth facebook
 =============
 
 Аутентификация или создание аккаунта через facebook (OAuth2).

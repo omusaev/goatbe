@@ -1,11 +1,11 @@
 create step
 ===========
 
-Создание шага подготовки
+Создание шага.
 
 **URL**::
 
-    /{v}/events/steps/create/
+    /{v}/steps/create/
 
 **Method**::
 

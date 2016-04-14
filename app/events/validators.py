@@ -5,11 +5,12 @@ from sqlalchemy.orm import joinedload
 from common.exceptions import (
     EventNotFoundException, UserIsNotEventParticipant,
     StepNotFoundException, PermissionDeniedException,
-    StepIsNotInEventException
+    StepIsNotInEventException, InvalidParameterException
 )
 from common.validators import BaseValidator
 from db.helpers import db_session
 from events.models import Event, Participant, Step
+from events.permissions import PERMISSION
 
 __all__ = (
     'EventExistenceValidator',
@@ -87,3 +88,32 @@ class PermissionValidator(BaseValidator):
 
         if not set(self.permissions).issubset(set(participant_permissions)):
             raise PermissionDeniedException
+
+
+class UpdateAssigneesValidator(BaseValidator):
+    '''
+    Needs AccountIsEventParticipantValidator
+    '''
+
+    def run(self, resource, *args, **kwargs):
+
+        new_ids = resource.get_param('assign_accounts_ids')
+        old_ids = resource.get_param('unassign_accounts_ids')
+
+        if new_ids and old_ids and set(new_ids) & set(old_ids):
+            raise InvalidParameterException('assign_accounts_ids and unassign_accounts_ids have common ids')
+
+        if new_ids:
+            # TODO: do not use other validators
+            PermissionValidator(permissions=[PERMISSION.CREATE_STEP_ASSIGNEE, ]).run(resource, *args, **kwargs)
+
+            event = resource.data.get('event')
+
+            with db_session() as db:
+                # TODO: only ACTIVE participants
+                participants_count = db.query(Participant).filter(Participant.account_id.in_(new_ids), Participant.event_id == event.id).count()
+                if participants_count != len(new_ids):
+                    raise InvalidParameterException('Some of assign_accounts_ids not in event')
+
+        if old_ids:
+            PermissionValidator(permissions=[PERMISSION.DELETE_STEP_ASSIGNEE, ]).run(resource, *args, **kwargs)

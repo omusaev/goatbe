@@ -1,5 +1,5 @@
-/update_resolution/
-===================
+update assignee resolution
+==========================
 
 обновить резолюцию асайни
 

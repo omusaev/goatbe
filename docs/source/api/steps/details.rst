@@ -5,7 +5,7 @@ step details
 
 **URL**::
 
-    /{v}/events/steps/details/
+    /{v}/steps/details/
 
 **Method**::
 
