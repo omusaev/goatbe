@@ -37,6 +37,7 @@ Parameter        Default  Type     Format                   Required  Descriptio
 * STEP_NOT_FOUND
 * STEP_IS_NOT_IN_EVENT
 * PERMISSION_DENIED
+* INVALID_EVENT_STATUS
 
 **Пример запроса**
 

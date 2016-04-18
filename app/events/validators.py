@@ -5,7 +5,8 @@ from sqlalchemy.orm import joinedload
 from common.exceptions import (
     EventNotFoundException, UserIsNotEventParticipant,
     StepNotFoundException, PermissionDeniedException,
-    StepIsNotInEventException, InvalidParameterException
+    StepIsNotInEventException, InvalidParameterException,
+    InvalidEventStatusException,
 )
 from common.validators import BaseValidator
 from db.helpers import db_session
@@ -22,6 +23,9 @@ __all__ = (
 
 class EventExistenceValidator(BaseValidator):
 
+    def __init__(self, event_statuses=[]):
+        self.statuses = event_statuses
+
     def run(self, resource, *args, **kwargs):
         event_id = resource.get_param('event_id')
 
@@ -31,6 +35,9 @@ class EventExistenceValidator(BaseValidator):
 
         if not event:
             raise EventNotFoundException
+
+        if self.statuses and event.status not in self.statuses:
+            raise InvalidEventStatusException
 
         resource.data['event'] = event
 

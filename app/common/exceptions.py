@@ -15,6 +15,7 @@ __all__ = (
     'UserIsNotEventParticipant',
     'PermissionDeniedException',
     'StepNotFoundException',
+    'InvalidEventStatusException',
 )
 
 
@@ -106,3 +107,9 @@ class StepIsNotInEventException(GoatBaseException):
 
     error_code = 'STEP_IS_NOT_IN_EVENT'
     message = 'Step is not in event'
+
+
+class InvalidEventStatusException(GoatBaseException):
+
+    error_code = 'INVALID_EVENT_STATUS'
+    message = 'Invalid event status'
