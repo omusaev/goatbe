@@ -27,12 +27,14 @@ class Event(Base, GoatBasicModelMixin):
         READY = 'READY'
         IN_PROGRESS = 'IN_PROGRESS'
         FINISHED = 'FINISHED'
+        CANCELED = 'CANCELED'
 
         ALL = (
             PREPARATION,
             READY,
             IN_PROGRESS,
             FINISHED,
+            CANCELED,
         )
 
     class TYPE:

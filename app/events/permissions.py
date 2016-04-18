@@ -9,6 +9,8 @@ class PERMISSION(object):
 
     UPDATE_EVENT_DETAILS = 'update_event_details'
     READ_EVENT_DETAILS = 'read_event_details'
+    CANCEL_EVENT = 'cancel_event'
+    RESTORE_EVENT = 'restore_event'
     DELETE_EVENT = 'delete_event'
     INVITE_EVENT_PARTICIPANT = 'invite_event_participant'
     DELETE_EVENT_PARTICIPANT = 'delete_event_participant'
@@ -23,12 +25,15 @@ class PERMISSION(object):
     ALL = [
         UPDATE_EVENT_DETAILS,
         READ_EVENT_DETAILS,
+        CANCEL_EVENT,
+        RESTORE_EVENT,
         DELETE_EVENT,
         INVITE_EVENT_PARTICIPANT,
         DELETE_EVENT_PARTICIPANT,
         CREATE_EVENT_STEP,
         DELETE_EVENT_STEP,
         UPDATE_EVENT_STEP,
+        READ_STEP_DETAILS,
         CREATE_STEP_ASSIGNEE,
         DELETE_STEP_ASSIGNEE,
         UPDATE_STEP_RESOLUTION,
@@ -40,6 +45,11 @@ class PERMISSION(object):
         UPDATE_EVENT_DETAILS,
         READ_EVENT_DETAILS,
         INVITE_EVENT_PARTICIPANT,
+        DELETE_EVENT_PARTICIPANT,
+        CREATE_EVENT_STEP,
+        DELETE_EVENT_STEP,
+        UPDATE_EVENT_STEP,
+        READ_STEP_DETAILS,
         CREATE_STEP_ASSIGNEE,
         DELETE_STEP_ASSIGNEE,
         UPDATE_STEP_RESOLUTION,
