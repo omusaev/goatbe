@@ -29,6 +29,7 @@ __all__ = (
     'CreateStep',
     'UpdateStep',
     'StepDetails',
+    'DeleteStep',
 
     'UpdateStepAssignees',
 )
@@ -391,6 +392,34 @@ class StepDetails(BaseResource):
             })
 
         self.response_data = step_data
+
+
+class DeleteStep(BaseResource):
+
+    url = '/v1/steps/delete/'
+
+    data_schema = {
+        Required('event_id'): All(int),
+        Required('step_id'): All(int),
+    }
+
+    validators = [
+        AuthRequiredValidator(),
+        EventExistenceValidator(),
+        AccountIsEventParticipantValidator(),
+        PermissionValidator(permissions=[PERMISSION.DELETE_EVENT_STEP, ]),
+        StepExistenceValidator(),
+    ]
+
+    def post(self):
+
+        step = self.data.get('step')
+
+        with db_session() as db:
+            db.query(Assignee).filter(Assignee.step_id == step.id).delete(synchronize_session=False)
+            db.query(Step).filter(Step.id == step.id).delete(synchronize_session=False)
+
+        self.response_data = {}
 
 
 class UpdateStepAssignees(BaseResource):
