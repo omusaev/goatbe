@@ -9,3 +9,4 @@ API для работы с шагами ивента.
    create.rst
    update.rst
    details.rst
+   delete.rst
