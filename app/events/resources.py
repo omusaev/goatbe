@@ -23,6 +23,7 @@ __all__ = (
     'EventTypes',
     'CreateEvent',
     'UpdateEvent',
+    'CancelEvent',
     'EventDetails',
     'EventList',
 
@@ -168,6 +169,33 @@ class UpdateEvent(BaseResource):
 
         if finish_at:
             event.finish_at = finish_at
+
+        with db_session() as db:
+            db.merge(event)
+
+        self.response_data = {}
+
+
+class CancelEvent(BaseResource):
+
+    url = '/v1/events/cancel/'
+
+    data_schema = {
+        Required('event_id'): All(int),
+    }
+
+    validators = [
+        AuthRequiredValidator(),
+        EventExistenceValidator(),
+        AccountIsEventParticipantValidator(),
+        PermissionValidator(permissions=[PERMISSION.CANCEL_EVENT, ])
+    ]
+
+    def post(self):
+
+        event = self.data.get('event')
+
+        event.status = Event.STATUS.CANCELED
 
         with db_session() as db:
             db.merge(event)
