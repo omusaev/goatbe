@@ -24,6 +24,7 @@ __all__ = (
     'CreateEvent',
     'UpdateEvent',
     'CancelEvent',
+    'RestoreEvent',
     'EventDetails',
     'EventList',
 
@@ -140,7 +141,7 @@ class UpdateEvent(BaseResource):
 
     validators = [
         AuthRequiredValidator(),
-        EventExistenceValidator(),
+        EventExistenceValidator(event_statuses=[Event.STATUS.PREPARATION, Event.STATUS.IN_PROGRESS, Event.STATUS.READY, ]),
         AccountIsEventParticipantValidator(),
         PermissionValidator(permissions=[PERMISSION.UPDATE_EVENT_DETAILS, ])
     ]
@@ -186,7 +187,7 @@ class CancelEvent(BaseResource):
 
     validators = [
         AuthRequiredValidator(),
-        EventExistenceValidator(),
+        EventExistenceValidator(event_statuses=[Event.STATUS.PREPARATION, Event.STATUS.IN_PROGRESS, Event.STATUS.READY, ]),
         AccountIsEventParticipantValidator(),
         PermissionValidator(permissions=[PERMISSION.CANCEL_EVENT, ])
     ]
@@ -196,6 +197,34 @@ class CancelEvent(BaseResource):
         event = self.data.get('event')
 
         event.status = Event.STATUS.CANCELED
+
+        with db_session() as db:
+            db.merge(event)
+
+        self.response_data = {}
+
+
+class RestoreEvent(BaseResource):
+
+    url = '/v1/events/restore/'
+
+    data_schema = {
+        Required('event_id'): All(int),
+    }
+
+    validators = [
+        AuthRequiredValidator(),
+        EventExistenceValidator(event_statuses=[Event.STATUS.CANCELED, ]),
+        AccountIsEventParticipantValidator(),
+        PermissionValidator(permissions=[PERMISSION.RESTORE_EVENT, ])
+    ]
+
+    def post(self):
+
+        event = self.data.get('event')
+
+        # todo: what status we have to set?! It's time to think about event status calculation mechanism...
+        event.status = Event.STATUS.PREPARATION
 
         with db_session() as db:
             db.merge(event)
@@ -213,7 +242,7 @@ class EventDetails(BaseResource):
 
     validators = [
         AuthRequiredValidator(),
-        EventExistenceValidator(),
+        EventExistenceValidator(event_statuses=[Event.STATUS.PREPARATION, Event.STATUS.IN_PROGRESS, Event.STATUS.READY, Event.STATUS.CANCELED, ]),
         AccountIsEventParticipantValidator(),
         PermissionValidator(permissions=[PERMISSION.READ_EVENT_DETAILS, ])
     ]
@@ -319,7 +348,7 @@ class CreateStep(BaseResource):
 
     validators = [
         AuthRequiredValidator(),
-        EventExistenceValidator(),
+        EventExistenceValidator(event_statuses=[Event.STATUS.PREPARATION, Event.STATUS.IN_PROGRESS, Event.STATUS.READY, ]),
         AccountIsEventParticipantValidator(),
         PermissionValidator(permissions=[PERMISSION.CREATE_EVENT_STEP, ])
     ]
@@ -355,7 +384,7 @@ class UpdateStep(BaseResource):
 
     validators = [
         AuthRequiredValidator(),
-        EventExistenceValidator(),
+        EventExistenceValidator(event_statuses=[Event.STATUS.PREPARATION, Event.STATUS.IN_PROGRESS, Event.STATUS.READY, ]),
         AccountIsEventParticipantValidator(),
         PermissionValidator(permissions=[PERMISSION.UPDATE_EVENT_STEP, ]),
         StepExistenceValidator(),
@@ -391,7 +420,7 @@ class StepDetails(BaseResource):
 
     validators = [
         AuthRequiredValidator(),
-        EventExistenceValidator(),
+        EventExistenceValidator(event_statuses=[Event.STATUS.PREPARATION, Event.STATUS.IN_PROGRESS, Event.STATUS.READY, Event.STATUS.CANCELED, ]),
         AccountIsEventParticipantValidator(),
         PermissionValidator(permissions=[PERMISSION.READ_STEP_DETAILS, ]),
         StepExistenceValidator(),
@@ -433,7 +462,7 @@ class DeleteStep(BaseResource):
 
     validators = [
         AuthRequiredValidator(),
-        EventExistenceValidator(),
+        EventExistenceValidator(event_statuses=[Event.STATUS.PREPARATION, Event.STATUS.IN_PROGRESS, Event.STATUS.READY, ]),
         AccountIsEventParticipantValidator(),
         PermissionValidator(permissions=[PERMISSION.DELETE_EVENT_STEP, ]),
         StepExistenceValidator(),
@@ -463,7 +492,7 @@ class UpdateStepAssignees(BaseResource):
 
     validators = [
         AuthRequiredValidator(),
-        EventExistenceValidator(),
+        EventExistenceValidator(event_statuses=[Event.STATUS.PREPARATION, Event.STATUS.IN_PROGRESS, Event.STATUS.READY, ]),
         AccountIsEventParticipantValidator(),
         StepExistenceValidator(),
         UpdateAssigneesValidator(),

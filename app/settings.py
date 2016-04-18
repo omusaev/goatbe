@@ -41,6 +41,7 @@ INSTALLED_RESOURCES = [
     'events.resources.CreateEvent',
     'events.resources.UpdateEvent',
     'events.resources.CancelEvent',
+    'events.resources.RestoreEvent',
     'events.resources.EventDetails',
     'events.resources.EventList',
 

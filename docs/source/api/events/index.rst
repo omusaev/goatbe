@@ -12,3 +12,4 @@ API для работы с ивентами.
    details.rst
    list.rst
    cancel.rst
+   restore.rst
