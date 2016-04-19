@@ -242,7 +242,7 @@ class EventDetails(BaseResource):
 
     validators = [
         AuthRequiredValidator(),
-        EventExistenceValidator(event_statuses=[Event.STATUS.PREPARATION, Event.STATUS.IN_PROGRESS, Event.STATUS.READY, Event.STATUS.CANCELED, ]),
+        EventExistenceValidator(),
         AccountIsEventParticipantValidator(),
         PermissionValidator(permissions=[PERMISSION.READ_EVENT_DETAILS, ])
     ]
@@ -420,7 +420,7 @@ class StepDetails(BaseResource):
 
     validators = [
         AuthRequiredValidator(),
-        EventExistenceValidator(event_statuses=[Event.STATUS.PREPARATION, Event.STATUS.IN_PROGRESS, Event.STATUS.READY, Event.STATUS.CANCELED, ]),
+        EventExistenceValidator(),
         AccountIsEventParticipantValidator(),
         PermissionValidator(permissions=[PERMISSION.READ_STEP_DETAILS, ]),
         StepExistenceValidator(),
