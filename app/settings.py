@@ -32,7 +32,6 @@ MIDDLEWARES = [
 ]
 
 INSTALLED_RESOURCES = [
-    'api.resources.Ping',
     'accounts.resources.AuthFacebook',
     'accounts.resources.AuthAnonym',
     'accounts.resources.Logout',

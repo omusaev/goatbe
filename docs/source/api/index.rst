@@ -70,6 +70,4 @@ Status     Description
 .. toctree::
    :maxdepth: 2
 
-   errors.rst
-   language_codes.rst
-   permissions.rst
+   other/index.rst

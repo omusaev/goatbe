@@ -536,6 +536,7 @@ class UpdateAssigneesResolution(BaseResource):
     data_schema = {
         Required('event_id'): All(int),
         Required('step_id'): All(int),
+        # TODO: not work. need fix.
         Required('resolutions'): ListOf(resolution_schema),
     }
 

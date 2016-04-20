@@ -4,7 +4,7 @@ permissions
 Права участника ивента.
 
 ========================  =================================
-Pernission                Description
+Permission                Description
 ========================  =================================
 update_event_details      Редактирование ивента
 read_event_details        Просмотр ивента
