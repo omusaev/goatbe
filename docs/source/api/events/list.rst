@@ -20,6 +20,7 @@ event list
 ======================  ====  =============================================================================
 Parameter               Type  Description
 ======================  ====  =============================================================================
+``id``                  int   Id ивента
 ``status``              str   :doc:`Статус ивента <../other/event_statuses>`
 ``start_at``            str   Дата старта
 ``description``         str   Описание ивента
@@ -43,6 +44,7 @@ Parameter               Type  Description
        "status":"ok",
        "data":[
            {
+             "id":12,
              "status":"PREPARATION",
              "start_at":"2016-08-10 12:12:12",
              "description":"Just another hike",
@@ -53,6 +55,7 @@ Parameter               Type  Description
              "is_owner":true
            },
            {
+             "id":13,
              "status":"PREPARATION",
              "start_at":"2016-09-25 12:12:12",
              "description":"Wow! Qomolangma!",
