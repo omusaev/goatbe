@@ -50,7 +50,8 @@ INSTALLED_RESOURCES = [
     'events.resources.StepDetails',
     'events.resources.DeleteStep',
 
-    'events.resources.UpdateStepAssignees',
+    'events.resources.UpdateAssignees',
+    'events.resources.UpdateAssigneesResolution',
 ]
 
 SESSION_TTL = 60 * 60 * 24 * 14  # 2 weeks
