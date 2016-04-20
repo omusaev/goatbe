@@ -46,7 +46,6 @@ Parameter       Default  Type  Required  Description
 * STEP_IS_NOT_IN_EVENT
 * ASSIGNEE_NOT_FOUND
 * PERMISSION_DENIED
-* INVALID_EVENT_STATUS
 
 **Пример запроса**
 

@@ -39,7 +39,6 @@ Parameter        Type  Description
 * EVENT_NOT_FOUND
 * USER_IS_NOT_EVENT_PARTICIPANT
 * PERMISSION_DENIED
-* INVALID_EVENT_STATUS
 
 **Пример запроса**
 
