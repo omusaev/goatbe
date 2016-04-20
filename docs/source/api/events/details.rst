@@ -30,7 +30,6 @@ Parameter               Type  Description
 ``title``               str   Название ивента
 ``destination``         str   Место проведения
 ``finish_at``           str   Дата конца
-``participants_count``  int   Количество участников
 ``participants``        list  Участники
 ``steps``               list  Шаги
 ======================  ====  ==============================================

@@ -260,7 +260,6 @@ class EventDetails(BaseResource):
             'status': event.status,
             'start_at': event.start_at.strftime(EVENT_DATES_FORMAT),
             'finish_at': event.finish_at.strftime(EVENT_DATES_FORMAT),
-            'participants_count': len(event.participants),
             'participants': [],
             'steps': [],
         }
