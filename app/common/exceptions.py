@@ -15,6 +15,7 @@ __all__ = (
     'UserIsNotEventParticipant',
     'PermissionDeniedException',
     'StepNotFoundException',
+    'AssigneeNotFoundException',
     'InvalidEventStatusException',
 )
 
@@ -24,6 +25,10 @@ class GoatBaseException(Exception):
     status_code = status_codes.HTTP_200
     error_code = 'INTERNAL_ERROR'
     message = ''
+
+    def __init__(self, message=None):
+        if message is not None:
+            self.message = message
 
 
 class UnsupportedResourceMethodException(GoatBaseException):
@@ -38,27 +43,19 @@ class MissingParameterException(GoatBaseException):
     message_template = 'Missing parameter: %s'
 
     def __init__(self, param_name):
-        self.param_name = param_name
-
-    @property
-    def message(self):
-        return self.message_template % self.param_name
+        self.message = self.message_template % param_name
 
 
 class InvalidParameterException(GoatBaseException):
 
     error_code = 'INVALID_PARAMETER'
-
-    def __init__(self, message):
-        self.message = message
+    message = 'Invalid parameter'
 
 
 class FacebookLoginException(GoatBaseException):
 
     error_code = 'FACEBOOK_LOGIN_FAILED'
-
-    def __init__(self, message):
-        self.message = message
+    message = 'Facebook login failed'
 
 
 class AccountNotFoundException(GoatBaseException):
@@ -101,6 +98,12 @@ class StepNotFoundException(GoatBaseException):
 
     error_code = 'STEP_NOT_FOUND'
     message = 'Step not found'
+
+
+class AssigneeNotFoundException(GoatBaseException):
+
+    error_code = 'ASSIGNEE_NOT_FOUND'
+    message = 'Assignee not found'
 
 
 class StepIsNotInEventException(GoatBaseException):

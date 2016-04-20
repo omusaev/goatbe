@@ -6,6 +6,7 @@ from voluptuous import (
 
 from accounts.validators import AuthRequiredValidator
 
+from common.exceptions import AssigneeNotFoundException
 from common.schemas import ListOf
 from common.resources.base import BaseResource
 
@@ -33,7 +34,8 @@ __all__ = (
     'StepDetails',
     'DeleteStep',
 
-    'UpdateStepAssignees',
+    'UpdateAssignees',
+    'UpdateAssigneesResolution',
 )
 
 
@@ -141,7 +143,7 @@ class UpdateEvent(BaseResource):
 
     validators = [
         AuthRequiredValidator(),
-        EventExistenceValidator(event_statuses=[Event.STATUS.PREPARATION, Event.STATUS.IN_PROGRESS, Event.STATUS.READY, ]),
+        EventExistenceValidator(event_statuses=Event.STATUS.ALL_ACTIVE),
         AccountIsEventParticipantValidator(),
         PermissionValidator(permissions=[PERMISSION.UPDATE_EVENT_DETAILS, ])
     ]
@@ -187,7 +189,7 @@ class CancelEvent(BaseResource):
 
     validators = [
         AuthRequiredValidator(),
-        EventExistenceValidator(event_statuses=[Event.STATUS.PREPARATION, Event.STATUS.IN_PROGRESS, Event.STATUS.READY, ]),
+        EventExistenceValidator(event_statuses=Event.STATUS.ALL_ACTIVE),
         AccountIsEventParticipantValidator(),
         PermissionValidator(permissions=[PERMISSION.CANCEL_EVENT, ])
     ]
@@ -214,7 +216,7 @@ class RestoreEvent(BaseResource):
 
     validators = [
         AuthRequiredValidator(),
-        EventExistenceValidator(event_statuses=[Event.STATUS.CANCELED, ]),
+        EventExistenceValidator(event_statuses=(Event.STATUS.CANCELED, )),
         AccountIsEventParticipantValidator(),
         PermissionValidator(permissions=[PERMISSION.RESTORE_EVENT, ])
     ]
@@ -348,7 +350,7 @@ class CreateStep(BaseResource):
 
     validators = [
         AuthRequiredValidator(),
-        EventExistenceValidator(event_statuses=[Event.STATUS.PREPARATION, Event.STATUS.IN_PROGRESS, Event.STATUS.READY, ]),
+        EventExistenceValidator(event_statuses=Event.STATUS.ALL_ACTIVE),
         AccountIsEventParticipantValidator(),
         PermissionValidator(permissions=[PERMISSION.CREATE_EVENT_STEP, ])
     ]
@@ -384,7 +386,7 @@ class UpdateStep(BaseResource):
 
     validators = [
         AuthRequiredValidator(),
-        EventExistenceValidator(event_statuses=[Event.STATUS.PREPARATION, Event.STATUS.IN_PROGRESS, Event.STATUS.READY, ]),
+        EventExistenceValidator(event_statuses=Event.STATUS.ALL_ACTIVE),
         AccountIsEventParticipantValidator(),
         PermissionValidator(permissions=[PERMISSION.UPDATE_EVENT_STEP, ]),
         StepExistenceValidator(),
@@ -462,7 +464,7 @@ class DeleteStep(BaseResource):
 
     validators = [
         AuthRequiredValidator(),
-        EventExistenceValidator(event_statuses=[Event.STATUS.PREPARATION, Event.STATUS.IN_PROGRESS, Event.STATUS.READY, ]),
+        EventExistenceValidator(event_statuses=Event.STATUS.ALL_ACTIVE),
         AccountIsEventParticipantValidator(),
         PermissionValidator(permissions=[PERMISSION.DELETE_EVENT_STEP, ]),
         StepExistenceValidator(),
@@ -470,16 +472,16 @@ class DeleteStep(BaseResource):
 
     def post(self):
 
-        step = self.data.get('step')
+        step_id = self.get_param('step_id')
 
         with db_session() as db:
-            db.query(Assignee).filter(Assignee.step_id == step.id).delete(synchronize_session=False)
-            db.query(Step).filter(Step.id == step.id).delete(synchronize_session=False)
+            db.query(Assignee).filter(Assignee.step_id == step_id).delete(synchronize_session=False)
+            db.query(Step).filter(Step.id == step_id).delete(synchronize_session=False)
 
         self.response_data = {}
 
 
-class UpdateStepAssignees(BaseResource):
+class UpdateAssignees(BaseResource):
 
     url = '/v1/assignees/update/'
 
@@ -492,7 +494,7 @@ class UpdateStepAssignees(BaseResource):
 
     validators = [
         AuthRequiredValidator(),
-        EventExistenceValidator(event_statuses=[Event.STATUS.PREPARATION, Event.STATUS.IN_PROGRESS, Event.STATUS.READY, ]),
+        EventExistenceValidator(event_statuses=Event.STATUS.ALL_ACTIVE),
         AccountIsEventParticipantValidator(),
         StepExistenceValidator(),
         UpdateAssigneesValidator(),
@@ -518,5 +520,49 @@ class UpdateStepAssignees(BaseResource):
 
             if old_ids:
                 db.query(Assignee).filter(Assignee.account_id.in_(old_ids), Assignee.step_id == step.id).delete(synchronize_session=False)
+
+        self.response_data = {}
+
+
+class UpdateAssigneesResolution(BaseResource):
+
+    url = '/v1/assignees/resolution/update/'
+
+    resolution_schema = {
+        Required('account_id'): All(int),
+        Required('resolution', default=Assignee.RESOLUTION.OPEN): All(Upper, In(Assignee.RESOLUTION.ALL)),
+    }
+
+    data_schema = {
+        Required('event_id'): All(int),
+        Required('step_id'): All(int),
+        Required('resolutions'): ListOf(resolution_schema),
+    }
+
+    validators = [
+        AuthRequiredValidator(),
+        EventExistenceValidator(event_statuses=Event.STATUS.ALL_ACTIVE),
+        AccountIsEventParticipantValidator(),
+        PermissionValidator(permissions=[PERMISSION.UPDATE_STEP_RESOLUTION, ]),
+        StepExistenceValidator(),
+    ]
+
+    def post(self):
+
+        step_id = self.get_param('step_id')
+        resolutions = self.get_param('resolutions')
+
+        with db_session() as db:
+
+            for item in resolutions:
+                account_id = item.get('account_id')
+                resolution = item.get('resolution')
+                assignee = db.query(Assignee).filter_by(account_id=account_id, step_id=step_id).first()
+
+                if not assignee:
+                    raise AssigneeNotFoundException('Assignee with account_id %s from step %s was not found' % (account_id, step_id))
+
+                assignee.resolution = resolution
+                db.merge(assignee)
 
         self.response_data = {}

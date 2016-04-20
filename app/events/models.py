@@ -37,6 +37,12 @@ class Event(Base, GoatBasicModelMixin):
             CANCELED,
         )
 
+        ALL_ACTIVE = (
+            PREPARATION,
+            READY,
+            IN_PROGRESS,
+        )
+
     class TYPE:
         HIKING = 'HIKING'
         JOURNEY = 'JOURNEY'
