@@ -6,7 +6,7 @@ from voluptuous import (
 
 from accounts.validators import AuthRequiredValidator
 
-from common.exceptions import AssigneeNotFoundException
+from common.exceptions import AssigneeNotFoundException, UserIsNotEventParticipant
 from common.schemas import ListOf
 from common.resources.base import BaseResource
 
@@ -17,7 +17,8 @@ from events.models import Event, Participant, Step, Assignee
 from events.permissions import PERMISSION
 from events.validators import (
     EventExistenceValidator, AccountIsEventParticipantValidator,
-    StepExistenceValidator, PermissionValidator, UpdateAssigneesValidator
+    StepExistenceValidator, PermissionValidator, UpdateAssigneesValidator,
+    getEventParticipant
 )
 
 __all__ = (
@@ -29,6 +30,8 @@ __all__ = (
     'DeleteEvent',
     'EventDetails',
     'EventList',
+
+    'DeleteParticipant',
 
     'CreateStep',
     'UpdateStep',
@@ -362,6 +365,36 @@ class EventList(BaseResource):
         self.response_data = response_data
 
 
+class DeleteParticipant(BaseResource):
+
+    url = '/v1/participants/delete/'
+
+    data_schema = {
+        Required('event_id'): All(int),
+        Required('account_id'): All(int),
+    }
+
+    validators = [
+        AuthRequiredValidator(),
+        EventExistenceValidator(),
+        AccountIsEventParticipantValidator(),
+        PermissionValidator(permissions=[PERMISSION.DELETE_EVENT_PARTICIPANT, ])
+    ]
+
+    def post(self):
+
+        event = self.data.get('event')
+        account_id = self.get_param('account_id')
+
+        with db_session() as db:
+            db.query(Participant).filter(Participant.account_id == account_id, Participant.event_id == event.id).delete(synchronize_session=False)
+
+            for step in event.steps:
+                db.query(Assignee).filter(Assignee.account_id == account_id, Assignee.step_id == step.id).delete(synchronize_session=False)
+
+        self.response_data = {}
+
+
 class CreateStep(BaseResource):
 
     url = '/v1/steps/create/'
@@ -526,11 +559,16 @@ class UpdateAssignees(BaseResource):
 
     def post(self):
 
+        event = self.data.get('event')
         step = self.data.get('step')
 
         with db_session() as db:
 
             for account_id in self.get_param('assign_accounts_ids'):
+                if not getEventParticipant(account_id=account_id, event_id=event.id):
+                    msg = 'Account with id %s is not in event %s', (account_id, event.id)
+                    raise UserIsNotEventParticipant(msg)
+
                 assignee = db.query(Assignee).filter_by(account_id=account_id, step_id=step.id).first()
 
                 if not assignee:

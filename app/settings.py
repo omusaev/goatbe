@@ -45,6 +45,8 @@ INSTALLED_RESOURCES = [
     'events.resources.EventDetails',
     'events.resources.EventList',
 
+    'events.resources.DeleteParticipant',
+
     'events.resources.CreateStep',
     'events.resources.UpdateStep',
     'events.resources.StepDetails',
