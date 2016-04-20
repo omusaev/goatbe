@@ -23,7 +23,7 @@ __all__ = (
 
 class EventExistenceValidator(BaseValidator):
 
-    def __init__(self, event_statuses=[]):
+    def __init__(self, event_statuses=()):
         self.statuses = event_statuses
 
     def run(self, resource, *args, **kwargs):
