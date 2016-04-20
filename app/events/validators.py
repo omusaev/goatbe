@@ -23,14 +23,13 @@ __all__ = (
 
 class EventExistenceValidator(BaseValidator):
 
-    def __init__(self, event_statuses=Event.STATUS.ALL):
+    def __init__(self, event_statuses=[]):
         self.statuses = event_statuses
 
     def run(self, resource, *args, **kwargs):
         event_id = resource.get_param('event_id')
 
         with db_session() as db:
-            # todo: add is_deleted==false condition
             event = db.query(Event).options(joinedload('*')).get(event_id)
 
         if not event:
