@@ -23,12 +23,12 @@ Parameter        Default  Type              Required  Description
 
 Формат resolution
 
-===============  =======  ====  ========  ===========
-Parameter        Default  Type  Required  Description
-===============  =======  ====  ========  ===========
-``account_id``            int   true      Id аккунта
-``resolution``            str   true      Резролюция
-===============  =======  ====  ========  ===========
+==============  =======  ====  ========  ================================================
+Parameter       Default  Type  Required  Description
+==============  =======  ====  ========  ================================================
+``account_id``           int   true      Id аккунта
+``resolution``           str   true      :doc:`Резолюция <../other/assignee_resolutions>`
+==============  =======  ====  ========  ================================================
 
 **Структура data**
 

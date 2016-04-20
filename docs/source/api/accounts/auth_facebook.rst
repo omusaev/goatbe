@@ -29,7 +29,7 @@ Parameter              Default  Type  Required  Description
 =====================  ====  =====================
 Parameter              Type  Description
 =====================  ====  =====================
-``user_access_token``  str   FB Токен пользователя
+``user_access_token``  str   FB токен пользователя
 ``account_id``         int   Id пользователя
 =====================  ====  =====================
 
