@@ -1,11 +1,11 @@
-delete event
-============
+leave event
+===========
 
-Удаление ивента.
+Покинуть ивент.
 
 **URL**::
 
-    /{v}/events/delete/
+    /{v}/events/leave/
 
 **Method**::
 
@@ -13,11 +13,11 @@ delete event
 
 **Параметры запроса**
 
-============  ====  ========  ===========
-Parameter     Type  Required  Description
-============  ====  ========  ===========
-``event_id``  int   true      Id ивента
-============  ====  ========  ===========
+============  =======  ====  ========  ===========
+Parameter     Default  Type  Required  Description
+============  =======  ====  ========  ===========
+``event_id``           int   true      Id ивента
+============  =======  ====  ========  ===========
 
 **Структура data**
 
@@ -31,7 +31,6 @@ Parameter     Type  Required  Description
 * AUTH_REQUIRED
 * EVENT_NOT_FOUND
 * USER_IS_NOT_EVENT_PARTICIPANT
-* PERMISSION_DENIED
 
 **Пример запроса**
 

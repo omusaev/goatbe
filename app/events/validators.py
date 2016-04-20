@@ -18,6 +18,8 @@ __all__ = (
     'StepExistenceValidator',
     'AccountIsEventParticipantValidator',
     'PermissionValidator',
+    'UpdateAssigneesValidator',
+    'getEventParticipant',
 )
 
 
@@ -70,9 +72,7 @@ class AccountIsEventParticipantValidator(BaseValidator):
     def run(self, resource, *args, **kwargs):
         account_id = resource.account_info.account_id
         event = resource.data['event']
-
-        with db_session() as db:
-            participant = db.query(Participant).filter_by(account_id=account_id, event_id=event.id).first()
+        participant = getEventParticipant(account_id, event.id)
 
         if not participant:
             raise UserIsNotEventParticipant
@@ -123,3 +123,11 @@ class UpdateAssigneesValidator(BaseValidator):
 
         if old_ids:
             PermissionValidator(permissions=[PERMISSION.DELETE_STEP_ASSIGNEE, ]).run(resource, *args, **kwargs)
+
+
+def getEventParticipant(account_id, event_id):
+
+    with db_session() as db:
+        participant = db.query(Participant).filter_by(account_id=account_id, event_id=event_id).first()
+
+    return participant or None

@@ -42,7 +42,7 @@ Parameter     Default  Type  Required  Description
 
     {
         "event_id": 1,
-        "step_id": 2,
+        "step_id": 2
     }
 
 **Пример ответа**
