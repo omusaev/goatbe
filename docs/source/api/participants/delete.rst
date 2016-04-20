@@ -40,7 +40,7 @@ Parameter       Default  Type  Required  Description
 
     {
         "event_id": 1,
-        "account_id": 2,
+        "account_id": 2
     }
 
 **Пример ответа**

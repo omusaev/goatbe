@@ -28,6 +28,7 @@ __all__ = (
     'CancelEvent',
     'RestoreEvent',
     'DeleteEvent',
+    'LeaveEvent',
     'EventDetails',
     'EventList',
 
@@ -259,6 +260,34 @@ class DeleteEvent(BaseResource):
 
         with db_session() as db:
             db.delete(event)
+
+        self.response_data = {}
+
+
+class LeaveEvent(BaseResource):
+
+    url = '/v1/events/leave/'
+
+    data_schema = {
+        Required('event_id'): All(int),
+    }
+
+    validators = [
+        AuthRequiredValidator(),
+        EventExistenceValidator(),
+        AccountIsEventParticipantValidator(),
+    ]
+
+    def post(self):
+
+        event = self.data.get('event')
+        account_id = self.account_info.account_id
+
+        with db_session() as db:
+            db.query(Participant).filter(Participant.account_id == account_id, Participant.event_id == event.id).delete(synchronize_session=False)
+
+            for step in event.steps:
+                db.query(Assignee).filter(Assignee.account_id == account_id, Assignee.step_id == step.id).delete(synchronize_session=False)
 
         self.response_data = {}
 

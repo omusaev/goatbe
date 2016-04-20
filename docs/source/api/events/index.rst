@@ -14,3 +14,4 @@ API для работы с ивентами.
    cancel.rst
    restore.rst
    delete.rst
+   leave.rst
