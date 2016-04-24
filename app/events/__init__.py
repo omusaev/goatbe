@@ -9,7 +9,7 @@ __all__ = (
 
 EVENT_TYPES_DESCRIPTION = {
     Event.TYPE.HIKING: {
-        'en_EN': {
+        'en': {
             'title': u'Hiking',
             'description': u'',
             'steps': [
@@ -105,7 +105,7 @@ EVENT_TYPES_DESCRIPTION = {
                 },
             ]
         },
-        'ru_RU': {
+        'ru': {
             'title': u'Пеший поход',
             'description': u'',
             'steps': [
@@ -203,7 +203,7 @@ EVENT_TYPES_DESCRIPTION = {
         },
     },
     Event.TYPE.JOURNEY: {
-        'en_EN': {
+        'en': {
             'title': u'Journey',
             'description': u'',
             'steps': [
@@ -269,7 +269,7 @@ EVENT_TYPES_DESCRIPTION = {
                 },
             ]
         },
-        'ru_RU': {
+        'ru': {
             'title': u'Поездка',
             'description': u'',
             'steps': [
