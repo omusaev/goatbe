@@ -6,7 +6,7 @@ from common.exceptions import (
     EventNotFoundException, UserIsNotEventParticipant,
     StepNotFoundException, PermissionDeniedException,
     StepIsNotInEventException, InvalidParameterException,
-    InvalidEventStatusException,
+    InvalidEventStatusException, InvalidEventSecretException,
 )
 from common.validators import BaseValidator
 from db.helpers import db_session
@@ -19,6 +19,7 @@ __all__ = (
     'AccountIsEventParticipantValidator',
     'PermissionValidator',
     'UpdateAssigneesValidator',
+    'EventSecretValidator',
     'getEventParticipant',
 )
 
@@ -69,10 +70,15 @@ class AccountIsEventParticipantValidator(BaseValidator):
     Needs EventExistenceValidator
     '''
 
+    def __init__(self, only_active=True):
+        self.only_active = only_active
+
     def run(self, resource, *args, **kwargs):
         account_id = resource.account_info.account_id
         event = resource.data['event']
-        participant = getEventParticipant(account_id, event.id)
+
+        participant_status = Participant.STATUS.ACTIVE if self.only_active else None
+        participant = getEventParticipant(account_id, event.id, participant_status)
 
         if not participant:
             raise UserIsNotEventParticipant
@@ -125,9 +131,31 @@ class UpdateAssigneesValidator(BaseValidator):
             PermissionValidator(permissions=[PERMISSION.DELETE_STEP_ASSIGNEE, ]).run(resource, *args, **kwargs)
 
 
-def getEventParticipant(account_id, event_id):
+class EventSecretValidator(BaseValidator):
+    '''
+    Needs EventExistenceValidator
+    '''
+
+    def run(self, resource, *args, **kwargs):
+
+        event = resource.data['event']
+        secret = resource.get_param('event_secret')
+
+        if event.secret != secret:
+            raise InvalidEventSecretException()
+
+
+def getEventParticipant(account_id, event_id, status=None):
 
     with db_session() as db:
-        participant = db.query(Participant).filter_by(account_id=account_id, event_id=event_id).first()
+        filters = {
+            'account_id': account_id,
+            'event_id': event_id,
+        }
+
+        if status:
+            filters.update({'status': status})
+
+        participant = db.query(Participant).filter_by(**filters).first()
 
     return participant or None

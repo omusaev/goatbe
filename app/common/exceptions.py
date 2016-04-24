@@ -17,6 +17,7 @@ __all__ = (
     'StepNotFoundException',
     'AssigneeNotFoundException',
     'InvalidEventStatusException',
+    'InvalidEventSecretException',
 )
 
 
@@ -116,3 +117,9 @@ class InvalidEventStatusException(GoatBaseException):
 
     error_code = 'INVALID_EVENT_STATUS'
     message = 'Invalid event status'
+
+
+class InvalidEventSecretException(GoatBaseException):
+
+    error_code = 'INVALID_EVENT_SECRET'
+    message = 'Invalid event secret'

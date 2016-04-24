@@ -32,6 +32,7 @@ Parameter               Type  Description
 ``finish_at``           str   Дата конца
 ``participants``        list  Участники
 ``steps``               list  Шаги
+``secret``              list  Секретная строка
 ======================  ====  ==============================================
 
 Элементы ``participants`` имеют следующую структуру.
@@ -107,7 +108,6 @@ Parameter       Type  Description
           "title":"Yearly extreme",
           "destination":"Georgia",
           "finish_at":"2016-09-10 12:12:12",
-          "participants_count":3,
           "participants":[
              {
                 "status":"ACTIVE",

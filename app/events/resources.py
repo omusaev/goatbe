@@ -18,6 +18,7 @@ from events.permissions import PERMISSION
 from events.validators import (
     EventExistenceValidator, AccountIsEventParticipantValidator,
     StepExistenceValidator, PermissionValidator, UpdateAssigneesValidator,
+    EventSecretValidator,
     getEventParticipant
 )
 
@@ -30,9 +31,13 @@ __all__ = (
     'DeleteEvent',
     'LeaveEvent',
     'EventDetails',
+    'ShortEventDetails',
+    'ShortEventDetailsBySecret',
     'EventList',
 
     'DeleteParticipant',
+    'CreateParticipant',
+    'ActivateParticipant',
 
     'CreateStep',
     'UpdateStep',
@@ -318,6 +323,7 @@ class EventDetails(BaseResource):
             'status': event.status,
             'start_at': event.start_at.strftime(EVENT_DATES_FORMAT),
             'finish_at': event.finish_at.strftime(EVENT_DATES_FORMAT),
+            'secret': event.secret,
             'participants': [],
             'steps': [],
         }
@@ -356,6 +362,61 @@ class EventDetails(BaseResource):
             event_data['steps'].append(full_step)
 
         self.response_data = event_data
+
+
+class ShortEventDetails(BaseResource):
+
+    url = '/v1/events/details/short/'
+
+    data_schema = {
+        Required('event_id'): All(int),
+    }
+
+    validators = [
+        AuthRequiredValidator(),
+        EventExistenceValidator(),
+        AccountIsEventParticipantValidator(only_active=False),
+    ]
+
+    def post(self):
+
+        event = self.data.get('event')
+
+        event_data = {
+            'title': event.title,
+            'destination': event.destination,
+            'description': event.description,
+            'status': event.status,
+            'start_at': event.start_at.strftime(EVENT_DATES_FORMAT),
+            'finish_at': event.finish_at.strftime(EVENT_DATES_FORMAT),
+            'participants': [],
+        }
+
+        for participant in event.participants:
+            event_data['participants'].append({
+                'account': {
+                    'name': participant.account.name,
+                    'avatar_url': participant.account.avatar_url,
+                },
+                'status': participant.status,
+            })
+
+        self.response_data = event_data
+
+
+class ShortEventDetailsBySecret(ShortEventDetails):
+
+    url = '/v1/events/details/short/secret/'
+
+    data_schema = {
+        Required('event_id'): All(int),
+        Required('event_secret'): All(unicode, Length(min=32, max=32)),
+    }
+
+    validators = [
+        EventExistenceValidator(),
+        EventSecretValidator(),
+    ]
 
 
 class EventList(BaseResource):
@@ -420,6 +481,65 @@ class DeleteParticipant(BaseResource):
 
             for step in event.steps:
                 db.query(Assignee).filter(Assignee.account_id == account_id, Assignee.step_id == step.id).delete(synchronize_session=False)
+
+        self.response_data = {}
+
+
+class CreateParticipant(BaseResource):
+
+    url = '/v1/participants/create/'
+
+    data_schema = {
+        Required('event_id'): All(int),
+        Required('event_secret'): All(unicode, Length(min=32, max=32)),
+    }
+
+    validators = [
+        AuthRequiredValidator(),
+        EventExistenceValidator(),
+        EventSecretValidator(),
+    ]
+
+    def post(self):
+
+        event = self.data.get('event')
+        account = self.account_info.account
+
+        with db_session() as db:
+            participant = Participant(
+                account=account,
+                event=event,
+                is_owner=False,
+                status=Participant.STATUS.INACTIVE,
+                permissions=PERMISSION.DEFAULT_INACTIVE_SET,
+            )
+            db.merge(participant)
+
+        self.response_data = {}
+
+
+class ActivateParticipant(BaseResource):
+
+    url = '/v1/participants/activate/'
+
+    data_schema = {
+        Required('event_id'): All(int),
+    }
+
+    validators = [
+        AuthRequiredValidator(),
+        EventExistenceValidator(),
+        AccountIsEventParticipantValidator(only_active=False),
+    ]
+
+    def post(self):
+
+        participant = self.data.get('participant')
+
+        with db_session() as db:
+            participant.permissions = PERMISSION.DEFAULT_NOT_OWNER_SET
+            participant.status = Participant.STATUS.ACTIVE
+            db.merge(participant)
 
         self.response_data = {}
 

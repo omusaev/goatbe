@@ -54,3 +54,5 @@ class PERMISSION(object):
         DELETE_STEP_ASSIGNEE,
         UPDATE_STEP_RESOLUTION,
     ]
+
+    DEFAULT_INACTIVE_SET = []

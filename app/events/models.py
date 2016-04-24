@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 
 import sqlalchemy as sa
+import uuid
+
 from sqlalchemy import Column, BigInteger, String, DateTime, Text, ForeignKey, Boolean
 from sqlalchemy.dialects.postgresql import JSON
 from sqlalchemy.orm import relationship, backref
@@ -53,6 +55,7 @@ class Event(Base, GoatBasicModelMixin):
     type = Column(String(64), nullable=False)
     start_at = Column(DateTime, nullable=False)
     finish_at = Column(DateTime, nullable=False)
+    secret = Column(String(32), nullable=False, default=uuid.uuid4().get_hex)
 
     steps = relationship(
         'Step',
