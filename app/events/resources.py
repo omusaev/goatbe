@@ -56,7 +56,7 @@ class EventTypes(BaseResource):
         AuthRequiredValidator(),
     ]
 
-    def get(self):
+    def post(self):
 
         lang = self.get_param('lang')
         response_data = []
@@ -307,7 +307,7 @@ class EventDetails(BaseResource):
         PermissionValidator(permissions=[PERMISSION.READ_EVENT_DETAILS, ])
     ]
 
-    def get(self):
+    def post(self):
 
         event = self.data.get('event')
 
@@ -366,7 +366,7 @@ class EventList(BaseResource):
         AuthRequiredValidator(),
     ]
 
-    def get(self):
+    def post(self):
 
         response_data = []
         account_id = self.account_info.account_id
@@ -515,7 +515,7 @@ class StepDetails(BaseResource):
         StepExistenceValidator(),
     ]
 
-    def get(self):
+    def post(self):
 
         step = self.data.get('step')
 

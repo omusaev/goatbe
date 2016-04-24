@@ -9,7 +9,7 @@ step details
 
 **Method**::
 
-    GET
+    POST
 
 **Параметры запроса**
 

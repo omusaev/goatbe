@@ -9,7 +9,7 @@ event details
 
 **Method**::
 
-    GET
+    POST
 
 **Параметры запроса**
 

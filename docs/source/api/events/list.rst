@@ -9,7 +9,7 @@ event list
 
 **Method**::
 
-    GET
+    POST
 
 **Параметры запроса**
 
