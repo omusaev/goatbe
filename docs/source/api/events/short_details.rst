@@ -59,6 +59,7 @@ Parameter       Type  Description
 * AUTH_REQUIRED
 * EVENT_NOT_FOUND
 * USER_IS_NOT_EVENT_PARTICIPANT
+* PERMISSION_DENIED
 
 **Пример запроса**
 

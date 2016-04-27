@@ -281,6 +281,7 @@ class LeaveEvent(BaseResource):
         AuthRequiredValidator(),
         EventExistenceValidator(),
         AccountIsEventParticipantValidator(),
+        PermissionValidator(permissions=[PERMISSION.LEAVE_EVENT, ])
     ]
 
     def post(self):
@@ -309,7 +310,7 @@ class EventDetails(BaseResource):
         AuthRequiredValidator(),
         EventExistenceValidator(),
         AccountIsEventParticipantValidator(),
-        PermissionValidator(permissions=[PERMISSION.READ_EVENT_DETAILS, ])
+        PermissionValidator(permissions=[PERMISSION.READ_EVENT_DETAILS, ]),
     ]
 
     def post(self):
@@ -375,7 +376,8 @@ class ShortEventDetails(BaseResource):
     validators = [
         AuthRequiredValidator(),
         EventExistenceValidator(),
-        AccountIsEventParticipantValidator(only_active=False),
+        AccountIsEventParticipantValidator(),
+        PermissionValidator(permissions=[PERMISSION.READ_SHORT_EVENT_DETAILS, ]),
     ]
 
     def post(self):
@@ -529,7 +531,8 @@ class ActivateParticipant(BaseResource):
     validators = [
         AuthRequiredValidator(),
         EventExistenceValidator(),
-        AccountIsEventParticipantValidator(only_active=False),
+        AccountIsEventParticipantValidator(),
+        PermissionValidator(permissions=[PERMISSION.ACTIVATE_EVENT_PARTICIPANT, ])
     ]
 
     def post(self):

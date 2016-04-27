@@ -70,15 +70,11 @@ class AccountIsEventParticipantValidator(BaseValidator):
     Needs EventExistenceValidator
     '''
 
-    def __init__(self, only_active=True):
-        self.only_active = only_active
-
     def run(self, resource, *args, **kwargs):
         account_id = resource.account_info.account_id
         event = resource.data['event']
 
-        participant_status = Participant.STATUS.ACTIVE if self.only_active else None
-        participant = getEventParticipant(account_id, event.id, participant_status)
+        participant = getEventParticipant(account_id, event.id)
 
         if not participant:
             raise UserIsNotEventParticipant
@@ -145,17 +141,9 @@ class EventSecretValidator(BaseValidator):
             raise InvalidEventSecretException()
 
 
-def getEventParticipant(account_id, event_id, status=None):
+def getEventParticipant(account_id, event_id):
 
     with db_session() as db:
-        filters = {
-            'account_id': account_id,
-            'event_id': event_id,
-        }
-
-        if status:
-            filters.update({'status': status})
-
-        participant = db.query(Participant).filter_by(**filters).first()
+        participant = db.query(Participant).filter_by(account_id=account_id, event_id=event_id).first()
 
     return participant or None
