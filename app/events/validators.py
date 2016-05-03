@@ -6,7 +6,7 @@ from common.exceptions import (
     EventNotFoundException, UserIsNotEventParticipant,
     StepNotFoundException, PermissionDeniedException,
     StepIsNotInEventException, InvalidParameterException,
-    InvalidEventStatusException,
+    InvalidEventStatusException, InvalidEventSecretException,
 )
 from common.validators import BaseValidator
 from db.helpers import db_session
@@ -19,6 +19,7 @@ __all__ = (
     'AccountIsEventParticipantValidator',
     'PermissionValidator',
     'UpdateAssigneesValidator',
+    'EventSecretValidator',
     'getEventParticipant',
 )
 
@@ -72,6 +73,7 @@ class AccountIsEventParticipantValidator(BaseValidator):
     def run(self, resource, *args, **kwargs):
         account_id = resource.account_info.account_id
         event = resource.data['event']
+
         participant = getEventParticipant(account_id, event.id)
 
         if not participant:
@@ -123,6 +125,20 @@ class UpdateAssigneesValidator(BaseValidator):
 
         if old_ids:
             PermissionValidator(permissions=[PERMISSION.DELETE_STEP_ASSIGNEE, ]).run(resource, *args, **kwargs)
+
+
+class EventSecretValidator(BaseValidator):
+    '''
+    Needs EventExistenceValidator
+    '''
+
+    def run(self, resource, *args, **kwargs):
+
+        event = resource.data['event']
+        secret = resource.get_param('event_secret')
+
+        if event.secret != secret:
+            raise InvalidEventSecretException()
 
 
 def getEventParticipant(account_id, event_id):

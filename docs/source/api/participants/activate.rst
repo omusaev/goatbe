@@ -1,11 +1,11 @@
-delete participant
-==================
+activate participant
+====================
 
-Удаление участника.
+Активация участника.
 
 **URL**::
 
-    /{v}/participants/delete/
+    /{v}/participants/activate/
 
 **Method**::
 
@@ -13,12 +13,11 @@ delete participant
 
 **Параметры запроса**
 
-==============  =======  ====  ========  ===========
-Parameter       Default  Type  Required  Description
-==============  =======  ====  ========  ===========
-``event_id``             int   true      Id ивента
-``account_id``           int   true      Id аккаунта
-==============  =======  ====  ========  ===========
+============  =======  ====  ========  ===========
+Parameter     Default  Type  Required  Description
+============  =======  ====  ========  ===========
+``event_id``           int   true      Id ивента
+============  =======  ====  ========  ===========
 
 **Структура data**
 
@@ -39,8 +38,7 @@ Parameter       Default  Type  Required  Description
 .. code-block:: javascript
 
     {
-        "event_id": 1,
-        "account_id": 2
+        "event_id": 2
     }
 
 **Пример ответа**

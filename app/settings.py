@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+import logging
+import logging.config
 import os
 
 PROJECT_ROOT = os.path.dirname(os.path.realpath(__file__))
@@ -44,9 +46,13 @@ INSTALLED_RESOURCES = [
     'events.resources.DeleteEvent',
     'events.resources.LeaveEvent',
     'events.resources.EventDetails',
+    'events.resources.ShortEventDetails',
+    'events.resources.ShortEventDetailsBySecret',
     'events.resources.EventList',
 
     'events.resources.DeleteParticipant',
+    'events.resources.CreateParticipant',
+    'events.resources.ActivateParticipant',
 
     'events.resources.CreateStep',
     'events.resources.UpdateStep',
@@ -73,8 +79,7 @@ except ImportError:
     pass
 
 
-import logging
-
+# Logging
 
 class LevelFilter(logging.Filter):
 
@@ -179,6 +184,4 @@ LOGGING = {
     }
 }
 
-
-import logging.config
 logging.config.dictConfig(LOGGING)

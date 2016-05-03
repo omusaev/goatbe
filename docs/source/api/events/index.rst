@@ -10,6 +10,8 @@ API для работы с ивентами.
    create.rst
    update.rst
    details.rst
+   short_details.rst
+   short_details_secret.rst
    list.rst
    cancel.rst
    restore.rst
