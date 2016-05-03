@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+import logging
+import logging.config
 import os
 
 PROJECT_ROOT = os.path.dirname(os.path.realpath(__file__))
@@ -77,8 +79,7 @@ except ImportError:
     pass
 
 
-import logging
-
+# Logging
 
 class LevelFilter(logging.Filter):
 
@@ -183,6 +184,4 @@ LOGGING = {
     }
 }
 
-
-import logging.config
 logging.config.dictConfig(LOGGING)
