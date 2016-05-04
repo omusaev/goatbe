@@ -3,7 +3,7 @@
 from voluptuous import *
 
 
-# Refactor that
+# todo: Refactor that
 class ListOf(object):
     """Matches each element in a sequence against the corresponding element in
     the validators.
