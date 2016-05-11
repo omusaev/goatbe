@@ -18,6 +18,8 @@ __all__ = (
     'AssigneeNotFoundException',
     'InvalidEventStatusException',
     'InvalidEventSecretException',
+    'InvalidAuthMethodException',
+    'InvalidAccountStateException',
 )
 
 
@@ -123,3 +125,15 @@ class InvalidEventSecretException(GoatBaseException):
 
     error_code = 'INVALID_EVENT_SECRET'
     message = 'Invalid event secret'
+
+
+class InvalidAuthMethodException(GoatBaseException):
+
+    error_code = 'INVALID_AUTH_METHOD'
+    message = 'Invalid auth method'
+
+
+class InvalidAccountStateException(GoatBaseException):
+
+    error_code = 'INVALID_ACCOUNT_STATE'
+    message = 'Invalid account state'

@@ -36,6 +36,7 @@ MIDDLEWARES = [
 INSTALLED_RESOURCES = [
     'accounts.resources.AuthFacebook',
     'accounts.resources.AuthAnonym',
+    'accounts.resources.ReplaceAnonym',
     'accounts.resources.Logout',
 
     'events.resources.EventTypes',

@@ -7,16 +7,25 @@ from voluptuous import Required, Optional, All
 
 from accounts import settings as account_settings
 from accounts.models import Account
+from accounts.validators import AuthRequiredValidator, AuthMethodValidator
+
 from common.sessions.models import SessionManager
-from common.exceptions import FacebookLoginException, AccountNotFoundException, AlreadyLoggedInException
+from common.exceptions import (
+    FacebookLoginException, AccountNotFoundException,
+    AlreadyLoggedInException, InvalidAccountStateException
+)
 from common.resources.base import BaseResource
+
 from db.helpers import db_session
+
+from events.models import Participant
 
 import settings as app_settings
 
 __all__ = (
     'AuthFacebook',
     'AuthAnonym',
+    'ReplaceAnonym',
     'Logout',
 )
 
@@ -115,6 +124,56 @@ class AuthAnonym(AuthBaseResource):
                 account = db.merge(account)
 
         return account
+
+
+class ReplaceAnonym(BaseResource):
+
+    url = '/v1/accounts/auth/anonym/replace/'
+
+    data_schema = {
+        Required('user_access_token'): All(unicode),
+    }
+
+    validators = [
+        AuthRequiredValidator(),
+        AuthMethodValidator(),
+    ]
+
+    def post(self, *args, **kwargs):
+
+        user_access_token = self.get_param('user_access_token')
+
+        with db_session() as db:
+            anonym_account = db.query(Account).filter_by(identifier=user_access_token,
+                                                         auth_method=Account.AUTH_METHOD.ANONYM).first()
+
+        if not anonym_account:
+            raise AccountNotFoundException
+
+        account = self.account_info.account
+
+        # We can create a validator to check that the account does not have events...
+        # but it's too specific and won't be reused. So just put it right here!
+        with db_session() as db:
+            is_participant = bool(db.query(Participant).filter_by(account_id=account.id).count())
+
+        if is_participant:
+            raise InvalidAccountStateException
+
+        # Ok, just replace anonym with normal account
+        # todo: refactor swapping
+        anonym_account.name = account.name
+        anonym_account.status = account.status
+        anonym_account.avatar_url = account.avatar_url
+        anonym_account.auth_method = account.auth_method
+        anonym_account.identifier = account.identifier
+        anonym_account.attributes = account.attributes
+
+        with db_session() as db:
+            db.merge(anonym_account)
+            db.query(Account).filter(Account.id == account.id).delete(synchronize_session=False)
+
+        self.session[account_settings.ACCOUNT_ID_SESSION_KEY] = anonym_account.id
 
 
 class Logout(BaseResource):

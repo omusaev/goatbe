@@ -8,4 +8,5 @@ API для работы с аккаунтами.
 
    auth_facebook.rst
    auth_anonym.rst
+   replace_anonym.rst
    logout.rst
