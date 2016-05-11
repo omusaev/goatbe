@@ -153,7 +153,7 @@ class ReplaceAnonym(BaseResource):
         account = self.account_info.account
 
         # We can create a validator to check that the account does not have events...
-        # but it too specific and won't be reused. So just put it right here!
+        # but it's too specific and won't be reused. So just put it right here!
         with db_session() as db:
             is_participant = bool(db.query(Participant).filter_by(account_id=account.id).count())
 
@@ -161,14 +161,19 @@ class ReplaceAnonym(BaseResource):
             raise InvalidAccountStateException
 
         # Ok, just replace anonym with normal account
-        normal_account_id = account.id
-        account.id = anonym_account.id
+        # todo: refactor swapping
+        anonym_account.name = account.name
+        anonym_account.status = account.status
+        anonym_account.avatar_url = account.avatar_url
+        anonym_account.auth_method = account.auth_method
+        anonym_account.identifier = account.identifier
+        anonym_account.attributes = account.attributes
 
         with db_session() as db:
-            db.query(Account).filter(Account.id == normal_account_id).delete(synchronize_session=False)
-            db.merge(account)
+            db.merge(anonym_account)
+            db.query(Account).filter(Account.id == account.id).delete(synchronize_session=False)
 
-        self.session[account_settings.ACCOUNT_ID_SESSION_KEY] = account.id
+        self.session[account_settings.ACCOUNT_ID_SESSION_KEY] = anonym_account.id
 
 
 class Logout(BaseResource):

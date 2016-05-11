@@ -19,7 +19,9 @@ class AuthRequiredValidator(BaseValidator):
 
 
 class AuthMethodValidator(BaseValidator):
-
+    '''
+    Needs AuthRequiredValidator
+    '''
     # add some parameters if you need. Now it just checks that auth method is not anonym
     def run(self, resource, *args, **kwargs):
         if resource.account_info.account.auth_method == Account.AUTH_METHOD.ANONYM:
