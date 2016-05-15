@@ -9,12 +9,12 @@ from accounts import settings as account_settings
 from accounts.models import Account
 from accounts.validators import AuthRequiredValidator, AuthMethodValidator
 
-from common.sessions.models import SessionManager
-from common.exceptions import (
+from core.sessions.models import SessionManager
+from core.exceptions import (
     FacebookLoginException, AccountNotFoundException,
     AlreadyLoggedInException, InvalidAccountStateException
 )
-from common.resources.base import BaseResource
+from core.resources.base import BaseResource
 
 from db.helpers import db_session
 

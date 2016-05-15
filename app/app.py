@@ -2,7 +2,7 @@
 
 import falcon
 
-from common.helpers import collect_installed_resources, collect_middlewares
+from core.helpers import collect_installed_resources, collect_middlewares
 
 __all__ = (
     'application',

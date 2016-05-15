@@ -2,8 +2,8 @@
 
 from accounts.models import Account
 
-from common.exceptions import AuthenticationRequiredException, InvalidAuthMethodException
-from common.validators import BaseValidator
+from core.exceptions import AuthenticationRequiredException, InvalidAuthMethodException
+from core.validators import BaseValidator
 
 __all__ = (
     'AuthRequiredValidator',

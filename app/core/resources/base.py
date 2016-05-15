@@ -7,7 +7,7 @@ from voluptuous import (
     RequiredFieldInvalid,
 )
 
-from common.exceptions import (
+from core.exceptions import (
     GoatBaseException,
     UnsupportedResourceMethodException,
     MissingParameterException,

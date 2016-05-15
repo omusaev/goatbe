@@ -2,13 +2,13 @@
 
 from sqlalchemy.orm import joinedload
 
-from common.exceptions import (
+from core.exceptions import (
     EventNotFoundException, UserIsNotEventParticipant,
     StepNotFoundException, PermissionDeniedException,
     StepIsNotInEventException, InvalidParameterException,
     InvalidEventStatusException, InvalidEventSecretException,
 )
-from common.validators import BaseValidator
+from core.validators import BaseValidator
 from db.helpers import db_session
 from events.models import Event, Participant, Step
 from events.permissions import PERMISSION
@@ -109,7 +109,7 @@ class UpdateAssigneesValidator(BaseValidator):
         old_ids = resource.get_param('unassign_accounts_ids')
 
         if new_ids and old_ids and set(new_ids) & set(old_ids):
-            raise InvalidParameterException('assign_accounts_ids and unassign_accounts_ids have common ids')
+            raise InvalidParameterException('assign_accounts_ids and unassign_accounts_ids have core ids')
 
         if new_ids:
             # TODO: do not use other validators

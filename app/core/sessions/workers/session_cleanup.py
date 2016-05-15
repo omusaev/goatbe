@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
-from common.sessions.models import SessionManager
-from common.workers import BaseWorker
+from core.sessions.models import SessionManager
+from core.workers import BaseWorker
 
 import logging
 logger = logging.getLogger(__name__)

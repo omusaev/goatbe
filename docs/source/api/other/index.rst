@@ -13,3 +13,4 @@ other
    step_types.rst
    participant_statuses.rst
    assignee_resolutions.rst
+   settings.rst

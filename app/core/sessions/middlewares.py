@@ -2,7 +2,7 @@
 
 import datetime
 
-from common.sessions.models import SessionManager
+from core.sessions.models import SessionManager
 
 import settings as app_settings
 
