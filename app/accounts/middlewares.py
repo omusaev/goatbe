@@ -2,7 +2,7 @@
 
 from accounts import settings as account_settings
 from accounts.models import Account
-from common.decorators import cached_property
+from core.decorators import cached_property
 from db.helpers import db_session
 
 

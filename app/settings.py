@@ -28,8 +28,8 @@ DB_CONNECTION_URL = '%(DIALECT)s+%(DRIVER)s://%(USERNAME)s:%(PASSWORD)s@%(HOST)s
 ALEMBIC_CONFIG_PATH = '%s/db/migrations/alembic.ini' % PROJECT_ROOT
 
 MIDDLEWARES = [
-    'common.resources.middlewares.ResourceSetupMiddleware',
-    'common.sessions.middlewares.SessionMiddleware',
+    'core.resources.middlewares.ResourceSetupMiddleware',
+    'core.sessions.middlewares.SessionMiddleware',
     'accounts.middlewares.AccountMiddleware'
 ]
 
@@ -62,6 +62,8 @@ INSTALLED_RESOURCES = [
 
     'events.resources.UpdateAssignees',
     'events.resources.UpdateAssigneesResolution',
+
+    'common.resources.ClientSettings',
 ]
 
 SESSION_TTL = 60 * 60 * 24 * 14  # 2 weeks
@@ -73,6 +75,11 @@ WORKERS = {
 
 FB_APP_ID = '1000652553335107'
 FB_APP_SECRET = 'f7b5a32a886d31b3cfd6d22d55e75d4c'
+
+CLIENT_SETTINGS = {
+    'REGISTRATION_SKIP_ENABLED': True,
+}
+
 
 try:
     from settings_local import *

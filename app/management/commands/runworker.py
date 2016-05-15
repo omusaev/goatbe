@@ -2,7 +2,7 @@
 
 import daemon
 
-import common.sessions.workers.session_cleanup as session_cleanup
+import core.sessions.workers.session_cleanup as session_cleanup
 
 from management.commands import BaseCommand
 

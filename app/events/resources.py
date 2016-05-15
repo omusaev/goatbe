@@ -6,9 +6,9 @@ from voluptuous import (
 
 from accounts.validators import AuthRequiredValidator
 
-from common.exceptions import AssigneeNotFoundException, UserIsNotEventParticipant
-from common.schemas import ListOf
-from common.resources.base import BaseResource
+from core.exceptions import AssigneeNotFoundException, UserIsNotEventParticipant
+from core.schemas import ListOf
+from core.resources.base import BaseResource
 
 from db.helpers import db_session
 
