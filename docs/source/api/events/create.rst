@@ -45,7 +45,7 @@ Parameter     Type  Description
 .. code-block:: javascript
 
     {
-        "lang": "en_EN",
+        "lang": "en",
         "type": "hiking",
         "title": "My first hiking!",
         "description": "How about a trip to the georgia mountains, friends?!",
