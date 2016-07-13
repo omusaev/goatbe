@@ -8,3 +8,5 @@ requests
 ipython==2.2.0
 python-daemon
 facepy
+redis
+rq

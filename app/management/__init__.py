@@ -5,6 +5,12 @@ import argparse
 from importlib import import_module
 
 from management.commands import BaseCommand, get_submodules, CommandError
+from management.rq import task
+
+__all__ = (
+    'handle_cli',
+    'task',
+)
 
 for item in get_submodules():
     try:

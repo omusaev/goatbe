@@ -44,7 +44,7 @@ Parameter        Type  Description
 .. code-block:: javascript
 
     {
-        "lang": "en_EN"
+        "lang": "en"
     }
 
 **Пример ответа**

@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 
-import sqlalchemy as sa
+from datetime import datetime
 import uuid
 
+import sqlalchemy as sa
 from sqlalchemy import Column, BigInteger, String, DateTime, Text, ForeignKey, Boolean
 from sqlalchemy.dialects.postgresql import JSON
 from sqlalchemy.orm import relationship, backref
@@ -68,6 +69,16 @@ class Event(Base, GoatBasicModelMixin):
         backref=backref('event'),
         cascade='all, delete-orphan',
     )
+
+    def is_started(self):
+        if self.start_at < datetime.now():
+            return True
+        return False
+
+    def is_finished(self):
+        if self.finish_at < datetime.now():
+            return True
+        return False
 
 
 class Step(Base, GoatBasicModelMixin):

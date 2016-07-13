@@ -13,6 +13,7 @@ from core.resources.base import BaseResource
 from db.helpers import db_session
 
 from events import EVENT_TYPES_DESCRIPTION, EVENT_DATES_FORMAT
+from events.logic import calculate_event_status
 from events.models import Event, Participant, Step, Assignee
 from events.permissions import PERMISSION
 from events.validators import (
@@ -578,6 +579,8 @@ class CreateStep(BaseResource):
             )
             db.add(step)
 
+        calculate_event_status.delay(event.id)
+
         self.response_data = {
             'step_id': step.id,
         }
@@ -687,6 +690,8 @@ class DeleteStep(BaseResource):
         with db_session() as db:
             db.delete(step)
 
+        calculate_event_status.delay(self.get_param('event_id'))
+
         self.response_data = {}
 
 
@@ -735,6 +740,8 @@ class UpdateAssignees(BaseResource):
             if old_ids:
                 db.query(Assignee).filter(Assignee.account_id.in_(old_ids), Assignee.step_id == step.id).delete(synchronize_session=False)
 
+        calculate_event_status.delay(event.id)
+
         self.response_data = {}
 
 
@@ -764,7 +771,7 @@ class UpdateAssigneesResolution(BaseResource):
 
     def post(self):
 
-        step = self.get_param('step')
+        step = self.data.get('step')
         resolutions = self.get_param('resolutions')
 
         with db_session() as db:
@@ -779,5 +786,7 @@ class UpdateAssigneesResolution(BaseResource):
 
                 assignee.resolution = resolution
                 db.merge(assignee)
+
+        calculate_event_status.delay(self.get_param('event_id'))
 
         self.response_data = {}
