@@ -1,8 +1,5 @@
 # -*- coding: utf-8 -*-
 
-from datetime import datetime
-import logging
-
 from sqlalchemy.orm import joinedload
 
 from db.helpers import db_session
@@ -12,8 +9,6 @@ from management import task
 __all__ = (
     'calculate_event_status',
 )
-
-logger = logging.getLogger()
 
 
 def is_step_resolved(step):

@@ -579,6 +579,8 @@ class CreateStep(BaseResource):
             )
             db.add(step)
 
+        calculate_event_status.delay(event.id)
+
         self.response_data = {
             'step_id': step.id,
         }
@@ -687,6 +689,8 @@ class DeleteStep(BaseResource):
 
         with db_session() as db:
             db.delete(step)
+
+        calculate_event_status.delay(self.get_param('event_id'))
 
         self.response_data = {}
 
