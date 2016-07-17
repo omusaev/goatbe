@@ -51,6 +51,7 @@ __all__ = (
     'CreatePlace',
     'UpdatePlace',
     'DeletePlace',
+    'PlaceDetails',
 )
 
 
@@ -90,7 +91,6 @@ class CreateEvent(BaseResource):
         Required('lang'): All(unicode),
         Required('title'): All(unicode, Length(min=1, max=255)),
         Optional('description'): All(unicode, Length(min=1, max=2000)),
-        Optional('destination'): All(unicode, Length(min=1, max=255)),
         Required('start_at'): All(Datetime(format=EVENT_DATES_FORMAT)),
         Required('finish_at'): All(Datetime(format=EVENT_DATES_FORMAT)),
         Required('type'): All(Upper, In(Event.TYPE.ALL)),
@@ -112,7 +112,6 @@ class CreateEvent(BaseResource):
             event = Event(
                 title=self.get_param('title'),
                 description=self.get_param('description'),
-                destination=self.get_param('destination'),
                 start_at=self.get_param('start_at'),
                 finish_at=self.get_param('finish_at'),
                 type=event_type,
@@ -151,7 +150,6 @@ class UpdateEvent(BaseResource):
         Required('event_id'): All(int),
         Optional('title'): All(unicode, Length(min=1, max=255)),
         Optional('description'): All(unicode, Length(min=1, max=2000)),
-        Optional('destination'): All(unicode, Length(min=1, max=255)),
         Optional('start_at'): All(Datetime(format=EVENT_DATES_FORMAT)),
         Optional('finish_at'): All(Datetime(format=EVENT_DATES_FORMAT)),
     }
@@ -169,7 +167,6 @@ class UpdateEvent(BaseResource):
 
         title = self.get_param('title')
         description = self.get_param('description')
-        destination = self.get_param('destination')
         start_at = self.get_param('start_at')
         finish_at = self.get_param('finish_at')
 
@@ -178,9 +175,6 @@ class UpdateEvent(BaseResource):
 
         if description:
             event.description = description
-
-        if destination:
-            event.destination = destination
 
         if start_at:
             event.start_at = start_at
@@ -240,7 +234,7 @@ class RestoreEvent(BaseResource):
 
         event = self.data.get('event')
 
-        # todo: what status we have to set?! It's time to think about event status calculation mechanism...
+        # todo: what status do we have to set?! It's time to think about event status calculation mechanism...
         event.status = Event.STATUS.PREPARATION
 
         with db_session() as db:
@@ -324,7 +318,6 @@ class EventDetails(BaseResource):
 
         event_data = {
             'title': event.title,
-            'destination': event.destination,
             'description': event.description,
             'status': event.status,
             'start_at': event.start_at.strftime(EVENT_DATES_FORMAT),
@@ -376,8 +369,10 @@ class EventDetails(BaseResource):
                 'start_at': place.start_at,
                 'finish_at': place.finish_at,
                 'order': place.order,
-                'lng': place.lng,
-                'lat': place.lat,
+                'point': {
+                    'lng': place.lng,
+                    'lat': place.lat,
+                }
             })
 
         self.response_data = event_data
@@ -404,7 +399,6 @@ class ShortEventDetails(BaseResource):
 
         event_data = {
             'title': event.title,
-            'destination': event.destination,
             'description': event.description,
             'status': event.status,
             'start_at': event.start_at.strftime(EVENT_DATES_FORMAT),
@@ -429,8 +423,10 @@ class ShortEventDetails(BaseResource):
                 'start_at': place.start_at,
                 'finish_at': place.finish_at,
                 'order': place.order,
-                'lng': place.lng,
-                'lat': place.lat,
+                'point': {
+                    'lng': place.lng,
+                    'lat': place.lat,
+                }
             })
 
         self.response_data = event_data
@@ -473,7 +469,6 @@ class EventList(BaseResource):
                 event_data = {
                     'id': event.id,
                     'title': event.title,
-                    'destination': event.destination,
                     'description': event.description,
                     'status': event.status,
                     'start_at': event.start_at.strftime(EVENT_DATES_FORMAT),
@@ -952,3 +947,40 @@ class DeletePlace(BaseResource):
             db.delete(place)
 
         self.response_data = {}
+
+
+class PlaceDetails(BaseResource):
+
+    url = '/v1/places/details/'
+
+    data_schema = {
+        Required('event_id'): All(int),
+        Required('place_id'): All(int),
+    }
+
+    validators = [
+        AuthRequiredValidator(),
+        EventExistenceValidator(),
+        AccountIsEventParticipantValidator(),
+        PermissionValidator(permissions=[PERMISSION.READ_PLACE_DETAILS, ]),
+        PlaceExistenceValidator(),
+    ]
+
+    def post(self):
+
+        place = self.data.get('place')
+
+        place_data = {
+            'id': place.id,
+            'title': place.title,
+            'description': place.description,
+            'start_at': place.start_at,
+            'finish_at': place.finish_at,
+            'order': place.order,
+            'point': {
+                'lng': place.lng,
+                'lat': place.lat,
+            }
+        }
+
+        self.response_data = place_data

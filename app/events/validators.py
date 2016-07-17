@@ -184,6 +184,6 @@ class TimestampValidator(BaseValidator):
         try:
             parsed = datetime.datetime.fromtimestamp(timestamp)
         except (ValueError, TypeError) as e:
-            raise Invalid('Inavelid timestamp', error_message=e.message)
+            raise Invalid('Invalid timestamp', error_message=e.message)
 
         return parsed

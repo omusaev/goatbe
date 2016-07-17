@@ -55,7 +55,6 @@ class Event(Base, GoatBasicModelMixin):
         )
 
     title = Column(String(255), nullable=False, default='', server_default='')
-    destination = Column(String(255), nullable=False, default='', server_default='')
     description = Column(Text(), nullable=False, default='', server_default='')
     status = Column(String(32), nullable=False, default=STATUS.PREPARATION, server_default=STATUS.PREPARATION)
     type = Column(String(64), nullable=False)
