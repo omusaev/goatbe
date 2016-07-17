@@ -15,11 +15,14 @@ __all__ = (
     'UserIsNotEventParticipant',
     'PermissionDeniedException',
     'StepNotFoundException',
+    'StepIsNotInEventException',
     'AssigneeNotFoundException',
     'InvalidEventStatusException',
     'InvalidEventSecretException',
     'InvalidAuthMethodException',
     'InvalidAccountStateException',
+    'PlaceNotFoundException',
+    'PlaceIsNotInEventException',
 )
 
 
@@ -137,3 +140,15 @@ class InvalidAccountStateException(GoatBaseException):
 
     error_code = 'INVALID_ACCOUNT_STATE'
     message = 'Invalid account state'
+
+
+class PlaceNotFoundException(GoatBaseException):
+
+    error_code = 'PLACE_NOT_FOUND'
+    message = 'Place not found'
+
+
+class PlaceIsNotInEventException(GoatBaseException):
+
+    error_code = 'PLACE_IS_NOT_IN_EVENT'
+    message = 'Place is not in event'

@@ -25,6 +25,12 @@ class PERMISSION(object):
     DELETE_STEP_ASSIGNEE = 'delete_step_assignee'
     UPDATE_STEP_RESOLUTION = 'update_step_resolution'
 
+    CREATE_EVENT_PLACE = 'create_event_place'
+    DELETE_EVENT_PLACE = 'delete_event_place'
+    UPDATE_EVENT_PLACE = 'update_event_place'
+    REORDER_EVENT_PLACE = 'reorder_event_place'
+    READ_PLACE_DETAILS = 'read_place_details'
+
     ALL = [
         UPDATE_EVENT_DETAILS,
         READ_EVENT_DETAILS,
@@ -43,6 +49,11 @@ class PERMISSION(object):
         CREATE_STEP_ASSIGNEE,
         DELETE_STEP_ASSIGNEE,
         UPDATE_STEP_RESOLUTION,
+        CREATE_EVENT_PLACE,
+        DELETE_EVENT_PLACE,
+        UPDATE_EVENT_PLACE,
+        REORDER_EVENT_PLACE,
+        READ_PLACE_DETAILS,
     ]
 
     DEFAULT_OWNER_SET = ALL
@@ -62,6 +73,7 @@ class PERMISSION(object):
         CREATE_STEP_ASSIGNEE,
         DELETE_STEP_ASSIGNEE,
         UPDATE_STEP_RESOLUTION,
+        READ_PLACE_DETAILS,
     ]
 
     DEFAULT_INACTIVE_SET = [

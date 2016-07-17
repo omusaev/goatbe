@@ -4,9 +4,13 @@ from datetime import datetime
 import uuid
 
 import sqlalchemy as sa
-from sqlalchemy import Column, BigInteger, String, DateTime, Text, ForeignKey, Boolean
+from sqlalchemy import Column, BigInteger, String, DateTime, Text, ForeignKey, Boolean, Integer
 from sqlalchemy.dialects.postgresql import JSON
 from sqlalchemy.orm import relationship, backref
+
+from geoalchemy2 import Geography
+
+from shapely.wkt import loads as wkt_loads
 
 from accounts.models import Account
 from db.base import Base
@@ -18,6 +22,7 @@ __all__ = (
     'Step',
     'Participant',
     'Assignee',
+    'Place',
 )
 
 
@@ -66,6 +71,12 @@ class Event(Base, GoatBasicModelMixin):
 
     participants = relationship(
         'Participant',
+        backref=backref('event'),
+        cascade='all, delete-orphan',
+    )
+
+    places = relationship(
+        'Place',
         backref=backref('event'),
         cascade='all, delete-orphan',
     )
@@ -201,3 +212,42 @@ class Assignee(Base, GoatModelMixin):
         nullable=False
     )
     resolution = Column(String(255), nullable=False, default=RESOLUTION.OPEN, server_default=RESOLUTION.OPEN)
+
+
+class Place(Base, GoatBasicModelMixin):
+
+    __tablename__ = 'place'
+
+    title = Column(String(255), nullable=False, default='', server_default='')
+    description = Column(Text(), nullable=False, default='', server_default='')
+    point = Column(Geography(geometry_type='POINT', srid=4326))
+    start_at = Column(DateTime, nullable=False)
+    finish_at = Column(DateTime, nullable=False)
+    order = Column(Integer())
+
+    event_id = Column(
+        BigInteger,
+        ForeignKey(
+            Event.id,
+            use_alter=True,
+            name='place_event_id',
+            ondelete='CASCADE'
+        ),
+        nullable=False
+    )
+
+    @property
+    def geom_point(self):
+        return wkt_loads(self.point)
+
+    @property
+    def lng(self):
+        return self.geom_point.x
+
+    @property
+    def lat(self):
+        return self.geom_point.y
+
+    @classmethod
+    def format_point(cls, lng, lat):
+        return 'POINT(%s %s)' % (lng, lat)

@@ -14,13 +14,13 @@ from db.helpers import db_session
 
 from events import EVENT_TYPES_DESCRIPTION, EVENT_DATES_FORMAT
 from events.logic import calculate_event_status
-from events.models import Event, Participant, Step, Assignee
+from events.models import Event, Participant, Step, Assignee, Place
 from events.permissions import PERMISSION
 from events.validators import (
     EventExistenceValidator, AccountIsEventParticipantValidator,
     StepExistenceValidator, PermissionValidator, UpdateAssigneesValidator,
-    EventSecretValidator,
-    getEventParticipant
+    EventSecretValidator, PlaceExistenceValidator,
+    getEventParticipant, TimestampValidator
 )
 
 __all__ = (
@@ -47,6 +47,10 @@ __all__ = (
 
     'UpdateAssignees',
     'UpdateAssigneesResolution',
+
+    'CreatePlace',
+    'UpdatePlace',
+    'DeletePlace',
 )
 
 
@@ -328,6 +332,7 @@ class EventDetails(BaseResource):
             'secret': event.secret,
             'participants': [],
             'steps': [],
+            'places': [],
         }
 
         for participant in event.participants:
@@ -362,6 +367,18 @@ class EventDetails(BaseResource):
                 })
 
             event_data['steps'].append(full_step)
+
+        for place in event.places:
+            event_data['places'].append({
+                'id': place.id,
+                'title': place.title,
+                'description': place.description,
+                'start_at': place.start_at,
+                'finish_at': place.finish_at,
+                'order': place.order,
+                'lng': place.lng,
+                'lat': place.lat,
+            })
 
         self.response_data = event_data
 
@@ -402,6 +419,18 @@ class ShortEventDetails(BaseResource):
                     'avatar_url': participant.account.avatar_url,
                 },
                 'status': participant.status,
+            })
+
+        for place in event.places:
+            event_data['places'].append({
+                'id': place.id,
+                'title': place.title,
+                'description': place.description,
+                'start_at': place.start_at,
+                'finish_at': place.finish_at,
+                'order': place.order,
+                'lng': place.lng,
+                'lat': place.lat,
             })
 
         self.response_data = event_data
@@ -788,5 +817,138 @@ class UpdateAssigneesResolution(BaseResource):
                 db.merge(assignee)
 
         calculate_event_status.delay(self.get_param('event_id'))
+
+        self.response_data = {}
+
+
+class CreatePlace(BaseResource):
+
+    url = '/v1/places/create/'
+
+    data_schema = {
+        Required('event_id'): All(int),
+        Optional('title'): All(unicode, Length(min=1, max=255)),
+        Optional('description'): All(unicode, Length(min=1, max=2000)),
+        Optional('start_at'): All(int, TimestampValidator()),
+        Optional('finish_at'): All(int, TimestampValidator()),
+        Required('order'): All(int, min=1),
+        Required('lng'): All(float),
+        Required('lat'): All(float),
+    }
+
+    validators = [
+        AuthRequiredValidator(),
+        EventExistenceValidator(),
+        AccountIsEventParticipantValidator(),
+        PermissionValidator(permissions=[PERMISSION.CREATE_EVENT_PLACE, ])
+    ]
+
+    def post(self):
+
+        event = self.data.get('event')
+
+        with db_session() as db:
+            place = Place(
+                title=self.get_param('title'),
+                description=self.get_param('description'),
+                start_at=self.get_param('start_at'),
+                finish_at=self.get_param('finish_at'),
+                order=self.get_param('order'),
+                point=Place.format_point(self.get_param('lng'), self.get_param('lat')),
+                event=event,
+            )
+            db.add(place)
+
+        self.response_data = {
+            'place_id': place.id,
+        }
+
+
+class UpdatePlace(BaseResource):
+
+    url = '/v1/places/update/'
+
+    data_schema = {
+        Required('event_id'): All(int),
+        Required('place_id'): All(int),
+        Optional('title'): All(unicode, Length(min=1, max=255)),
+        Optional('description'): All(unicode, Length(min=1, max=2000)),
+        Optional('start_at'): All(int, TimestampValidator()),
+        Optional('finish_at'): All(int, TimestampValidator()),
+        Optional('order'): All(int, min=1),
+        Optional('lng'): All(float),
+        Optional('lat'): All(float),
+    }
+
+    validators = [
+        AuthRequiredValidator(),
+        EventExistenceValidator(),
+        AccountIsEventParticipantValidator(),
+        PermissionValidator(permissions=[PERMISSION.UPDATE_EVENT_PLACE, ]),
+        PlaceExistenceValidator(),
+    ]
+
+    def post(self):
+
+        place = self.data.get('place')
+
+        title = self.get_param('title')
+        description = self.get_param('description')
+        start_at = self.get_param('start_at')
+        finish_at = self.get_param('finish_at')
+        order = self.get_param('order')
+        lng = self.get_param('lng')
+        lat = self.get_param('lat')
+
+        if title:
+            place.title = title
+
+        if description:
+            place.description = description
+
+        if start_at:
+            place.start_at = start_at
+
+        if finish_at:
+            place.finish_at = finish_at
+
+        if order:
+            place.order = order
+
+        if lng or lat:
+            lng = lng or place.lng
+            lat = lat or place.lat
+
+            place.point = Place.format_point(lng, lat)
+
+        with db_session() as db:
+            db.merge(place)
+
+        self.response_data = {}
+
+
+class DeletePlace(BaseResource):
+
+    url = '/v1/places/delete/'
+
+    data_schema = {
+        Required('event_id'): All(int),
+        Required('place_id'): All(int),
+    }
+
+    validators = [
+        AuthRequiredValidator(),
+        EventExistenceValidator(),
+        AccountIsEventParticipantValidator(),
+        PermissionValidator(permissions=[PERMISSION.DELETE_EVENT_PLACE, ]),
+        PlaceExistenceValidator(),
+    ]
+
+    def post(self):
+
+        place = self.get_param('place')
+
+        with db_session() as db:
+            db.delete(place)
 
         self.response_data = {}
