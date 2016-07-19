@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from voluptuous import (
-    Required, Optional, All, Length, Datetime, Upper, In
+    Required, Optional, All, Length, Datetime, Upper, In, Schema
 )
 
 from accounts.validators import AuthRequiredValidator
@@ -20,7 +20,8 @@ from events.validators import (
     EventExistenceValidator, AccountIsEventParticipantValidator,
     StepExistenceValidator, PermissionValidator, UpdateAssigneesValidator,
     EventSecretValidator, PlaceExistenceValidator,
-    getEventParticipant, TimestampValidator
+    getEventParticipant, TimestampValidator,
+    ChangePlacesOrderValidator,
 )
 
 __all__ = (
@@ -773,15 +774,14 @@ class UpdateAssigneesResolution(BaseResource):
 
     url = '/v1/assignees/resolution/update/'
 
-    resolution_schema = {
+    resolution_schema = Schema({
         Required('account_id'): All(int),
         Required('resolution', default=Assignee.RESOLUTION.OPEN): All(Upper, In(Assignee.RESOLUTION.ALL)),
-    }
+    })
 
     data_schema = {
         Required('event_id'): All(int),
         Required('step_id'): All(int),
-        # TODO: not work. need fix.
         Required('resolutions'): ListOf(resolution_schema),
     }
 
@@ -826,9 +826,11 @@ class CreatePlace(BaseResource):
         Optional('description'): All(unicode, Length(min=1, max=2000)),
         Optional('start_at'): All(int, TimestampValidator()),
         Optional('finish_at'): All(int, TimestampValidator()),
-        Required('order'): All(int, min=1),
-        Required('lng'): All(float),
-        Required('lat'): All(float),
+        Required('order'): All(int),
+        Required('point'): {
+            Required('lng'): All(float),
+            Required('lat'): All(float),
+        },
     }
 
     validators = [
@@ -870,9 +872,11 @@ class UpdatePlace(BaseResource):
         Optional('description'): All(unicode, Length(min=1, max=2000)),
         Optional('start_at'): All(int, TimestampValidator()),
         Optional('finish_at'): All(int, TimestampValidator()),
-        Optional('order'): All(int, min=1),
-        Optional('lng'): All(float),
-        Optional('lat'): All(float),
+        Optional('order'): All(int),
+        Required('point'): {
+            Optional('lng'): All(float),
+            Optional('lat'): All(float),
+        }
     }
 
     validators = [
@@ -984,3 +988,34 @@ class PlaceDetails(BaseResource):
         }
 
         self.response_data = place_data
+
+
+class ChangePlacesOrder(BaseResource):
+
+    url = '/v1/places/order/'
+
+    place_order_schema = Schema({Required('id'): All(int), Required('order'): All(int)})
+
+    data_schema = {
+        Required('event_id'): All(int),
+        Required('orders'): ListOf(place_order_schema),
+    }
+
+    validators = [
+        AuthRequiredValidator(),
+        EventExistenceValidator(),
+        AccountIsEventParticipantValidator(),
+        PermissionValidator(permissions=[PERMISSION.REORDER_EVENT_PLACE, ]),
+        ChangePlacesOrderValidator()
+    ]
+
+    def post(self):
+
+        places = self.data.get('places')
+
+        with db_session() as db:
+            for place, order in places:
+                place.order = order
+                db.merge(place)
+
+        self.response_data = {}

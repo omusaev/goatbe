@@ -67,6 +67,7 @@ INSTALLED_RESOURCES = [
     'events.resources.UpdatePlace',
     'events.resources.DeletePlace',
     'events.resources.PlaceDetails',
+    'events.resources.ChangePlacesOrder',
 
     'common.resources.ClientSettings',
 ]
