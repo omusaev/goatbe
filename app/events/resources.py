@@ -7,6 +7,7 @@ from voluptuous import (
 from accounts.validators import AuthRequiredValidator
 
 from core.exceptions import AssigneeNotFoundException, UserIsNotEventParticipant
+from core.helpers import to_timestamp
 from core.schemas import ListOf
 from core.resources.base import BaseResource
 
@@ -92,8 +93,8 @@ class CreateEvent(BaseResource):
         Required('lang'): All(unicode),
         Required('title'): All(unicode, Length(min=1, max=255)),
         Optional('description'): All(unicode, Length(min=1, max=2000)),
-        Required('start_at'): All(Datetime(format=EVENT_DATES_FORMAT)),
-        Required('finish_at'): All(Datetime(format=EVENT_DATES_FORMAT)),
+        Required('start_at'): All(TimestampValidator()),
+        Required('finish_at'): All(TimestampValidator()),
         Required('type'): All(Upper, In(Event.TYPE.ALL)),
     }
 
@@ -151,8 +152,8 @@ class UpdateEvent(BaseResource):
         Required('event_id'): All(int),
         Optional('title'): All(unicode, Length(min=1, max=255)),
         Optional('description'): All(unicode, Length(min=1, max=2000)),
-        Optional('start_at'): All(Datetime(format=EVENT_DATES_FORMAT)),
-        Optional('finish_at'): All(Datetime(format=EVENT_DATES_FORMAT)),
+        Optional('start_at'): All(TimestampValidator()),
+        Optional('finish_at'): All(TimestampValidator()),
     }
 
     validators = [
@@ -321,8 +322,8 @@ class EventDetails(BaseResource):
             'title': event.title,
             'description': event.description,
             'status': event.status,
-            'start_at': event.start_at.strftime(EVENT_DATES_FORMAT),
-            'finish_at': event.finish_at.strftime(EVENT_DATES_FORMAT),
+            'start_at': to_timestamp(event.start_at),
+            'finish_at': to_timestamp(event.finish_at),
             'secret': event.secret,
             'participants': [],
             'steps': [],
@@ -367,8 +368,8 @@ class EventDetails(BaseResource):
                 'id': place.id,
                 'title': place.title,
                 'description': place.description,
-                'start_at': place.start_at,
-                'finish_at': place.finish_at,
+                'start_at': to_timestamp(place.start_at),
+                'finish_at': to_timestamp(place.finish_at),
                 'order': place.order,
                 'point': {
                     'lng': place.lng,
@@ -402,8 +403,8 @@ class ShortEventDetails(BaseResource):
             'title': event.title,
             'description': event.description,
             'status': event.status,
-            'start_at': event.start_at.strftime(EVENT_DATES_FORMAT),
-            'finish_at': event.finish_at.strftime(EVENT_DATES_FORMAT),
+            'start_at': to_timestamp(event.start_at),
+            'finish_at': to_timestamp(event.finish_at),
             'participants': [],
         }
 
@@ -421,8 +422,8 @@ class ShortEventDetails(BaseResource):
                 'id': place.id,
                 'title': place.title,
                 'description': place.description,
-                'start_at': place.start_at,
-                'finish_at': place.finish_at,
+                'start_at': to_timestamp(place.start_at),
+                'finish_at': to_timestamp(place.finish_at),
                 'order': place.order,
                 'point': {
                     'lng': place.lng,
@@ -472,8 +473,8 @@ class EventList(BaseResource):
                     'title': event.title,
                     'description': event.description,
                     'status': event.status,
-                    'start_at': event.start_at.strftime(EVENT_DATES_FORMAT),
-                    'finish_at': event.finish_at.strftime(EVENT_DATES_FORMAT),
+                    'start_at': to_timestamp(event.start_at),
+                    'finish_at': to_timestamp(event.finish_at),
                     'participant_status': participant.status,
                     'is_owner': participant.is_owner
                 }
@@ -826,7 +827,7 @@ class CreatePlace(BaseResource):
         Optional('description'): All(unicode, Length(min=1, max=2000)),
         Optional('start_at'): All(int, TimestampValidator()),
         Optional('finish_at'): All(int, TimestampValidator()),
-        Required('order'): All(int),
+        Optional('order'): All(int),
         Required('point'): {
             Required('lng'): All(float),
             Required('lat'): All(float),
@@ -845,19 +846,32 @@ class CreatePlace(BaseResource):
         event = self.data.get('event')
 
         with db_session() as db:
+            order = self.get_param('order')
+
+            if order is None:
+                if event.places:
+                    order = max(p.order for p in event.places) + 1
+                else:
+                    order = 1
+
+            lng = self.get_param('point').get('lng')
+            lat = self.get_param('point').get('lat')
+            point = Place.format_point(lng, lat)
+
             place = Place(
                 title=self.get_param('title'),
                 description=self.get_param('description'),
                 start_at=self.get_param('start_at'),
                 finish_at=self.get_param('finish_at'),
-                order=self.get_param('order'),
-                point=Place.format_point(self.get_param('lng'), self.get_param('lat')),
+                order=order,
+                point=point,
                 event=event,
             )
             db.add(place)
 
         self.response_data = {
             'place_id': place.id,
+            'order': order,
         }
 
 
@@ -873,9 +887,9 @@ class UpdatePlace(BaseResource):
         Optional('start_at'): All(int, TimestampValidator()),
         Optional('finish_at'): All(int, TimestampValidator()),
         Optional('order'): All(int),
-        Required('point'): {
-            Optional('lng'): All(float),
-            Optional('lat'): All(float),
+        Optional('point'): {
+            Required('lng'): All(float),
+            Required('lat'): All(float),
         }
     }
 
@@ -896,8 +910,8 @@ class UpdatePlace(BaseResource):
         start_at = self.get_param('start_at')
         finish_at = self.get_param('finish_at')
         order = self.get_param('order')
-        lng = self.get_param('lng')
-        lat = self.get_param('lat')
+        lng = self.get_param('point').get('lng')
+        lat = self.get_param('point').get('lat')
 
         if title:
             place.title = title
@@ -915,9 +929,6 @@ class UpdatePlace(BaseResource):
             place.order = order
 
         if lng or lat:
-            lng = lng or place.lng
-            lat = lat or place.lat
-
             place.point = Place.format_point(lng, lat)
 
         with db_session() as db:
@@ -978,8 +989,8 @@ class PlaceDetails(BaseResource):
             'id': place.id,
             'title': place.title,
             'description': place.description,
-            'start_at': place.start_at,
-            'finish_at': place.finish_at,
+            'start_at': to_timestamp(place.start_at),
+            'finish_at': to_timestamp(place.finish_at),
             'order': place.order,
             'point': {
                 'lng': place.lng,
