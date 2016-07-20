@@ -12,6 +12,7 @@ from core.exceptions import (
     StepIsNotInEventException, InvalidParameterException,
     InvalidEventStatusException, InvalidEventSecretException,
     PlaceNotFoundException, PlaceIsNotInEventException,
+    EventNotFinishedManuallyException,
 )
 from core.validators import BaseValidator
 from db.helpers import db_session
@@ -30,6 +31,7 @@ __all__ = (
     'getEventParticipant',
     'ChangePlacesOrderValidator',
     'ChangeStepsOrderValidator',
+    'EventFinishedManually',
 )
 
 
@@ -231,3 +233,17 @@ class ChangeStepsOrderValidator(BaseValidator):
             steps.append((step, order, ))
 
         resource.data['steps'] = steps
+
+
+class EventFinishedManually(BaseValidator):
+    '''
+    Needs EventExistenceValidator
+    '''
+
+    def run(self, resource, *args, **kwargs):
+
+        event = resource.data['event']
+        finished_manually = event.attributes.get('finished_manually')
+
+        if not finished_manually:
+            raise EventNotFinishedManuallyException

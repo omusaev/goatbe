@@ -24,10 +24,13 @@ def is_step_resolved(step):
 def calculate_event_status(event_id):
     with db_session() as db:
         event = db.query(Event).options(joinedload('*')).get(event_id)
-        if event.is_started():
+        if event.is_finished():
             return
 
-        status = Event.STATUS.PREPARATION
+        if event.is_started():
+            status = event.status
+        else:
+            status = Event.STATUS.PREPARATION
 
         for step in event.steps:
             if not is_step_resolved(step):

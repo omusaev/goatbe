@@ -14,11 +14,13 @@ from shapely.wkb import loads as wkb_loads
 
 from accounts.models import Account
 from db.base import Base
+from db.helpers import db_session
 from db.mixins import GoatModelMixin, GoatBasicModelMixin
 
 
 __all__ = (
     'Event',
+    'EventManager',
     'Step',
     'Participant',
     'Assignee',
@@ -36,6 +38,7 @@ class Event(Base, GoatBasicModelMixin):
         IN_PROGRESS = 'IN_PROGRESS'
         FINISHED = 'FINISHED'
         CANCELED = 'CANCELED'
+        NOT_COMPLETED = 'NOT_COMPLETED'
 
         ALL = (
             PREPARATION,
@@ -43,6 +46,7 @@ class Event(Base, GoatBasicModelMixin):
             IN_PROGRESS,
             FINISHED,
             CANCELED,
+            NOT_COMPLETED,
         )
 
     class TYPE:
@@ -89,6 +93,30 @@ class Event(Base, GoatBasicModelMixin):
         if self.finish_at < datetime.now():
             return True
         return False
+
+
+class EventManager(object):
+
+    @staticmethod
+    def update_started():
+        now = datetime.datetime.now()
+
+        with db_session() as db:
+            db.query(Event).\
+                filter(Event.start_at > now, Event.finish_at < now, Event.status == Event.STATUS.READY).\
+                update({Event.status: Event.STATUS.IN_PROGRESS})
+
+    @staticmethod
+    def update_finished():
+        now = datetime.datetime.now()
+
+        with db_session() as db:
+            db.query(Event).\
+                filter(Event.finish_at > now, Event.status.in_(Event.STATUS.READY, Event.STATUS.IN_PROGRESS)).\
+                update({Event.status: Event.STATUS.FINISHED})
+            db.query(Event).\
+                filter(Event.finish_at > now, Event.status == Event.STATUS.PREPARATION).\
+                update({Event.status: Event.STATUS.NOT_COMPLETED})
 
 
 class Step(Base, GoatBasicModelMixin):
