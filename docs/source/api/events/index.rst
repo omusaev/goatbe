@@ -17,3 +17,4 @@ API для работы с ивентами.
    restore.rst
    delete.rst
    leave.rst
+   map_details.rst

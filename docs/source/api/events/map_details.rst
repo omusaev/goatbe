@@ -1,11 +1,11 @@
-short event details
-===================
+map event details
+=================
 
-Короткая информация по ивенту для неактивного участника.
+Информация по ивенту для отображения на карте.
 
 **URL**::
 
-    /{v}/events/details/short/
+    /{v}/events/details/map/
 
 **Method**::
 
@@ -29,27 +29,8 @@ Parameter         Type  Description
 ``description``   str   Описание ивента
 ``title``         str   Название ивента
 ``finish_at``     str   Дата конца
-``participants``  list  Участники
 ``places``        list  Места
 ================  ====  ==============================================
-
-Элементы ``participants`` имеют следующую структуру.
-
-===========  ====  =============================================
-Parameter    Type  Description
-===========  ====  =============================================
-``status``   str   :doc:`Статус <../other/participant_statuses>`
-``account``  dict  Пользователь
-===========  ====  =============================================
-
-``account`` имеют следующую структуру.
-
-==============  ====  ========================
-Parameter       Type  Description
-==============  ====  ========================
-``name``        str   Имя пользователя
-``avatar_url``  str   url аватара пользователя
-==============  ====  ========================
 
 Элементы ``places`` имеют следующую структуру.
 
@@ -81,8 +62,6 @@ Parameter        Type   Description
 * INVALID_PARAMETER
 * AUTH_REQUIRED
 * EVENT_NOT_FOUND
-* USER_IS_NOT_EVENT_PARTICIPANT
-* PERMISSION_DENIED
 
 **Пример запроса**
 
@@ -104,22 +83,6 @@ Parameter        Type   Description
           "description":"Just another hike",
           "title":"Yearly extreme",
           "finish_at":1469059355,
-          "participants":[
-             {
-                "status":"ACTIVE",
-                "account":{
-                   "name":"Jerry",
-                   "avatar_url":"http://avatars.com/123.png"
-                }
-             },
-             {
-                "status":"INACTIVE",
-                "account":{
-                   "name":"Tom",
-                   "avatar_url":"http://avatars.com/456.png"
-                }
-             }
-          ]
           "places": [
 		      {
 		  	     "id":1,
