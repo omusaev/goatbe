@@ -23,7 +23,7 @@ from events.validators import (
     EventExistenceValidator, AccountIsEventParticipantValidator,
     StepExistenceValidator, PermissionValidator, UpdateAssigneesValidator,
     EventSecretValidator, PlaceExistenceValidator,
-    getEventParticipant, TimestampValidator,
+    getEventParticipant, timestamp_validator,
     ChangePlacesOrderValidator,
 )
 
@@ -97,8 +97,8 @@ class CreateEvent(BaseResource):
         Required('lang'): All(unicode),
         Required('title'): All(unicode, Length(min=1, max=255)),
         Optional('description'): All(unicode, Length(min=1, max=2000)),
-        Required('start_at'): All(TimestampValidator()),
-        Required('finish_at'): All(TimestampValidator()),
+        Required('start_at'): All(timestamp_validator),
+        Required('finish_at'): All(timestamp_validator),
         Required('type'): All(Upper, In(Event.TYPE.ALL)),
     }
 
@@ -156,8 +156,8 @@ class UpdateEvent(BaseResource):
         Required('event_id'): All(int),
         Optional('title'): All(unicode, Length(min=1, max=255)),
         Optional('description'): All(unicode, Length(min=1, max=2000)),
-        Optional('start_at'): All(TimestampValidator()),
-        Optional('finish_at'): All(TimestampValidator()),
+        Optional('start_at'): All(timestamp_validator),
+        Optional('finish_at'): All(timestamp_validator),
     }
 
     validators = [
@@ -873,8 +873,8 @@ class CreatePlace(BaseResource):
         Required('event_id'): All(int),
         Optional('title'): All(unicode, Length(min=1, max=255)),
         Optional('description'): All(unicode, Length(min=1, max=2000)),
-        Optional('start_at'): All(int, TimestampValidator()),
-        Optional('finish_at'): All(int, TimestampValidator()),
+        Optional('start_at'): All(int, timestamp_validator),
+        Optional('finish_at'): All(int, timestamp_validator),
         Optional('order'): All(int),
         Required('point'): {
             Required('lng'): All(float),
@@ -932,8 +932,8 @@ class UpdatePlace(BaseResource):
         Required('place_id'): All(int),
         Optional('title'): All(unicode, Length(min=1, max=255)),
         Optional('description'): All(unicode, Length(min=1, max=2000)),
-        Optional('start_at'): All(int, TimestampValidator()),
-        Optional('finish_at'): All(int, TimestampValidator()),
+        Optional('start_at'): All(int, timestamp_validator),
+        Optional('finish_at'): All(int, timestamp_validator),
         Optional('order'): All(int),
         Optional('point'): {
             Required('lng'): All(float),
@@ -958,8 +958,7 @@ class UpdatePlace(BaseResource):
         start_at = self.get_param('start_at')
         finish_at = self.get_param('finish_at')
         order = self.get_param('order')
-        lng = self.get_param('point').get('lng')
-        lat = self.get_param('point').get('lat')
+        point = self.get_param('point')
 
         if title:
             place.title = title
@@ -976,8 +975,8 @@ class UpdatePlace(BaseResource):
         if order:
             place.order = order
 
-        if lng or lat:
-            place.point = Place.format_point(lng, lat)
+        if point:
+            place.point = Place.format_point(point.get('lng'), point.get('lat'))
 
         with db_session() as db:
             db.merge(place)

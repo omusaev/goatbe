@@ -19,6 +19,7 @@ from events.models import Event, Participant, Step, Place
 from events.permissions import PERMISSION
 
 __all__ = (
+    'timestamp_validator',
     'EventExistenceValidator',
     'StepExistenceValidator',
     'PlaceExistenceValidator',
@@ -27,9 +28,17 @@ __all__ = (
     'UpdateAssigneesValidator',
     'EventSecretValidator',
     'getEventParticipant',
-    'TimestampValidator',
     'ChangePlacesOrderValidator',
 )
+
+
+def timestamp_validator(timestamp):
+    try:
+        parsed = datetime.datetime.fromtimestamp(timestamp)
+    except (ValueError, TypeError) as e:
+        raise Invalid('Invalid timestamp', error_message=e.message)
+
+    return parsed
 
 
 class EventExistenceValidator(BaseValidator):
@@ -177,17 +186,6 @@ def getEventParticipant(account_id, event_id):
         participant = db.query(Participant).filter_by(account_id=account_id, event_id=event_id).first()
 
     return participant or None
-
-
-class TimestampValidator(BaseValidator):
-
-    def run(self, timestamp):
-        try:
-            parsed = datetime.datetime.fromtimestamp(timestamp)
-        except (ValueError, TypeError) as e:
-            raise Invalid('Invalid timestamp', error_message=e.message)
-
-        return parsed
 
 
 class ChangePlacesOrderValidator(BaseValidator):
