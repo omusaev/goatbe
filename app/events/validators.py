@@ -1,27 +1,44 @@
 # -*- coding: utf-8 -*-
 
+import datetime
+
 from sqlalchemy.orm import joinedload
+
+from voluptuous import Invalid
 
 from core.exceptions import (
     EventNotFoundException, UserIsNotEventParticipant,
     StepNotFoundException, PermissionDeniedException,
     StepIsNotInEventException, InvalidParameterException,
     InvalidEventStatusException, InvalidEventSecretException,
+    PlaceNotFoundException, PlaceIsNotInEventException,
 )
 from core.validators import BaseValidator
 from db.helpers import db_session
-from events.models import Event, Participant, Step
+from events.models import Event, Participant, Step, Place
 from events.permissions import PERMISSION
 
 __all__ = (
+    'timestamp_validator',
     'EventExistenceValidator',
     'StepExistenceValidator',
+    'PlaceExistenceValidator',
     'AccountIsEventParticipantValidator',
     'PermissionValidator',
     'UpdateAssigneesValidator',
     'EventSecretValidator',
     'getEventParticipant',
+    'ChangePlacesOrderValidator',
 )
+
+
+def timestamp_validator(timestamp):
+    try:
+        parsed = datetime.datetime.fromtimestamp(timestamp)
+    except (ValueError, TypeError) as e:
+        raise Invalid('Invalid timestamp', error_message=e.message)
+
+    return parsed
 
 
 class EventExistenceValidator(BaseValidator):
@@ -63,6 +80,27 @@ class StepExistenceValidator(BaseValidator):
             raise StepIsNotInEventException
 
         resource.data['step'] = step
+
+
+class PlaceExistenceValidator(BaseValidator):
+    '''
+    Needs EventExistenceValidator
+    '''
+
+    def run(self, resource, *args, **kwargs):
+        place_id = resource.get_param('place_id')
+        event = resource.data['event']
+
+        with db_session() as db:
+            place = db.query(Place).options(joinedload('*')).get(place_id)
+
+        if not place:
+            raise PlaceNotFoundException
+
+        if place.event_id != event.id:
+            raise PlaceIsNotInEventException
+
+        resource.data['place'] = place
 
 
 class AccountIsEventParticipantValidator(BaseValidator):
@@ -141,9 +179,32 @@ class EventSecretValidator(BaseValidator):
             raise InvalidEventSecretException()
 
 
+# TODO: codestyle. Move to the logic.py
 def getEventParticipant(account_id, event_id):
 
     with db_session() as db:
         participant = db.query(Participant).filter_by(account_id=account_id, event_id=event_id).first()
 
     return participant or None
+
+
+class ChangePlacesOrderValidator(BaseValidator):
+
+    def run(self, resource, *args, **kwargs):
+
+        orders = resource.get_param('orders')
+        places = []
+
+        for order_info in orders:
+            place_id = order_info.get('id')
+            order = order_info.get('order')
+
+            with db_session() as db:
+                place = db.query(Place).options(joinedload('*')).get(place_id)
+
+            if not place:
+                raise PlaceNotFoundException
+
+            places.append((place, order, ))
+
+        resource.data['places'] = places

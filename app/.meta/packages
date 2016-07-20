@@ -1,5 +1,7 @@
 falcon
 SQLAlchemy
+GeoAlchemy2
+shapely
 psycopg2
 voluptuous
 uWSGI

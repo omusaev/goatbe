@@ -1,26 +1,30 @@
 # -*- coding: utf-8 -*-
 
+import datetime
+
 from voluptuous import (
-    Required, Optional, All, Length, Datetime, Upper, In
+    Required, Optional, All, Length, Upper, In, Schema
 )
 
 from accounts.validators import AuthRequiredValidator
 
 from core.exceptions import AssigneeNotFoundException, UserIsNotEventParticipant
+from core.helpers import to_timestamp
 from core.schemas import ListOf
 from core.resources.base import BaseResource
 
 from db.helpers import db_session
 
-from events import EVENT_TYPES_DESCRIPTION, EVENT_DATES_FORMAT
+from events import EVENT_TYPES_DESCRIPTION
 from events.logic import calculate_event_status
-from events.models import Event, Participant, Step, Assignee
+from events.models import Event, Participant, Step, Assignee, Place
 from events.permissions import PERMISSION
 from events.validators import (
     EventExistenceValidator, AccountIsEventParticipantValidator,
     StepExistenceValidator, PermissionValidator, UpdateAssigneesValidator,
-    EventSecretValidator,
-    getEventParticipant
+    EventSecretValidator, PlaceExistenceValidator,
+    getEventParticipant, timestamp_validator,
+    ChangePlacesOrderValidator,
 )
 
 __all__ = (
@@ -34,6 +38,7 @@ __all__ = (
     'EventDetails',
     'ShortEventDetails',
     'ShortEventDetailsBySecret',
+    'MapEventDetails',
     'EventList',
 
     'DeleteParticipant',
@@ -47,6 +52,12 @@ __all__ = (
 
     'UpdateAssignees',
     'UpdateAssigneesResolution',
+
+    'CreatePlace',
+    'UpdatePlace',
+    'DeletePlace',
+    'PlaceDetails',
+    'MapPlaces',
 )
 
 
@@ -86,9 +97,8 @@ class CreateEvent(BaseResource):
         Required('lang'): All(unicode),
         Required('title'): All(unicode, Length(min=1, max=255)),
         Optional('description'): All(unicode, Length(min=1, max=2000)),
-        Optional('destination'): All(unicode, Length(min=1, max=255)),
-        Required('start_at'): All(Datetime(format=EVENT_DATES_FORMAT)),
-        Required('finish_at'): All(Datetime(format=EVENT_DATES_FORMAT)),
+        Required('start_at'): All(timestamp_validator),
+        Required('finish_at'): All(timestamp_validator),
         Required('type'): All(Upper, In(Event.TYPE.ALL)),
     }
 
@@ -108,7 +118,6 @@ class CreateEvent(BaseResource):
             event = Event(
                 title=self.get_param('title'),
                 description=self.get_param('description'),
-                destination=self.get_param('destination'),
                 start_at=self.get_param('start_at'),
                 finish_at=self.get_param('finish_at'),
                 type=event_type,
@@ -147,9 +156,8 @@ class UpdateEvent(BaseResource):
         Required('event_id'): All(int),
         Optional('title'): All(unicode, Length(min=1, max=255)),
         Optional('description'): All(unicode, Length(min=1, max=2000)),
-        Optional('destination'): All(unicode, Length(min=1, max=255)),
-        Optional('start_at'): All(Datetime(format=EVENT_DATES_FORMAT)),
-        Optional('finish_at'): All(Datetime(format=EVENT_DATES_FORMAT)),
+        Optional('start_at'): All(timestamp_validator),
+        Optional('finish_at'): All(timestamp_validator),
     }
 
     validators = [
@@ -165,7 +173,6 @@ class UpdateEvent(BaseResource):
 
         title = self.get_param('title')
         description = self.get_param('description')
-        destination = self.get_param('destination')
         start_at = self.get_param('start_at')
         finish_at = self.get_param('finish_at')
 
@@ -174,9 +181,6 @@ class UpdateEvent(BaseResource):
 
         if description:
             event.description = description
-
-        if destination:
-            event.destination = destination
 
         if start_at:
             event.start_at = start_at
@@ -236,7 +240,7 @@ class RestoreEvent(BaseResource):
 
         event = self.data.get('event')
 
-        # todo: what status we have to set?! It's time to think about event status calculation mechanism...
+        # todo: what status do we have to set?! It's time to think about event status calculation mechanism...
         event.status = Event.STATUS.PREPARATION
 
         with db_session() as db:
@@ -320,14 +324,14 @@ class EventDetails(BaseResource):
 
         event_data = {
             'title': event.title,
-            'destination': event.destination,
             'description': event.description,
             'status': event.status,
-            'start_at': event.start_at.strftime(EVENT_DATES_FORMAT),
-            'finish_at': event.finish_at.strftime(EVENT_DATES_FORMAT),
+            'start_at': to_timestamp(event.start_at),
+            'finish_at': to_timestamp(event.finish_at),
             'secret': event.secret,
             'participants': [],
             'steps': [],
+            'places': [],
         }
 
         for participant in event.participants:
@@ -363,6 +367,20 @@ class EventDetails(BaseResource):
 
             event_data['steps'].append(full_step)
 
+        for place in event.places:
+            event_data['places'].append({
+                'id': place.id,
+                'title': place.title,
+                'description': place.description,
+                'start_at': to_timestamp(place.start_at),
+                'finish_at': to_timestamp(place.finish_at),
+                'order': place.order,
+                'point': {
+                    'lng': place.lng,
+                    'lat': place.lat,
+                }
+            })
+
         self.response_data = event_data
 
 
@@ -387,12 +405,12 @@ class ShortEventDetails(BaseResource):
 
         event_data = {
             'title': event.title,
-            'destination': event.destination,
             'description': event.description,
             'status': event.status,
-            'start_at': event.start_at.strftime(EVENT_DATES_FORMAT),
-            'finish_at': event.finish_at.strftime(EVENT_DATES_FORMAT),
+            'start_at': to_timestamp(event.start_at),
+            'finish_at': to_timestamp(event.finish_at),
             'participants': [],
+            'places': [],
         }
 
         for participant in event.participants:
@@ -402,6 +420,20 @@ class ShortEventDetails(BaseResource):
                     'avatar_url': participant.account.avatar_url,
                 },
                 'status': participant.status,
+            })
+
+        for place in event.places:
+            event_data['places'].append({
+                'id': place.id,
+                'title': place.title,
+                'description': place.description,
+                'start_at': to_timestamp(place.start_at),
+                'finish_at': to_timestamp(place.finish_at),
+                'order': place.order,
+                'point': {
+                    'lng': place.lng,
+                    'lat': place.lat,
+                }
             })
 
         self.response_data = event_data
@@ -420,6 +452,49 @@ class ShortEventDetailsBySecret(ShortEventDetails):
         EventExistenceValidator(),
         EventSecretValidator(),
     ]
+
+
+class MapEventDetails(BaseResource):
+
+    url = '/v1/events/details/map/'
+
+    data_schema = {
+        Required('event_id'): All(int),
+    }
+
+    validators = [
+        AuthRequiredValidator(),
+        EventExistenceValidator(),
+    ]
+
+    def post(self):
+
+        event = self.data.get('event')
+
+        event_data = {
+            'title': event.title,
+            'description': event.description,
+            'status': event.status,
+            'start_at': to_timestamp(event.start_at),
+            'finish_at': to_timestamp(event.finish_at),
+            'places': [],
+        }
+
+        for place in event.places:
+            event_data['places'].append({
+                'id': place.id,
+                'title': place.title,
+                'description': place.description,
+                'start_at': to_timestamp(place.start_at),
+                'finish_at': to_timestamp(place.finish_at),
+                'order': place.order,
+                'point': {
+                    'lng': place.lng,
+                    'lat': place.lat,
+                }
+            })
+
+        self.response_data = event_data
 
 
 class EventList(BaseResource):
@@ -444,11 +519,10 @@ class EventList(BaseResource):
                 event_data = {
                     'id': event.id,
                     'title': event.title,
-                    'destination': event.destination,
                     'description': event.description,
                     'status': event.status,
-                    'start_at': event.start_at.strftime(EVENT_DATES_FORMAT),
-                    'finish_at': event.finish_at.strftime(EVENT_DATES_FORMAT),
+                    'start_at': to_timestamp(event.start_at),
+                    'finish_at': to_timestamp(event.finish_at),
                     'participant_status': participant.status,
                     'is_owner': participant.is_owner
                 }
@@ -749,15 +823,14 @@ class UpdateAssigneesResolution(BaseResource):
 
     url = '/v1/assignees/resolution/update/'
 
-    resolution_schema = {
+    resolution_schema = Schema({
         Required('account_id'): All(int),
         Required('resolution', default=Assignee.RESOLUTION.OPEN): All(Upper, In(Assignee.RESOLUTION.ALL)),
-    }
+    })
 
     data_schema = {
         Required('event_id'): All(int),
         Required('step_id'): All(int),
-        # TODO: not work. need fix.
         Required('resolutions'): ListOf(resolution_schema),
     }
 
@@ -790,3 +863,257 @@ class UpdateAssigneesResolution(BaseResource):
         calculate_event_status.delay(self.get_param('event_id'))
 
         self.response_data = {}
+
+
+class CreatePlace(BaseResource):
+
+    url = '/v1/places/create/'
+
+    data_schema = {
+        Required('event_id'): All(int),
+        Optional('title'): All(unicode, Length(min=1, max=255)),
+        Optional('description'): All(unicode, Length(min=1, max=2000)),
+        Optional('start_at'): All(int, timestamp_validator),
+        Optional('finish_at'): All(int, timestamp_validator),
+        Optional('order'): All(int),
+        Required('point'): {
+            Required('lng'): All(float),
+            Required('lat'): All(float),
+        },
+    }
+
+    validators = [
+        AuthRequiredValidator(),
+        EventExistenceValidator(),
+        AccountIsEventParticipantValidator(),
+        PermissionValidator(permissions=[PERMISSION.CREATE_EVENT_PLACE, ])
+    ]
+
+    def post(self):
+
+        event = self.data.get('event')
+
+        with db_session() as db:
+            order = self.get_param('order')
+
+            if order is None:
+                if event.places:
+                    order = max(p.order for p in event.places) + 1
+                else:
+                    order = 1
+
+            lng = self.get_param('point').get('lng')
+            lat = self.get_param('point').get('lat')
+            point = Place.format_point(lng, lat)
+
+            place = Place(
+                title=self.get_param('title'),
+                description=self.get_param('description'),
+                start_at=self.get_param('start_at'),
+                finish_at=self.get_param('finish_at'),
+                order=order,
+                point=point,
+                event=event,
+            )
+            db.add(place)
+
+        self.response_data = {
+            'place_id': place.id,
+            'order': order,
+        }
+
+
+class UpdatePlace(BaseResource):
+
+    url = '/v1/places/update/'
+
+    data_schema = {
+        Required('event_id'): All(int),
+        Required('place_id'): All(int),
+        Optional('title'): All(unicode, Length(min=1, max=255)),
+        Optional('description'): All(unicode, Length(min=1, max=2000)),
+        Optional('start_at'): All(int, timestamp_validator),
+        Optional('finish_at'): All(int, timestamp_validator),
+        Optional('order'): All(int),
+        Optional('point'): {
+            Required('lng'): All(float),
+            Required('lat'): All(float),
+        }
+    }
+
+    validators = [
+        AuthRequiredValidator(),
+        EventExistenceValidator(),
+        AccountIsEventParticipantValidator(),
+        PermissionValidator(permissions=[PERMISSION.UPDATE_EVENT_PLACE, ]),
+        PlaceExistenceValidator(),
+    ]
+
+    def post(self):
+
+        place = self.data.get('place')
+
+        title = self.get_param('title')
+        description = self.get_param('description')
+        start_at = self.get_param('start_at')
+        finish_at = self.get_param('finish_at')
+        order = self.get_param('order')
+        point = self.get_param('point')
+
+        if title:
+            place.title = title
+
+        if description:
+            place.description = description
+
+        if start_at:
+            place.start_at = start_at
+
+        if finish_at:
+            place.finish_at = finish_at
+
+        if order:
+            place.order = order
+
+        if point:
+            place.point = Place.format_point(point.get('lng'), point.get('lat'))
+
+        with db_session() as db:
+            db.merge(place)
+
+        self.response_data = {}
+
+
+class DeletePlace(BaseResource):
+
+    url = '/v1/places/delete/'
+
+    data_schema = {
+        Required('event_id'): All(int),
+        Required('place_id'): All(int),
+    }
+
+    validators = [
+        AuthRequiredValidator(),
+        EventExistenceValidator(),
+        AccountIsEventParticipantValidator(),
+        PermissionValidator(permissions=[PERMISSION.DELETE_EVENT_PLACE, ]),
+        PlaceExistenceValidator(),
+    ]
+
+    def post(self):
+
+        place = self.get_param('place')
+
+        with db_session() as db:
+            db.delete(place)
+
+        self.response_data = {}
+
+
+class PlaceDetails(BaseResource):
+
+    url = '/v1/places/details/'
+
+    data_schema = {
+        Required('event_id'): All(int),
+        Required('place_id'): All(int),
+    }
+
+    validators = [
+        AuthRequiredValidator(),
+        EventExistenceValidator(),
+        AccountIsEventParticipantValidator(),
+        PermissionValidator(permissions=[PERMISSION.READ_PLACE_DETAILS, ]),
+        PlaceExistenceValidator(),
+    ]
+
+    def post(self):
+
+        place = self.data.get('place')
+
+        place_data = {
+            'id': place.id,
+            'title': place.title,
+            'description': place.description,
+            'start_at': to_timestamp(place.start_at),
+            'finish_at': to_timestamp(place.finish_at),
+            'order': place.order,
+            'point': {
+                'lng': place.lng,
+                'lat': place.lat,
+            }
+        }
+
+        self.response_data = place_data
+
+
+class ChangePlacesOrder(BaseResource):
+
+    url = '/v1/places/order/'
+
+    place_order_schema = Schema({Required('id'): All(int), Required('order'): All(int)})
+
+    data_schema = {
+        Required('event_id'): All(int),
+        Required('orders'): ListOf(place_order_schema),
+    }
+
+    validators = [
+        AuthRequiredValidator(),
+        EventExistenceValidator(),
+        AccountIsEventParticipantValidator(),
+        PermissionValidator(permissions=[PERMISSION.REORDER_EVENT_PLACE, ]),
+        ChangePlacesOrderValidator()
+    ]
+
+    def post(self):
+
+        places = self.data.get('places')
+
+        with db_session() as db:
+            for place, order in places:
+                place.order = order
+                db.merge(place)
+
+        self.response_data = {}
+
+
+class MapPlaces(BaseResource):
+
+    url = '/v1/places/map/'
+
+    validators = [
+        AuthRequiredValidator(),
+    ]
+
+    def post(self):
+
+        response_data = []
+        time_interval = 30
+
+        after = datetime.datetime.now() - datetime.timedelta(time_interval)
+        before = datetime.datetime.now() + datetime.timedelta(time_interval)
+
+        with db_session() as db:
+            places = db.query(Place).\
+                outerjoin(Event, Place.event_id == Event.id).\
+                filter(Event.finish_at > after, Event.start_at < before)
+
+            for place in places:
+                place_data = {
+                    'id': place.id,
+                    'title': place.title,
+                    'description': place.description,
+                    'start_at': to_timestamp(place.start_at),
+                    'finish_at': to_timestamp(place.finish_at),
+                    'point': {
+                        'lng': place.lng,
+                        'lat': place.lat,
+                    },
+                    'event_id': place.event_id,
+                }
+
+                response_data.append(place_data)
+
+        self.response_data = response_data

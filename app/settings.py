@@ -26,6 +26,7 @@ DATABASE = {
 DB_CONNECTION_URL = '%(DIALECT)s+%(DRIVER)s://%(USERNAME)s:%(PASSWORD)s@%(HOST)s:%(PORT)s/%(DATABASE)s' % DATABASE
 
 ALEMBIC_CONFIG_PATH = '%s/db/migrations/alembic.ini' % PROJECT_ROOT
+ALEMBIC_EXCLUDE_TABLES = ('spatial_ref_sys', )
 
 MIDDLEWARES = [
     'core.resources.middlewares.ResourceSetupMiddleware',
@@ -49,6 +50,7 @@ INSTALLED_RESOURCES = [
     'events.resources.EventDetails',
     'events.resources.ShortEventDetails',
     'events.resources.ShortEventDetailsBySecret',
+    'events.resources.MapEventDetails',
     'events.resources.EventList',
 
     'events.resources.DeleteParticipant',
@@ -62,6 +64,13 @@ INSTALLED_RESOURCES = [
 
     'events.resources.UpdateAssignees',
     'events.resources.UpdateAssigneesResolution',
+
+    'events.resources.CreatePlace',
+    'events.resources.UpdatePlace',
+    'events.resources.DeletePlace',
+    'events.resources.PlaceDetails',
+    'events.resources.ChangePlacesOrder',
+    'events.resources.MapPlaces',
 
     'common.resources.ClientSettings',
 ]

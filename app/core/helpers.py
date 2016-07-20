@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+import time
+
 from importlib import import_module
 
 import settings as app_settings
@@ -9,6 +11,7 @@ __all__ = (
     'import_by_path',
     'collect_installed_resources',
     'collect_middlewares',
+    'to_timestamp',
 )
 
 
@@ -48,3 +51,7 @@ def collect_middlewares():
         middleware_obj = middleware()
 
         yield middleware_obj
+
+
+def to_timestamp(dt):
+    return time.mktime(dt.timetuple())
