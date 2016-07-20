@@ -3,7 +3,7 @@
 import datetime
 
 from voluptuous import (
-    Required, Optional, All, Length, Datetime, Upper, In, Schema
+    Required, Optional, All, Length, Upper, In, Schema
 )
 
 from accounts.validators import AuthRequiredValidator
@@ -15,7 +15,7 @@ from core.resources.base import BaseResource
 
 from db.helpers import db_session
 
-from events import EVENT_TYPES_DESCRIPTION, EVENT_DATES_FORMAT
+from events import EVENT_TYPES_DESCRIPTION
 from events.logic import calculate_event_status
 from events.models import Event, Participant, Step, Assignee, Place
 from events.permissions import PERMISSION
@@ -475,8 +475,8 @@ class MapEventDetails(BaseResource):
             'title': event.title,
             'description': event.description,
             'status': event.status,
-            'start_at': event.start_at.strftime(EVENT_DATES_FORMAT),
-            'finish_at': event.finish_at.strftime(EVENT_DATES_FORMAT),
+            'start_at': to_timestamp(event.start_at),
+            'finish_at': to_timestamp(event.finish_at),
             'places': [],
         }
 
@@ -485,8 +485,8 @@ class MapEventDetails(BaseResource):
                 'id': place.id,
                 'title': place.title,
                 'description': place.description,
-                'start_at': place.start_at,
-                'finish_at': place.finish_at,
+                'start_at': to_timestamp(place.start_at),
+                'finish_at': to_timestamp(place.finish_at),
                 'order': place.order,
                 'point': {
                     'lng': place.lng,
@@ -1106,8 +1106,8 @@ class MapPlaces(BaseResource):
                     'id': place.id,
                     'title': place.title,
                     'description': place.description,
-                    'start_at': place.start_at,
-                    'finish_at': place.finish_at,
+                    'start_at': to_timestamp(place.start_at),
+                    'finish_at': to_timestamp(place.finish_at),
                     'point': {
                         'lng': place.lng,
                         'lat': place.lat,

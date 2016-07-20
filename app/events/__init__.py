@@ -325,5 +325,3 @@ EVENT_TYPES_DESCRIPTION = {
         },
     },
 }
-
-EVENT_DATES_FORMAT = '%Y-%m-%d %H:%M:%S'
