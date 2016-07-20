@@ -55,6 +55,13 @@ def run_migrations_offline():
         context.run_migrations()
 
 
+def include_object(object, name, type_, reflected, compare_to):
+    if type_ == "table" and name in app_settings.ALEMBIC_EXCLUDE_TABLES:
+        return False
+    else:
+        return True
+
+
 def run_migrations_online():
     """
     Run migrations in 'online' mode.
@@ -74,7 +81,8 @@ def run_migrations_online():
     connection = engine.connect()
     context.configure(
         connection=connection,
-        target_metadata=target_metadata
+        target_metadata=target_metadata,
+        include_object=include_object,
     )
 
     try:

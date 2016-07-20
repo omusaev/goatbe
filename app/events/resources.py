@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+import datetime
+
 from voluptuous import (
     Required, Optional, All, Length, Datetime, Upper, In, Schema
 )
@@ -36,6 +38,7 @@ __all__ = (
     'EventDetails',
     'ShortEventDetails',
     'ShortEventDetailsBySecret',
+    'MapEventDetails',
     'EventList',
 
     'DeleteParticipant',
@@ -54,6 +57,7 @@ __all__ = (
     'UpdatePlace',
     'DeletePlace',
     'PlaceDetails',
+    'MapPlaces',
 )
 
 
@@ -406,6 +410,7 @@ class ShortEventDetails(BaseResource):
             'start_at': to_timestamp(event.start_at),
             'finish_at': to_timestamp(event.finish_at),
             'participants': [],
+            'places': [],
         }
 
         for participant in event.participants:
@@ -447,6 +452,49 @@ class ShortEventDetailsBySecret(ShortEventDetails):
         EventExistenceValidator(),
         EventSecretValidator(),
     ]
+
+
+class MapEventDetails(BaseResource):
+
+    url = '/v1/events/details/map/'
+
+    data_schema = {
+        Required('event_id'): All(int),
+    }
+
+    validators = [
+        AuthRequiredValidator(),
+        EventExistenceValidator(),
+    ]
+
+    def post(self):
+
+        event = self.data.get('event')
+
+        event_data = {
+            'title': event.title,
+            'description': event.description,
+            'status': event.status,
+            'start_at': event.start_at.strftime(EVENT_DATES_FORMAT),
+            'finish_at': event.finish_at.strftime(EVENT_DATES_FORMAT),
+            'places': [],
+        }
+
+        for place in event.places:
+            event_data['places'].append({
+                'id': place.id,
+                'title': place.title,
+                'description': place.description,
+                'start_at': place.start_at,
+                'finish_at': place.finish_at,
+                'order': place.order,
+                'point': {
+                    'lng': place.lng,
+                    'lat': place.lat,
+                }
+            })
+
+        self.response_data = event_data
 
 
 class EventList(BaseResource):
@@ -1030,3 +1078,43 @@ class ChangePlacesOrder(BaseResource):
                 db.merge(place)
 
         self.response_data = {}
+
+
+class MapPlaces(BaseResource):
+
+    url = '/v1/places/map/'
+
+    validators = [
+        AuthRequiredValidator(),
+    ]
+
+    def post(self):
+
+        response_data = []
+        time_interval = 30
+
+        after = datetime.datetime.now() - datetime.timedelta(time_interval)
+        before = datetime.datetime.now() + datetime.timedelta(time_interval)
+
+        with db_session() as db:
+            places = db.query(Place).\
+                outerjoin(Event, Place.event_id == Event.id).\
+                filter(Event.finish_at > after, Event.start_at < before)
+
+            for place in places:
+                place_data = {
+                    'id': place.id,
+                    'title': place.title,
+                    'description': place.description,
+                    'start_at': place.start_at,
+                    'finish_at': place.finish_at,
+                    'point': {
+                        'lng': place.lng,
+                        'lat': place.lat,
+                    },
+                    'event_id': place.event_id,
+                }
+
+                response_data.append(place_data)
+
+        self.response_data = response_data

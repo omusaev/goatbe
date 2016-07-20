@@ -10,7 +10,7 @@ from sqlalchemy.orm import relationship, backref
 
 from geoalchemy2 import Geography
 
-from shapely.wkt import loads as wkt_loads
+from shapely.wkb import loads as wkb_loads
 
 from accounts.models import Account
 from db.base import Base
@@ -220,8 +220,8 @@ class Place(Base, GoatBasicModelMixin):
     title = Column(String(255), nullable=False, default='', server_default='')
     description = Column(Text(), nullable=False, default='', server_default='')
     point = Column(Geography(geometry_type='POINT', srid=4326))
-    start_at = Column(DateTime, nullable=False)
-    finish_at = Column(DateTime, nullable=False)
+    start_at = Column(DateTime)
+    finish_at = Column(DateTime)
     order = Column(Integer())
 
     event_id = Column(
@@ -237,7 +237,7 @@ class Place(Base, GoatBasicModelMixin):
 
     @property
     def geom_point(self):
-        return wkt_loads(self.point)
+        return wkb_loads(bytes(self.point.data))
 
     @property
     def lng(self):
