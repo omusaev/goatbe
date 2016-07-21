@@ -26,10 +26,10 @@ Parameter         Default  Format                  Type    Required  Description
 Parameter         Type  Description
 ================  ====  ==============================================
 ``status``        str   :doc:`Статус ивента <../other/event_statuses>`
-``start_at``      str   Дата старта
+``start_at``      int   Дата старта
 ``description``   str   Описание ивента
 ``title``         str   Название ивента
-``finish_at``     str   Дата конца
+``finish_at``     int   Дата конца
 ``participants``  list  Участники
 ``places``        list  Места
 ================  ====  ==============================================
