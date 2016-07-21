@@ -13,16 +13,15 @@ update event
 
 **Параметры запроса**
 
-===============  =======  =======================  ========  ================
-Parameter        Type     Format                   Required  Description
-===============  =======  =======================  ========  ================
-``event_id``     int                               true      Id ивента
-``title``        unicode  Length(min=1, max=255)   false     Заголовок
-``description``  unicode  Length(min=1, max=2000)  false     Описание
-``destination``  unicode  Length(min=1, max=255)   false     Место проведения
-``start_at``     str      YYYY-MM-DD HH:MM:SS      false     Дата начала
-``finish_at``    str      YYYY-MM-DD HH:MM:SS      false     Дата окончания
-===============  =======  =======================  ========  ================
+===============  =========  =======================  ========  ================
+Parameter        Type       Format                   Required  Description
+===============  =========  =======================  ========  ================
+``event_id``     int                                 true      Id ивента
+``title``        unicode    Length(min=1, max=255)   false     Заголовок
+``description``  unicode    Length(min=1, max=2000)  false     Описание
+``start_at``     timestamp                           false     Дата начала
+``finish_at``    timestamp                           false     Дата окончания
+===============  =========  =======================  ========  ================
 
 **Структура data**
 
@@ -45,7 +44,7 @@ Parameter        Type     Format                   Required  Description
     {
         "event_id": 1,
         "title": "My second hiking!",
-        "finish_at": "2016-07-11 18:30:00"
+        "finish_at":1470049355
     }
 
 **Пример ответа**

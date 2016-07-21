@@ -13,17 +13,16 @@ create event
 
 **Параметры запроса**
 
-===============  =======  =======  =======================  ========  ==========================================
-Parameter        Default  Type     Format                   Required  Description
-===============  =======  =======  =======================  ========  ==========================================
-``lang``                  str                               true      :doc:`Код языка <../other/language_codes>`
-``type``                  str                               true      :doc:`Тип <types>`
-``title``                 unicode  Length(min=1, max=255)   true      Заголовок
-``description``  ''       unicode  Length(min=1, max=2000)  false     Описание
-``destination``  ''       unicode  Length(min=1, max=255)   false     Место проведения
-``start_at``              str      YYYY-MM-DD HH:MM:SS      true      Дата начала
-``finish_at``             str      YYYY-MM-DD HH:MM:SS      true      Дата окончания
-===============  =======  =======  =======================  ========  ==========================================
+===============  =======  =========  =======================  ========  ==========================================
+Parameter        Default  Type       Format                   Required  Description
+===============  =======  =========  =======================  ========  ==========================================
+``lang``                  str                                 true      :doc:`Код языка <../other/language_codes>`
+``type``                  str                                 true      :doc:`Тип <types>`
+``title``                 unicode    Length(min=1, max=255)   true      Заголовок
+``description``  ''       unicode    Length(min=1, max=2000)  false     Описание
+``start_at``              timestamp                           true      Дата начала
+``finish_at``             timestamp                           true      Дата окончания
+===============  =======  =========  =======================  ========  ==========================================
 
 **Структура data**
 
@@ -49,9 +48,8 @@ Parameter     Type  Description
         "type": "hiking",
         "title": "My first hiking!",
         "description": "How about a trip to the georgia mountains, friends?!",
-        "destination": "Georgia",
-        "start_at": "2016-06-27 16:30:00",
-        "finish_at": "2016-07-11 18:30:00"
+        "start_at":1469049355,
+        "finish_at":1469059355
     }
 
 **Пример ответа**

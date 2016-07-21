@@ -20,5 +20,9 @@ read_step_details         Просмотр шага
 create_step_assignee      Добавление асайни на шаг
 delete_step_assignee      Удаление асайни из шага
 update_step_resolution    Редактирование резолюции шага
-wrong_participant_status  Участник имеет недопустимый статус
+create_event_place		  Добавление места
+delete_event_place		  Удаление места
+update_event_place		  Редактирование места
+reorder_event_place		  Изменение порядка места
+read_place_details		  Просмотр места
 ========================  ==================================

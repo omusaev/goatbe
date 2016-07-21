@@ -22,11 +22,11 @@ Parameter               Type  Description
 ======================  ====  =============================================================================
 ``id``                  int   Id ивента
 ``status``              str   :doc:`Статус ивента <../other/event_statuses>`
-``start_at``            str   Дата старта
+``start_at``            int   Дата старта
 ``description``         str   Описание ивента
 ``title``               str   Название ивента
 ``destination``         str   Место проведения
-``finish_at``           str   Дата конца
+``finish_at``           int   Дата конца
 ``participant_status``  str   :doc:`Статус участника(текущий пользователь) <../other/participant_statuses>`
 ``is_owner``            bool  Является ли владельцем ивента текущий пользователь
 ======================  ====  =============================================================================
@@ -46,22 +46,22 @@ Parameter               Type  Description
            {
              "id":12,
              "status":"PREPARATION",
-             "start_at":"2016-08-10 12:12:12",
+             "start_at":1469049355,
              "description":"Just another hike",
              "title":"Yearly extreme",
              "destination":"Georgia",
-             "finish_at":"2016-09-10 12:12:12",
+             "finish_at":1469059355,
              "participant_status":"ACTIVE",
              "is_owner":true
            },
            {
              "id":13,
              "status":"PREPARATION",
-             "start_at":"2016-09-25 12:12:12",
+             "start_at":1470049355,
              "description":"Wow! Qomolangma!",
              "title":"Yearly extreme",
              "destination":"Qomolangma",
-             "finish_at":"2016-10-13 12:12:12",
+             "finish_at":1470059355,
              "participant_status":"INACTIVE",
              "is_owner":false
            },
