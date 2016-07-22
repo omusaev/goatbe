@@ -49,6 +49,7 @@ __all__ = (
     'UpdateStep',
     'StepDetails',
     'DeleteStep',
+    'ChangeStepsOrder',
 
     'UpdateAssignees',
     'UpdateAssigneesResolution',
@@ -652,7 +653,7 @@ class CreateStep(BaseResource):
         with db_session() as db:
             if order is None:
                 if event.steps:
-                    order = max(p.order for p in event.steps) + 1
+                    order = max(s.order for s in event.steps) + 1
                 else:
                     order = 1
             step = Step(
