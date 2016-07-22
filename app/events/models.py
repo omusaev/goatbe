@@ -109,6 +109,7 @@ class Step(Base, GoatBasicModelMixin):
     title = Column(String(255), nullable=False, default='', server_default='')
     description = Column(Text(), nullable=False, default='', server_default='')
     type = Column(String(255), nullable=False, default=TYPE.COMMON, server_default=TYPE.COMMON)
+    order = Column(Integer())
     event_id = Column(
         BigInteger,
         ForeignKey(

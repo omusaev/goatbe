@@ -61,6 +61,7 @@ INSTALLED_RESOURCES = [
     'events.resources.UpdateStep',
     'events.resources.StepDetails',
     'events.resources.DeleteStep',
+    'events.resources.ChangeStepsOrder',
 
     'events.resources.UpdateAssignees',
     'events.resources.UpdateAssigneesResolution',
