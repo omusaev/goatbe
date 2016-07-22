@@ -19,6 +19,7 @@ Parameter        Default  Type     Format                   Required  Descriptio
 ``event_id``              int                               true      Id ивента
 ``step_id``               int                               true      Id шага
 ``title``                 unicode  Length(min=1, max=255)   false     Заголовок
+``order``                 int                               false     Порядок шага
 ``description``           unicode  Length(min=1, max=2000)  false     Описание
 ===============  =======  =======  =======================  ========  ===========
 

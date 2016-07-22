@@ -24,7 +24,7 @@ from events.validators import (
     StepExistenceValidator, PermissionValidator, UpdateAssigneesValidator,
     EventSecretValidator, PlaceExistenceValidator,
     getEventParticipant, timestamp_validator,
-    ChangePlacesOrderValidator,
+    ChangePlacesOrderValidator, ChangeStepsOrderValidator
 )
 
 __all__ = (
@@ -58,6 +58,7 @@ __all__ = (
     'DeletePlace',
     'PlaceDetails',
     'MapPlaces',
+    'ChangePlacesOrder',
 )
 
 
@@ -132,6 +133,7 @@ class CreateEvent(BaseResource):
                     description=predefined_step.get('description'),
                     type=predefined_step.get('type'),
                     event=event,
+                    order=predefined_step.get('order'),
                 )
                 db.add(step)
 
@@ -352,6 +354,7 @@ class EventDetails(BaseResource):
                 'title': step.title,
                 'description': step.description,
                 'type': step.type,
+                'order': step.order,
                 'assignees': [],
             }
 
@@ -631,6 +634,7 @@ class CreateStep(BaseResource):
         Required('title'): All(unicode, Length(min=1, max=255)),
         Optional('description'): All(unicode, Length(min=1, max=2000)),
         Optional('type', default=Step.TYPE.CUSTOM): All(Upper, In(Step.TYPE.ALL)),
+        Optional('order'): All(int),
     }
 
     validators = [
@@ -643,13 +647,20 @@ class CreateStep(BaseResource):
     def post(self):
 
         event = self.data.get('event')
+        order = self.get_param('order')
 
         with db_session() as db:
+            if order is None:
+                if event.steps:
+                    order = max(p.order for p in event.steps) + 1
+                else:
+                    order = 1
             step = Step(
                 title=self.get_param('title'),
                 description=self.get_param('description'),
                 type=self.get_param('type'),
                 event=event,
+                order=order,
             )
             db.add(step)
 
@@ -669,6 +680,7 @@ class UpdateStep(BaseResource):
         Required('step_id'): All(int),
         Optional('title'): All(unicode, Length(min=1, max=255)),
         Optional('description'): All(unicode, Length(min=1, max=2000)),
+        Optional('order'): All(int),
     }
 
     validators = [
@@ -685,12 +697,16 @@ class UpdateStep(BaseResource):
 
         title = self.get_param('title')
         description = self.get_param('description')
+        order = self.get_param('order')
 
         if title:
             step.title = title
 
         if description:
             step.description = description
+
+        if order:
+            step.order = order
 
         with db_session() as db:
             db.merge(step)
@@ -724,6 +740,7 @@ class StepDetails(BaseResource):
             'title': step.title,
             'description': step.description,
             'type': step.type,
+            'order': step.order,
             'assignees': [],
         }
 
@@ -767,6 +784,38 @@ class DeleteStep(BaseResource):
         calculate_event_status.delay(self.get_param('event_id'))
 
         self.response_data = {}
+
+
+class ChangeStepsOrder(BaseResource):
+
+    url = '/v1/steps/order/'
+
+    step_order_schema = Schema({Required('id'): All(int), Required('order'): All(int)})
+
+    data_schema = {
+        Required('event_id'): All(int),
+        Required('orders'): ListOf(step_order_schema),
+    }
+
+    validators = [
+        AuthRequiredValidator(),
+        EventExistenceValidator(),
+        AccountIsEventParticipantValidator(),
+        PermissionValidator(permissions=[PERMISSION.REORDER_EVENT_STEPS, ]),
+        ChangeStepsOrderValidator()
+    ]
+
+    def post(self):
+
+        steps = self.data.get('steps')
+
+        with db_session() as db:
+            for step, order in steps:
+                step.order = order
+                db.merge(step)
+
+        self.response_data = {}
+
 
 
 class UpdateAssignees(BaseResource):
@@ -892,9 +941,9 @@ class CreatePlace(BaseResource):
     def post(self):
 
         event = self.data.get('event')
+        order = self.get_param('order')
 
         with db_session() as db:
-            order = self.get_param('order')
 
             if order is None:
                 if event.places:
@@ -1063,7 +1112,7 @@ class ChangePlacesOrder(BaseResource):
         AuthRequiredValidator(),
         EventExistenceValidator(),
         AccountIsEventParticipantValidator(),
-        PermissionValidator(permissions=[PERMISSION.REORDER_EVENT_PLACE, ]),
+        PermissionValidator(permissions=[PERMISSION.REORDER_EVENT_PLACES, ]),
         ChangePlacesOrderValidator()
     ]
 

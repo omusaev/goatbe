@@ -54,6 +54,7 @@ Parameter        Type  Description
 ``id``           int   Id шага
 ``assignees``    list  Асайни
 ``type``         str   :doc:`Тип <../other/step_types>`
+``order``        int   Порядок шага
 ``description``  str   Описание шага
 ``title``        str   Название шага
 ===============  ====  ================================
@@ -190,6 +191,7 @@ Parameter        Type   Description
                 ],
                 "id":1,
                 "type":"COMMON",
+                "order":1,
                 "description":"Надо бы заполнить информацию",
                 "title":"Заполнить информацию о походе"
              },
@@ -202,6 +204,7 @@ Parameter        Type   Description
                 ],
                 "id":2,
                 "type":"BACKPACK",
+                "order":2,
                 "description":"Надо бы составить списочек",
                 "title":"Составить список снаряжения"
              }

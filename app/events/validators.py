@@ -29,6 +29,7 @@ __all__ = (
     'EventSecretValidator',
     'getEventParticipant',
     'ChangePlacesOrderValidator',
+    'ChangeStepsOrderValidator',
 )
 
 
@@ -208,3 +209,25 @@ class ChangePlacesOrderValidator(BaseValidator):
             places.append((place, order, ))
 
         resource.data['places'] = places
+
+
+class ChangeStepsOrderValidator(BaseValidator):
+
+    def run(self, resource, *args, **kwargs):
+
+        orders = resource.get_param('orders')
+        steps = []
+
+        for order_info in orders:
+            step_id = order_info.get('id')
+            order = order_info.get('order')
+
+            with db_session() as db:
+                step = db.query(Step).options(joinedload('*')).get(step_id)
+
+            if not step:
+                raise StepNotFoundException
+
+            steps.append((step, order, ))
+
+        resource.data['steps'] = steps
