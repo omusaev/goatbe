@@ -9,7 +9,7 @@ from voluptuous import (
 from accounts.validators import AuthRequiredValidator
 
 from core.exceptions import AssigneeNotFoundException, UserIsNotEventParticipant
-from core.helpers import to_timestamp
+from core.helpers import to_timestamp, to_datetime
 from core.schemas import ListOf
 from core.resources.base import BaseResource
 
@@ -24,7 +24,8 @@ from events.validators import (
     StepExistenceValidator, PermissionValidator, UpdateAssigneesValidator,
     EventSecretValidator, PlaceExistenceValidator,
     getEventParticipant, timestamp_validator,
-    ChangePlacesOrderValidator, ChangeStepsOrderValidator
+    ChangePlacesOrderValidator, ChangeStepsOrderValidator,
+    EventFinishedManually
 )
 
 __all__ = (
@@ -33,6 +34,8 @@ __all__ = (
     'UpdateEvent',
     'CancelEvent',
     'RestoreEvent',
+    'FinishEvent',
+    'UnfinishEvent',
     'DeleteEvent',
     'LeaveEvent',
     'EventDetails',
@@ -207,7 +210,8 @@ class CancelEvent(BaseResource):
 
     validators = [
         AuthRequiredValidator(),
-        EventExistenceValidator(),
+        EventExistenceValidator(event_statuses=(Event.STATUS.PREPARATION, Event.STATUS.READY,
+                                                Event.STATUS.IN_PROGRESS, Event.STATUS.NOT_COMPLETED)),
         AccountIsEventParticipantValidator(),
         PermissionValidator(permissions=[PERMISSION.CANCEL_EVENT, ])
     ]
@@ -216,6 +220,7 @@ class CancelEvent(BaseResource):
 
         event = self.data.get('event')
 
+        event.attributes['precanceled_status'] = event.status
         event.status = Event.STATUS.CANCELED
 
         with db_session() as db:
@@ -243,8 +248,79 @@ class RestoreEvent(BaseResource):
 
         event = self.data.get('event')
 
-        # todo: what status do we have to set?! It's time to think about event status calculation mechanism...
-        event.status = Event.STATUS.PREPARATION
+        event.status = event.attributes.pop('precanceled_status')
+
+        with db_session() as db:
+            db.merge(event)
+
+        self.response_data = {}
+
+
+class FinishEvent(BaseResource):
+
+    url = '/v1/events/finish/'
+
+    data_schema = {
+        Required('event_id'): All(int),
+    }
+
+    validators = [
+        AuthRequiredValidator(),
+        EventExistenceValidator(event_statuses=(Event.STATUS.PREPARATION, Event.STATUS.READY,
+                                                Event.STATUS.IN_PROGRESS, Event.STATUS.NOT_COMPLETED)),
+        AccountIsEventParticipantValidator(),
+        PermissionValidator(permissions=[PERMISSION.FINISH_EVENT, ])
+    ]
+
+    def post(self):
+
+        event = self.data.get('event')
+
+        event.attributes['finished_manually'] = True
+        event.attributes['prefinished_status'] = event.status
+        event.attributes['prefinished_start_at'] = to_timestamp(event.start_at)
+        event.attributes['prefinished_finish_at'] = to_timestamp(event.finish_at)
+        event.status = Event.STATUS.FINISHED
+
+        now = datetime.datetime.now()
+
+        if event.finish_at > now:
+            event.finish_at = now
+
+            if event.start_at > event.finish_at:
+                event.start_at = event.finish_at - datetime.timedelta(1)
+
+        with db_session() as db:
+            db.merge(event)
+
+        self.response_data = {}
+
+
+class UnfinishEvent(BaseResource):
+
+    url = '/v1/events/unfinish/'
+
+    data_schema = {
+        Required('event_id'): All(int),
+    }
+
+    validators = [
+        AuthRequiredValidator(),
+        EventExistenceValidator(event_statuses=(Event.STATUS.FINISHED, )),
+        EventFinishedManually(),
+        AccountIsEventParticipantValidator(),
+        PermissionValidator(permissions=[PERMISSION.UNFINISH_EVENT, ])
+    ]
+
+    def post(self):
+
+        event = self.data.get('event')
+
+        event.status = event.attributes.pop('prefinished_status')
+        event.start_at = to_datetime(event.attributes.pop('prefinished_start_at'))
+        event.finish_at = to_datetime(event.attributes.pop('prefinished_finish_at'))
+
+        del event.attributes['finished_manually']
 
         with db_session() as db:
             db.merge(event)
@@ -816,7 +892,6 @@ class ChangeStepsOrder(BaseResource):
                 db.merge(step)
 
         self.response_data = {}
-
 
 
 class UpdateAssignees(BaseResource):

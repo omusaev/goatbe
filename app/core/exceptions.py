@@ -23,6 +23,7 @@ __all__ = (
     'InvalidAccountStateException',
     'PlaceNotFoundException',
     'PlaceIsNotInEventException',
+    'EventIsNotFinishedManuallyException',
 )
 
 
@@ -152,3 +153,9 @@ class PlaceIsNotInEventException(GoatBaseException):
 
     error_code = 'PLACE_IS_NOT_IN_EVENT'
     message = 'Place is not in event'
+
+
+class EventIsNotFinishedManuallyException(GoatBaseException):
+
+    error_code = 'EVENT_IS_NOT_FINISHED_MANUALLY'
+    message = 'Event is not finished manually'

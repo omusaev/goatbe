@@ -20,7 +20,7 @@ Parameter        Default   Type     Format                   Required  Descripti
 ``title``                  unicode  Length(min=1, max=255)   true      Заголовок
 ``description``  ''        unicode  Length(min=1, max=2000)  false     Описание
 ``type``         'CUSTOM'  unicode                           false     :doc:`Тип <../other/step_types>`
-``order``        		   int   							 false 	   Порядок шага
+``order``                  int                               false     Порядок шага
 ===============  ========  =======  =======================  ========  ================================
 
 **Структура data**

@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 
-import datetime
-
 from sqlalchemy.orm import joinedload
 
 from voluptuous import Invalid
@@ -12,7 +10,9 @@ from core.exceptions import (
     StepIsNotInEventException, InvalidParameterException,
     InvalidEventStatusException, InvalidEventSecretException,
     PlaceNotFoundException, PlaceIsNotInEventException,
+    EventIsNotFinishedManuallyException,
 )
+from core.helpers import to_datetime
 from core.validators import BaseValidator
 from db.helpers import db_session
 from events.models import Event, Participant, Step, Place
@@ -30,12 +30,13 @@ __all__ = (
     'getEventParticipant',
     'ChangePlacesOrderValidator',
     'ChangeStepsOrderValidator',
+    'EventFinishedManually',
 )
 
 
 def timestamp_validator(timestamp):
     try:
-        parsed = datetime.datetime.fromtimestamp(timestamp)
+        parsed = to_datetime(timestamp)
     except (ValueError, TypeError) as e:
         raise Invalid('Invalid timestamp', error_message=e.message)
 
@@ -231,3 +232,17 @@ class ChangeStepsOrderValidator(BaseValidator):
             steps.append((step, order, ))
 
         resource.data['steps'] = steps
+
+
+class EventFinishedManually(BaseValidator):
+    '''
+    Needs EventExistenceValidator
+    '''
+
+    def run(self, resource, *args, **kwargs):
+
+        event = resource.data['event']
+        finished_manually = event.attributes.get('finished_manually')
+
+        if not finished_manually:
+            raise EventIsNotFinishedManuallyException

@@ -10,6 +10,8 @@ update_event_details      Редактирование ивента
 read_event_details        Просмотр ивента
 cancel_event              Отмена ивента
 restore_event             Восстановление отмененного ивента
+finish_event              Ручное завершение ивента
+unfinish_event            Раззавершение ивента
 delete_event              Удаление ивента
 invite_event_participant  Приглашение новых участников
 delete_event_participant  Удаление участников

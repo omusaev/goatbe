@@ -15,6 +15,8 @@ API для работы с ивентами.
    list.rst
    cancel.rst
    restore.rst
+   finish.rst
+   unfinish.rst
    delete.rst
    leave.rst
    map_details.rst

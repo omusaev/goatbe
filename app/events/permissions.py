@@ -12,6 +12,8 @@ class PERMISSION(object):
     READ_SHORT_EVENT_DETAILS = 'read_short_event_details'
     CANCEL_EVENT = 'cancel_event'
     RESTORE_EVENT = 'restore_event'
+    FINISH_EVENT = 'finish_event'
+    UNFINISH_EVENT = 'unfinish_event'
     DELETE_EVENT = 'delete_event'
     LEAVE_EVENT = 'leave_event'
     INVITE_EVENT_PARTICIPANT = 'invite_event_participant'
@@ -38,6 +40,8 @@ class PERMISSION(object):
         READ_SHORT_EVENT_DETAILS,
         CANCEL_EVENT,
         RESTORE_EVENT,
+        FINISH_EVENT,
+        UNFINISH_EVENT,
         DELETE_EVENT,
         LEAVE_EVENT,
         INVITE_EVENT_PARTICIPANT,

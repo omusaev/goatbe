@@ -20,5 +20,5 @@ class GoatModelMixin:
 
 class GoatBasicModelMixin(GoatModelMixin):
     id = Column(BigInteger, primary_key=True, nullable=False)
-    attributes = Column(JSON)
+    attributes = Column(JSON, default={}, server_default='{}')
     is_deleted = Column(Boolean, nullable=False, default=False, server_default=sa.sql.expression.false())

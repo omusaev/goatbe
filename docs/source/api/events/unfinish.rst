@@ -1,13 +1,13 @@
-cancel event
-============
+unfinish event
+==============
 
-Отмена ивента. Ивент переходит в :doc:`статус <../other/event_statuses>` CANCELED.
+Раззавершение ивента. Метод доступен только после :doc:`ручного завершения <finish>`.
 
-Недоступно для завершённых и отменённых ивентов.
+Ивенту возвращается :doc:`статус <../other/event_statuses>`, в котором он был до ручного завершения. Также восстанавливаются даты старта и финиша, если они были модифицированы.
 
 **URL**::
 
-    /{v}/events/cancel/
+    /{v}/events/unfinish/
 
 **Method**::
 
@@ -32,9 +32,10 @@ Parameter     Type  Required  Description
 * INVALID_PARAMETER
 * AUTH_REQUIRED
 * EVENT_NOT_FOUND
-* INVALID_EVENT_STATUS
 * USER_IS_NOT_EVENT_PARTICIPANT
 * PERMISSION_DENIED
+* INVALID_EVENT_STATUS
+* EVENT_IS_NOT_FINISHED_MANUALLY
 
 **Пример запроса**
 
