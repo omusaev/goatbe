@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 
-import datetime
-
 from sqlalchemy.orm import joinedload
 
 from voluptuous import Invalid
@@ -14,6 +12,7 @@ from core.exceptions import (
     PlaceNotFoundException, PlaceIsNotInEventException,
     EventIsNotFinishedManuallyException,
 )
+from core.helpers import to_datetime
 from core.validators import BaseValidator
 from db.helpers import db_session
 from events.models import Event, Participant, Step, Place
@@ -37,7 +36,7 @@ __all__ = (
 
 def timestamp_validator(timestamp):
     try:
-        parsed = datetime.datetime.fromtimestamp(timestamp)
+        parsed = to_datetime(timestamp)
     except (ValueError, TypeError) as e:
         raise Invalid('Invalid timestamp', error_message=e.message)
 

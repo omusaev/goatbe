@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import datetime
 import time
 
 from importlib import import_module
@@ -12,6 +13,7 @@ __all__ = (
     'collect_installed_resources',
     'collect_middlewares',
     'to_timestamp',
+    'to_datetime',
 )
 
 
@@ -55,3 +57,7 @@ def collect_middlewares():
 
 def to_timestamp(dt):
     return time.mktime(dt.timetuple())
+
+
+def to_datetime(ts):
+    return datetime.datetime.fromtimestamp(ts)

@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 import datetime
-import time
 
 from voluptuous import (
     Required, Optional, All, Length, Upper, In, Schema
@@ -10,7 +9,7 @@ from voluptuous import (
 from accounts.validators import AuthRequiredValidator
 
 from core.exceptions import AssigneeNotFoundException, UserIsNotEventParticipant
-from core.helpers import to_timestamp
+from core.helpers import to_timestamp, to_datetime
 from core.schemas import ListOf
 from core.resources.base import BaseResource
 
@@ -279,8 +278,8 @@ class FinishEvent(BaseResource):
 
         event.attributes['finished_manually'] = True
         event.attributes['prefinished_status'] = event.status
-        event.attributes['prefinished_start_at'] = time.mktime(event.start_at.timetuple())
-        event.attributes['prefinished_finish_at'] = time.mktime(event.finish_at.timetuple())
+        event.attributes['prefinished_start_at'] = to_timestamp(event.start_at)
+        event.attributes['prefinished_finish_at'] = to_timestamp(event.finish_at)
         event.status = Event.STATUS.FINISHED
 
         now = datetime.datetime.now()
@@ -318,8 +317,8 @@ class UnfinishEvent(BaseResource):
         event = self.data.get('event')
 
         event.status = event.attributes.pop('prefinished_status')
-        event.start_at = datetime.datetime.fromtimestamp(event.attributes.pop('prefinished_start_at'))
-        event.finish_at = datetime.datetime.fromtimestamp(event.attributes.pop('prefinished_finish_at'))
+        event.start_at = to_datetime(event.attributes.pop('prefinished_start_at'))
+        event.finish_at = to_datetime(event.attributes.pop('prefinished_finish_at'))
 
         del event.attributes['finished_manually']
 
