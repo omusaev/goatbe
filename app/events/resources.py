@@ -249,8 +249,7 @@ class RestoreEvent(BaseResource):
 
         event = self.data.get('event')
 
-        event.status = event.attributes['precanceled_status']
-        del event.attributes['precanceled_status']
+        event.status = event.attributes.pop('precanceled_status')
 
         with db_session() as db:
             db.merge(event)
@@ -318,14 +317,11 @@ class UnfinishEvent(BaseResource):
 
         event = self.data.get('event')
 
-        event.status = event.attributes['prefinished_status']
-        event.start_at = datetime.datetime.fromtimestamp(event.attributes['prefinished_start_at'])
-        event.finish_at = datetime.datetime.fromtimestamp(event.attributes['prefinished_finish_at'])
+        event.status = event.attributes.pop('prefinished_status')
+        event.start_at = datetime.datetime.fromtimestamp(event.attributes.pop('prefinished_start_at'))
+        event.finish_at = datetime.datetime.fromtimestamp(event.attributes.pop('prefinished_finish_at'))
 
         del event.attributes['finished_manually']
-        del event.attributes['prefinished_status']
-        del event.attributes['prefinished_start_at']
-        del event.attributes['prefinished_finish_at']
 
         with db_session() as db:
             db.merge(event)
