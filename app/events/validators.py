@@ -12,7 +12,7 @@ from core.exceptions import (
     StepIsNotInEventException, InvalidParameterException,
     InvalidEventStatusException, InvalidEventSecretException,
     PlaceNotFoundException, PlaceIsNotInEventException,
-    EventNotFinishedManuallyException,
+    EventIsNotFinishedManuallyException,
 )
 from core.validators import BaseValidator
 from db.helpers import db_session
@@ -246,4 +246,4 @@ class EventFinishedManually(BaseValidator):
         finished_manually = event.attributes.get('finished_manually')
 
         if not finished_manually:
-            raise EventNotFinishedManuallyException
+            raise EventIsNotFinishedManuallyException
