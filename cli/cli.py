@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import datetime
+import pprint
 import requests
 import time
 
@@ -23,14 +24,13 @@ class GoatClient(object):
 
     def out(self, msg):
         if not self.quite:
-            print msg
+            pprint.pprint(msg)
 
     def save_session_id(self, session_id):
         with open(self.SESSION_FILE, 'w') as session_file:
             session_file.write(session_id)
 
     def load_session_id(self):
-
         try:
             with open(self.SESSION_FILE) as session_file:
                 session_id = session_file.readlines()[0]
@@ -50,6 +50,9 @@ class GoatClient(object):
         return '%s%s:%s/%s%s' % (self.SCHEMA, self.host, self.port, self.VER, uri)
 
     def make_request(self, url, data, cookies=None, load_session=True):
+
+        data = dict((k, v) for k, v in data.iteritems() if v is not None)
+
         if cookies is None:
             cookies = {}
 
@@ -65,6 +68,7 @@ class GoatClient(object):
         return response
 
     def check_response(self, response):
+
         if response.status_code not in (requests.codes.OK,):
             print 'Not OK http code: %s\n' % response.status_code
             exit(1)
@@ -107,6 +111,15 @@ class GoatClient(object):
 
         return response
 
+    def events_types(self, args):
+        url = self.url('/events/types/')
+
+        data = {
+            'lang': args.lang,
+        }
+
+        return self.make_request(url, data)
+
     def create_event(self, args):
         url = self.url('/events/create/')
 
@@ -121,11 +134,33 @@ class GoatClient(object):
 
         return self.make_request(url, data)
 
+    def update_event(self, args):
+        url = self.url('/events/update/')
+
+        data = {
+            'event_id': args.event_id,
+            'title': args.title,
+            'description': args.description,
+            'start_at': args.start_at,
+            'finish_at': args.finish_at,
+        }
+
+        return self.make_request(url, data)
+
+    def event_details(self, args):
+        url = self.url('/events/details/')
+
+        data = {
+            'event_id': args.event_id,
+        }
+
+        return self.make_request(url, data)
+
     def create_feedback(self, args):
         url = self.url('/feedbacks/create/')
 
         data = {
-            'event_id': args.event,
+            'event_id': args.event_id,
             'comment': args.comment,
             'rating': args.rating,
         }
@@ -133,7 +168,45 @@ class GoatClient(object):
         return self.make_request(url, data)
 
 
-def add_parsers(sub_parsers):
+def add_event_parsers(sub_parsers):
+
+    events_types_parser = sub_parsers.add_parser('events_types')
+    events_types_parser.add_argument('--lang', default='en')
+    events_types_parser.set_defaults(handler='events_types')
+
+    create_event_parser = sub_parsers.add_parser('create_event')
+    create_event_parser.add_argument('--lang', default='en')
+    create_event_parser.add_argument('--type', default='hiking')
+    create_event_parser.add_argument('--title')
+    create_event_parser.add_argument('--description')
+    create_event_parser.add_argument('--start_at', default=time.mktime(datetime.datetime.now().timetuple()))
+    create_event_parser.add_argument('--finish_at', default=time.mktime(
+        (datetime.datetime.now() + datetime.timedelta(days=1)).timetuple()))
+    create_event_parser.set_defaults(handler='create_event')
+
+    update_event_parser = sub_parsers.add_parser('update_event')
+    update_event_parser.add_argument('--event_id', type=int)
+    update_event_parser.add_argument('--title')
+    update_event_parser.add_argument('--description')
+    update_event_parser.add_argument('--start_at', type=int)
+    update_event_parser.add_argument('--finish_at', type=int)
+    update_event_parser.set_defaults(handler='update_event')
+
+    event_details_parser = sub_parsers.add_parser('event_details')
+    event_details_parser.add_argument('--event_id', type=int)
+    event_details_parser.set_defaults(handler='event_details')
+
+
+def add_feedback_parsers(sub_parsers):
+
+    create_feedback_parser = sub_parsers.add_parser('create_feedback')
+    create_feedback_parser.add_argument('--event_id', type=int)
+    create_feedback_parser.add_argument('--comment')
+    create_feedback_parser.add_argument('--rating', type=int)
+    create_feedback_parser.set_defaults(handler='create_feedback')
+
+
+def add_auth_parsers(sub_parsers):
 
     flush_session_parser = sub_parsers.add_parser('flush_session')
     flush_session_parser.set_defaults(handler='flush_session')
@@ -149,22 +222,6 @@ def add_parsers(sub_parsers):
                                     default=True)
     auth_anonym_parser.set_defaults(handler='auth_anonym')
 
-    create_event_parser = sub_parsers.add_parser('create_event')
-    create_event_parser.add_argument('--lang', default='en')
-    create_event_parser.add_argument('--type', default='hiking')
-    create_event_parser.add_argument('--title')
-    create_event_parser.add_argument('--description')
-    create_event_parser.add_argument('--start_at', default=time.mktime(datetime.datetime.now().timetuple()))
-    create_event_parser.add_argument('--finish_at', default=time.mktime(
-        (datetime.datetime.now() + datetime.timedelta(days=1)).timetuple()))
-    create_event_parser.set_defaults(handler='create_event')
-
-    create_feedback_parser = sub_parsers.add_parser('create_feedback')
-    create_feedback_parser.add_argument('--event', type=int)
-    create_feedback_parser.add_argument('--comment')
-    create_feedback_parser.add_argument('--rating', type=int)
-    create_feedback_parser.set_defaults(handler='create_feedback')
-
 
 def main():
 
@@ -176,7 +233,10 @@ def main():
     parser.add_argument('-p', '--port', help='port', default='8000')
 
     sub_parsers = parser.add_subparsers()
-    add_parsers(sub_parsers)
+
+    add_auth_parsers(sub_parsers)
+    add_event_parsers(sub_parsers)
+    add_feedback_parsers(sub_parsers)
 
     args = parser.parse_args()
 
