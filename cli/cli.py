@@ -133,6 +133,39 @@ class GoatClient(object):
         return self.make_request(url, data)
 
 
+def add_parsers(sub_parsers):
+
+    flush_session_parser = sub_parsers.add_parser('flush_session')
+    flush_session_parser.set_defaults(handler='flush_session')
+
+    create_anonym_parser = sub_parsers.add_parser('create_anonym')
+    create_anonym_parser.add_argument('-s', '--save', help='Save session id cookie to use in future requests',
+                                      default=True)
+    create_anonym_parser.set_defaults(handler='create_anonym')
+
+    auth_anonym_parser = sub_parsers.add_parser('auth_anonym')
+    auth_anonym_parser.add_argument('token')
+    auth_anonym_parser.add_argument('-s', '--save', help='Save session id cookie to use in future requests',
+                                    default=True)
+    auth_anonym_parser.set_defaults(handler='auth_anonym')
+
+    create_event_parser = sub_parsers.add_parser('create_event')
+    create_event_parser.add_argument('--lang', default='en')
+    create_event_parser.add_argument('--type', default='hiking')
+    create_event_parser.add_argument('--title')
+    create_event_parser.add_argument('--description')
+    create_event_parser.add_argument('--start_at', default=time.mktime(datetime.datetime.now().timetuple()))
+    create_event_parser.add_argument('--finish_at', default=time.mktime(
+        (datetime.datetime.now() + datetime.timedelta(days=1)).timetuple()))
+    create_event_parser.set_defaults(handler='create_event')
+
+    create_feedback_parser = sub_parsers.add_parser('create_feedback')
+    create_feedback_parser.add_argument('--event', type=int)
+    create_feedback_parser.add_argument('--comment')
+    create_feedback_parser.add_argument('--rating', type=int)
+    create_feedback_parser.set_defaults(handler='create_feedback')
+
+
 def main():
 
     import argparse
@@ -143,43 +176,7 @@ def main():
     parser.add_argument('-p', '--port', help='port', default='8000')
 
     sub_parsers = parser.add_subparsers()
-
-    #
-    flush_session_parser = sub_parsers.add_parser('flush_session')
-    flush_session_parser.set_defaults(handler='flush_session')
-
-    #
-    create_anonym_parser = sub_parsers.add_parser('create_anonym')
-
-    create_anonym_parser.add_argument('-s', '--save', help='Save session id cookie to use in future requests', default=True)
-    create_anonym_parser.set_defaults(handler='create_anonym')
-
-    #
-    auth_anonym_parser = sub_parsers.add_parser('auth_anonym')
-
-    auth_anonym_parser.add_argument('token')
-    auth_anonym_parser.add_argument('-s', '--save', help='Save session id cookie to use in future requests', default=True)
-    auth_anonym_parser.set_defaults(handler='auth_anonym')
-
-    #
-    create_event_parser = sub_parsers.add_parser('create_event')
-
-    create_event_parser.add_argument('--lang', default='en')
-    create_event_parser.add_argument('--type', default='hiking')
-    create_event_parser.add_argument('--title')
-    create_event_parser.add_argument('--description')
-    create_event_parser.add_argument('--start_at', default=time.mktime(datetime.datetime.now().timetuple()))
-    create_event_parser.add_argument('--finish_at', default=time.mktime((datetime.datetime.now() + datetime.timedelta(days=1)).timetuple()))
-
-    create_event_parser.set_defaults(handler='create_event')
-
-    #
-    create_feedback_parser = sub_parsers.add_parser('create_feedback')
-
-    create_feedback_parser.add_argument('--event', type=int)
-    create_feedback_parser.add_argument('--comment')
-    create_feedback_parser.add_argument('--rating', type=int)
-    create_feedback_parser.set_defaults(handler='create_feedback')
+    add_parsers(sub_parsers)
 
     args = parser.parse_args()
 
