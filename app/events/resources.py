@@ -1306,6 +1306,8 @@ class CreateFeedback(BaseResource):
 
     def post(self):
 
+        account_id = self.account_info.account_id
+
         event = self.data.get('event')
         comment = self.get_param('comment')
         rating = self.get_param('rating')
@@ -1315,7 +1317,8 @@ class CreateFeedback(BaseResource):
             feedback = Feedback(
                 comment=comment,
                 rating=rating,
-                event=event
+                event=event,
+                account_id=account_id,
             )
             db.add(feedback)
 

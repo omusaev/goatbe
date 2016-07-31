@@ -93,6 +93,28 @@ def create_event(args):
     print 'Event id: %s' % data.get('data', {}).get('event_id')
 
 
+def create_feedback(args):
+    url = '%s%s:%s/%s/feedbacks/create/' % (SCHEMA, args.host, args.port, VER)
+
+    params = {
+        'event_id': args.event,
+        'comment': args.comment,
+        'rating': args.rating,
+    }
+
+    session_id=read_session_id()
+
+    cookies = {'sessionid': session_id}
+
+    response = requests.post(url, json=params, cookies=cookies)
+
+    check_response(response)
+
+    data = response.json()
+
+    print 'Feedback id: %s' % data.get('data', {}).get('feedback_id')
+
+
 def main():
 
     import argparse
@@ -129,6 +151,13 @@ def main():
 
     create_event_parser.set_defaults(handler='create_event')
 
+    ##############################################################
+    create_feedback_parser = sub_parsers.add_parser('create_feedback')
+
+    create_feedback_parser.add_argument('--event', type=int)
+    create_feedback_parser.add_argument('--comment')
+    create_feedback_parser.add_argument('--rating', type=int)
+    create_feedback_parser.set_defaults(handler='create_feedback')
 
     args = parser.parse_args()
 
