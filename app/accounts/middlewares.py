@@ -40,11 +40,7 @@ class AccountMiddleware(object):
     def process_request(self, req, resp):
         pass
 
-    def process_resource(self, req, resp, resource):
-
-        if not resource:
-            return
-
+    def process_resource(self, req, resp, resource, params):
         if account_settings.ACCOUNT_ID_SESSION_KEY in resource.session:
             account_info = AccountInfo(resource.session.get(account_settings.ACCOUNT_ID_SESSION_KEY))
         else:

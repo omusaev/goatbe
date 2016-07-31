@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 
-import datetime
-
 from core.sessions.models import SessionManager
 
 import settings as app_settings
@@ -16,11 +14,7 @@ class SessionMiddleware(object):
     def process_request(self, req, resp):
         pass
 
-    def process_resource(self, req, resp, resource):
-
-        if not resource:
-            return
-
+    def process_resource(self, req, resp, resource, params):
         session_id = req.cookies.get(app_settings.SESSION_COOKIE_NAME)
         session = SessionManager.get_or_create_session(session_id)
 
@@ -32,9 +26,9 @@ class SessionMiddleware(object):
             return
 
         session = resource.session
+
         if not session:
-            week_ago = datetime.datetime.now() - datetime.timedelta(7)
-            resp.set_cookie(app_settings.SESSION_COOKIE_NAME, '', expires=week_ago, path=app_settings.SITE_PATH, secure=False)
+            resp.unset_cookie(app_settings.SESSION_COOKIE_NAME)
             return
 
         SessionManager.save_session(session)
