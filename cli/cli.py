@@ -4,115 +4,121 @@ import datetime
 import requests
 import time
 
-VER = 'v1'
-SCHEMA = 'http://'
-SESSION_FILE = './session'
+__all__ = (
+    'GoatClient',
+)
 
 
-def check_response(response):
-    if response.status_code not in (requests.codes.OK, ):
-        print 'Not OK http code: %s\n' % response.status_code
-        exit()
+class GoatClient(object):
 
-    data = response.json()
+    VER = 'v1'
+    SCHEMA = 'http://'
+    SESSION_FILE = './session'
+    SESSION_COOKIE_NAME = 'sessionid'
 
-    if data.get('status') not in ('ok', ):
-        print 'Not OK response status. Error_code: %s. Error_message: %s\n' % (data.get('error_code'), data.get('error_message'))
-        exit()
+    def __init__(self, host, port):
+        self.host = host
+        self.port = port
 
+    def save_session_id(self, session_id):
+        with open(self.SESSION_FILE, 'w') as session_file:
+            session_file.write(session_id)
 
-def save_session_id(session_id):
-    with open(SESSION_FILE, 'w') as session_file:
-        session_file.write(session_id)
+    def load_session_id(self):
 
+        try:
+            with open(self.SESSION_FILE) as session_file:
+                session_id = session_file.readlines()[0]
+        except IOError:
+            return None
 
-def read_session_id():
-    with open(SESSION_FILE) as session_file:
-        session_id = session_file.readlines()[0]
+        return session_id
 
-    return session_id
+    def flush_session(self, args):
+        import os
+        os.remove(self.SESSION_FILE)
 
-###################################################################################
+    def url(self, uri):
+        return '%s%s:%s/%s%s' % (self.SCHEMA, self.host, self.port, self.VER, uri)
 
+    def make_request(self, url, data, cookies=None, load_session=True):
+        if cookies is None:
+            cookies = {}
 
-def create_anonym(args):
-    url = '%s%s:%s/%s/accounts/auth/anonym/' % (SCHEMA, args.host, args.port, VER)
-    response = requests.post(url)
+        if load_session:
+            session_id = self.load_session_id()
+            cookies.update({self.SESSION_COOKIE_NAME: session_id})
 
-    check_response(response)
+        response = requests.post(url=url, json=data, cookies=cookies)
 
-    data = response.json()
+        self.check_response(response)
+        self.output(response)
 
-    print 'Access token: %s' % data.get('data', {}).get('user_access_token')
-    print 'Account_id: %s' % data.get('data', {}).get('account_id')
-    print 'Session id: %s' % response.cookies.get('sessionid')
+        return response
 
-    if args.save:
-        save_session_id(response.cookies.get('sessionid'))
+    def check_response(self, response):
+        if response.status_code not in (requests.codes.OK,):
+            print 'Not OK http code: %s\n' % response.status_code
+            exit(1)
 
+        data = response.json()
 
-def auth_anonym(args):
-    url = '%s%s:%s/%s/accounts/auth/anonym/' % (SCHEMA, args.host, args.port, VER)
-    response = requests.post(url, json={'user_access_token': args.token})
+        if data.get('status') not in ('ok',):
+            print 'Not OK response status. Error_code: %s. Error_message: %s\n' % (
+            data.get('error_code'), data.get('error_message'))
+            exit(1)
 
-    check_response(response)
+    def output(self, response):
+        data = response.json()
 
-    data = response.json()
+        print data.get('data')
 
-    print 'Access token: %s' % data.get('data', {}).get('user_access_token')
-    print 'Account_id: %s' % data.get('data', {}).get('account_id')
-    print 'Session id: %s' % response.cookies.get('sessionid')
+    def create_anonym(self, args):
+        url = self.url('/accounts/auth/anonym/')
 
-    if args.save:
+        response = self.make_request(url, {})
+
+        print 'Session id: %s' % response.cookies.get('sessionid')
+
         if args.save:
-            save_session_id(response.cookies.get('sessionid'))
+            self.save_session_id(response.cookies.get(self.SESSION_COOKIE_NAME))
 
+    def auth_anonym(self, args):
+        url = self.url('/accounts/auth/anonym/')
 
-def create_event(args):
-    url = '%s%s:%s/%s/events/create/' % (SCHEMA, args.host, args.port, VER)
+        data = {'user_access_token': args.token}
 
-    params = {
-        'lang': args.lang,
-        'type': args.type,
-        'title': args.title,
-        'description': args.description,
-        'start_at': args.start_at,
-        'finish_at': args.finish_at,
-    }
+        response = self.make_request(url, data)
 
-    session_id=read_session_id()
+        print 'Session id: %s' % response.cookies.get('sessionid')
 
-    cookies = {'sessionid': session_id}
+        if args.save:
+            self.save_session_id(response.cookies.get(self.SESSION_COOKIE_NAME))
 
-    response = requests.post(url, json=params, cookies=cookies)
+    def create_event(self, args):
+        url = self.url('/events/create/')
 
-    check_response(response)
+        data = {
+            'lang': args.lang,
+            'type': args.type,
+            'title': args.title,
+            'description': args.description,
+            'start_at': args.start_at,
+            'finish_at': args.finish_at,
+        }
 
-    data = response.json()
+        response = self.make_request(url, data)
 
-    print 'Event id: %s' % data.get('data', {}).get('event_id')
+    def create_feedback(self, args):
+        url = self.url('/feedbacks/create/')
 
+        data = {
+            'event_id': args.event,
+            'comment': args.comment,
+            'rating': args.rating,
+        }
 
-def create_feedback(args):
-    url = '%s%s:%s/%s/feedbacks/create/' % (SCHEMA, args.host, args.port, VER)
-
-    params = {
-        'event_id': args.event,
-        'comment': args.comment,
-        'rating': args.rating,
-    }
-
-    session_id=read_session_id()
-
-    cookies = {'sessionid': session_id}
-
-    response = requests.post(url, json=params, cookies=cookies)
-
-    check_response(response)
-
-    data = response.json()
-
-    print 'Feedback id: %s' % data.get('data', {}).get('feedback_id')
+        response = self.make_request(url, data)
 
 
 def main():
@@ -126,20 +132,24 @@ def main():
 
     sub_parsers = parser.add_subparsers()
 
-    ##############################################################
+    #
+    flush_session_parser = sub_parsers.add_parser('flush_session')
+    flush_session_parser.set_defaults(handler='flush_session')
+
+    #
     create_anonym_parser = sub_parsers.add_parser('create_anonym')
 
-    create_anonym_parser.add_argument('-s', '--save', help='Save session id cookie to use in future requests')
+    create_anonym_parser.add_argument('-s', '--save', help='Save session id cookie to use in future requests', default=True)
     create_anonym_parser.set_defaults(handler='create_anonym')
 
-    ##############################################################
+    #
     auth_anonym_parser = sub_parsers.add_parser('auth_anonym')
 
     auth_anonym_parser.add_argument('token')
     auth_anonym_parser.add_argument('-s', '--save', help='Save session id cookie to use in future requests', default=True)
     auth_anonym_parser.set_defaults(handler='auth_anonym')
 
-    ##############################################################
+    #
     create_event_parser = sub_parsers.add_parser('create_event')
 
     create_event_parser.add_argument('--lang', default='en')
@@ -151,7 +161,7 @@ def main():
 
     create_event_parser.set_defaults(handler='create_event')
 
-    ##############################################################
+    #
     create_feedback_parser = sub_parsers.add_parser('create_feedback')
 
     create_feedback_parser.add_argument('--event', type=int)
@@ -161,7 +171,10 @@ def main():
 
     args = parser.parse_args()
 
-    globals()[args.handler](args)
+    client = GoatClient(args.host, args.port)
+
+    getattr(client, args.handler)(args)
+
 
 if __name__ in ('__main__',):
     main()
