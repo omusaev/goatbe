@@ -4,6 +4,7 @@ import requests
 
 VER = 'v1'
 SCHEMA = 'http://'
+SESSION_FILE = './session'
 
 
 def check_response(response):
@@ -30,6 +31,10 @@ def create_anonym(args):
     print 'Account_id: %s' % data.get('data', {}).get('account_id')
     print 'Session id: %s' % response.cookies.get('sessionid')
 
+    if args.save:
+        with open(SESSION_FILE, 'w') as session_file:
+            session_file.write(response.cookies.get('sessionid'))
+
 
 def auth_anonym(args):
     url = '%s%s:%s/%s/accounts/auth/anonym/' % (SCHEMA, args.host, args.port, VER)
@@ -42,6 +47,10 @@ def auth_anonym(args):
     print 'Access token: %s' % data.get('data', {}).get('user_access_token')
     print 'Account_id: %s' % data.get('data', {}).get('account_id')
     print 'Session id: %s' % response.cookies.get('sessionid')
+
+    if args.save:
+        with open(SESSION_FILE, 'w') as session_file:
+            session_file.write(response.cookies.get('sessionid'))
 
 
 def main():
@@ -56,10 +65,12 @@ def main():
     sub_parsers = parser.add_subparsers()
 
     create_anonym_parser = sub_parsers.add_parser('create_anonym')
+    create_anonym_parser.add_argument('-s', '--save', help='Save session id cookie to use in future requests')
     create_anonym_parser.set_defaults(handler='create_anonym')
 
     auth_anonym_parser = sub_parsers.add_parser('auth_anonym')
     auth_anonym_parser.add_argument('token')
+    auth_anonym_parser.add_argument('-s', '--save', help='Save session id cookie to use in future requests', default=True)
     auth_anonym_parser.set_defaults(handler='auth_anonym')
 
     args = parser.parse_args()
