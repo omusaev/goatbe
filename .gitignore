@@ -6,3 +6,4 @@
 *.directory
 *local.*
 /venv/*
+/cli/session
