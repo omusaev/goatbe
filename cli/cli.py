@@ -34,6 +34,7 @@ def read_session_id():
 
 ###################################################################################
 
+
 def create_anonym(args):
     url = '%s%s:%s/%s/accounts/auth/anonym/' % (SCHEMA, args.host, args.port, VER)
     response = requests.post(url)
@@ -90,7 +91,6 @@ def create_event(args):
     data = response.json()
 
     print 'Event id: %s' % data.get('data', {}).get('event_id')
-
 
 
 def main():
