@@ -27,7 +27,6 @@ Parameter        Default   Type        Format                   Required  Descri
 Parameter        Type  Description
 ===============  ====  =============
 ``feedback_id``  int   Id отзыва
-``order``        int   Порядок места
 ===============  ====  =============
 
 **Возможные ошибки**
