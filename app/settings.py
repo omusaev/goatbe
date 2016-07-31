@@ -52,6 +52,7 @@ INSTALLED_RESOURCES = [
     'events.resources.EventDetails',
     'events.resources.ShortEventDetails',
     'events.resources.ShortEventDetailsBySecret',
+    'events.resources.EventFeedbacks',
     'events.resources.MapEventDetails',
     'events.resources.EventList',
 
@@ -74,6 +75,11 @@ INSTALLED_RESOURCES = [
     'events.resources.PlaceDetails',
     'events.resources.ChangePlacesOrder',
     'events.resources.MapPlaces',
+
+    'events.resources.CreateFeedback',
+    'events.resources.UpdateFeedback',
+    'events.resources.DeleteFeedback',
+    'events.resources.FeedbackDetails',
 
     'common.resources.ClientSettings',
 ]

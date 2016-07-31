@@ -24,6 +24,8 @@ __all__ = (
     'PlaceNotFoundException',
     'PlaceIsNotInEventException',
     'EventIsNotFinishedManuallyException',
+    'FeedbackNotFoundException',
+    'FeedbackIsNotInEventException',
 )
 
 
@@ -159,3 +161,15 @@ class EventIsNotFinishedManuallyException(GoatBaseException):
 
     error_code = 'EVENT_IS_NOT_FINISHED_MANUALLY'
     message = 'Event is not finished manually'
+
+
+class FeedbackNotFoundException(GoatBaseException):
+
+    error_code = 'FEEDBACK_NOT_FOUND'
+    message = 'Feedback not found'
+
+
+class FeedbackIsNotInEventException(GoatBaseException):
+
+    error_code = 'FEEDBACK_IS_NOT_IN_EVENT'
+    message = 'Feedback is not in event'

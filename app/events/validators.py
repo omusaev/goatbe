@@ -11,11 +11,12 @@ from core.exceptions import (
     InvalidEventStatusException, InvalidEventSecretException,
     PlaceNotFoundException, PlaceIsNotInEventException,
     EventIsNotFinishedManuallyException,
+    FeedbackNotFoundException, FeedbackIsNotInEventException,
 )
 from core.helpers import to_datetime
 from core.validators import BaseValidator
 from db.helpers import db_session
-from events.models import Event, Participant, Step, Place
+from events.models import Event, Participant, Step, Place, Feedback
 from events.permissions import PERMISSION
 
 __all__ = (
@@ -30,7 +31,8 @@ __all__ = (
     'getEventParticipant',
     'ChangePlacesOrderValidator',
     'ChangeStepsOrderValidator',
-    'EventFinishedManually',
+    'EventFinishedManuallyValidator',
+    'FeedbackExistenceValidator',
 )
 
 
@@ -127,12 +129,23 @@ class PermissionValidator(BaseValidator):
     Needs AccountIsEventParticipantValidator
     '''
 
-    def __init__(self, permissions):
+    def __init__(self, permissions, ownership=None):
         self.permissions = permissions
+        self.ownership = ownership
 
     def run(self, resource, *args, **kwargs):
         participant = resource.data['participant']
         participant_permissions = participant.permissions
+
+        # check ownership condition. Owner can do all he wants with the object
+        if self.ownership is not None:
+            entity_name = self.ownership.get('entity')
+
+            account_id = resource.account_info.account_id
+            entity = resource.data[entity_name]
+
+            if getattr(entity, 'account_id') == account_id:
+                return
 
         if not set(self.permissions).issubset(set(participant_permissions)):
             raise PermissionDeniedException
@@ -234,7 +247,7 @@ class ChangeStepsOrderValidator(BaseValidator):
         resource.data['steps'] = steps
 
 
-class EventFinishedManually(BaseValidator):
+class EventFinishedManuallyValidator(BaseValidator):
     '''
     Needs EventExistenceValidator
     '''
@@ -246,3 +259,24 @@ class EventFinishedManually(BaseValidator):
 
         if not finished_manually:
             raise EventIsNotFinishedManuallyException
+
+
+class FeedbackExistenceValidator(BaseValidator):
+    '''
+    Needs EventExistenceValidator
+    '''
+
+    def run(self, resource, *args, **kwargs):
+        feedback_id = resource.get_param('feedback_id')
+        event = resource.data['event']
+
+        with db_session() as db:
+            feedback = db.query(Feedback).options(joinedload('*')).get(feedback_id)
+
+        if not feedback:
+            raise FeedbackNotFoundException
+
+        if feedback.event_id != event.id:
+            raise FeedbackIsNotInEventException
+
+        resource.data['feedback'] = feedback

@@ -65,6 +65,7 @@ Status     Description
    participants/index.rst
    assignees/index.rst
    places/index.rst
+   feedbacks/index.rst
 
 **Дополнительная информация по API**
 
