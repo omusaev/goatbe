@@ -21,6 +21,19 @@ def check_response(response):
         exit()
 
 
+def save_session_id(session_id):
+    with open(SESSION_FILE, 'w') as session_file:
+        session_file.write(session_id)
+
+
+def read_session_id():
+    with open(SESSION_FILE) as session_file:
+        session_id = session_file.readlines()[0]
+
+    return session_id
+
+###################################################################################
+
 def create_anonym(args):
     url = '%s%s:%s/%s/accounts/auth/anonym/' % (SCHEMA, args.host, args.port, VER)
     response = requests.post(url)
@@ -34,8 +47,7 @@ def create_anonym(args):
     print 'Session id: %s' % response.cookies.get('sessionid')
 
     if args.save:
-        with open(SESSION_FILE, 'w') as session_file:
-            session_file.write(response.cookies.get('sessionid'))
+        save_session_id(response.cookies.get('sessionid'))
 
 
 def auth_anonym(args):
@@ -51,8 +63,8 @@ def auth_anonym(args):
     print 'Session id: %s' % response.cookies.get('sessionid')
 
     if args.save:
-        with open(SESSION_FILE, 'w') as session_file:
-            session_file.write(response.cookies.get('sessionid'))
+        if args.save:
+            save_session_id(response.cookies.get('sessionid'))
 
 
 def create_event(args):
@@ -67,8 +79,7 @@ def create_event(args):
         'finish_at': args.finish_at,
     }
 
-    with open(SESSION_FILE) as session_file:
-        session_id = session_file.readlines()[0]
+    session_id=read_session_id()
 
     cookies = {'sessionid': session_id}
 
