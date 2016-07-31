@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 
+import datetime
 import requests
+import time
 
 VER = 'v1'
 SCHEMA = 'http://'
@@ -53,6 +55,33 @@ def auth_anonym(args):
             session_file.write(response.cookies.get('sessionid'))
 
 
+def create_event(args):
+    url = '%s%s:%s/%s/events/create/' % (SCHEMA, args.host, args.port, VER)
+
+    params = {
+        'lang': args.lang,
+        'type': args.type,
+        'title': args.title,
+        'description': args.description,
+        'start_at': args.start_at,
+        'finish_at': args.finish_at,
+    }
+
+    with open(SESSION_FILE) as session_file:
+        session_id = session_file.readlines()[0]
+
+    cookies = {'sessionid': session_id}
+
+    response = requests.post(url, json=params, cookies=cookies)
+
+    check_response(response)
+
+    data = response.json()
+
+    print 'Event id: %s' % data.get('data', {}).get('event_id')
+
+
+
 def main():
 
     import argparse
@@ -64,14 +93,31 @@ def main():
 
     sub_parsers = parser.add_subparsers()
 
+    ##############################################################
     create_anonym_parser = sub_parsers.add_parser('create_anonym')
+
     create_anonym_parser.add_argument('-s', '--save', help='Save session id cookie to use in future requests')
     create_anonym_parser.set_defaults(handler='create_anonym')
 
+    ##############################################################
     auth_anonym_parser = sub_parsers.add_parser('auth_anonym')
+
     auth_anonym_parser.add_argument('token')
     auth_anonym_parser.add_argument('-s', '--save', help='Save session id cookie to use in future requests', default=True)
     auth_anonym_parser.set_defaults(handler='auth_anonym')
+
+    ##############################################################
+    create_event_parser = sub_parsers.add_parser('create_event')
+
+    create_event_parser.add_argument('--lang', default='en')
+    create_event_parser.add_argument('--type', default='hiking')
+    create_event_parser.add_argument('--title')
+    create_event_parser.add_argument('--description')
+    create_event_parser.add_argument('--start_at', default=time.mktime(datetime.datetime.now().timetuple()))
+    create_event_parser.add_argument('--finish_at', default=time.mktime((datetime.datetime.now() + datetime.timedelta(days=1)).timetuple()))
+
+    create_event_parser.set_defaults(handler='create_event')
+
 
     args = parser.parse_args()
 
