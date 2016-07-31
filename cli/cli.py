@@ -16,9 +16,14 @@ class GoatClient(object):
     SESSION_FILE = './session'
     SESSION_COOKIE_NAME = 'sessionid'
 
-    def __init__(self, host, port):
+    def __init__(self, host, port, quiet=False):
         self.host = host
         self.port = port
+        self.quite = quiet
+
+    def out(self, msg):
+        if not self.quite:
+            print msg
 
     def save_session_id(self, session_id):
         with open(self.SESSION_FILE, 'w') as session_file:
@@ -52,7 +57,7 @@ class GoatClient(object):
         response = requests.post(url=url, json=data, cookies=cookies)
 
         self.check_response(response)
-        self.output(response)
+        self.output_response(response)
 
         return response
 
@@ -68,20 +73,22 @@ class GoatClient(object):
             data.get('error_code'), data.get('error_message'))
             exit(1)
 
-    def output(self, response):
+    def output_response(self, response):
         data = response.json()
 
-        print data.get('data')
+        self.out(data.get('data'))
 
     def create_anonym(self, args):
         url = self.url('/accounts/auth/anonym/')
 
         response = self.make_request(url, {})
 
-        print 'Session id: %s' % response.cookies.get('sessionid')
+        self.out('Session id: %s' % response.cookies.get('sessionid'))
 
         if args.save:
             self.save_session_id(response.cookies.get(self.SESSION_COOKIE_NAME))
+
+        return response
 
     def auth_anonym(self, args):
         url = self.url('/accounts/auth/anonym/')
@@ -90,10 +97,12 @@ class GoatClient(object):
 
         response = self.make_request(url, data)
 
-        print 'Session id: %s' % response.cookies.get('sessionid')
+        self.out('Session id: %s' % response.cookies.get('sessionid'))
 
         if args.save:
             self.save_session_id(response.cookies.get(self.SESSION_COOKIE_NAME))
+
+        return response
 
     def create_event(self, args):
         url = self.url('/events/create/')
@@ -107,7 +116,7 @@ class GoatClient(object):
             'finish_at': args.finish_at,
         }
 
-        response = self.make_request(url, data)
+        return self.make_request(url, data)
 
     def create_feedback(self, args):
         url = self.url('/feedbacks/create/')
@@ -118,7 +127,7 @@ class GoatClient(object):
             'rating': args.rating,
         }
 
-        response = self.make_request(url, data)
+        return self.make_request(url, data)
 
 
 def main():
