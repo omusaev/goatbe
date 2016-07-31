@@ -10,11 +10,7 @@ class ResourceSetupMiddleware(object):
     def process_request(self, req, resp):
         pass
 
-    def process_resource(self, req, resp, resource):
-
-        if not resource:
-            return
-
+    def process_resource(self, req, resp, resource, params):
         resource._cleanup()
 
         resource.request = req
