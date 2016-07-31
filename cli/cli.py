@@ -31,8 +31,17 @@ def create_anonym(args):
     print 'Session id: %s' % response.cookies.get('sessionid')
 
 
-def unknown_command():
-    print 'Unknown command\n'
+def auth_anonym(args):
+    url = '%s%s:%s/%s/accounts/auth/anonym/' % (SCHEMA, args.host, args.port, VER)
+    response = requests.post(url, json={'user_access_token': args.token})
+
+    check_response(response)
+
+    data = response.json()
+
+    print 'Access token: %s' % data.get('data', {}).get('user_access_token')
+    print 'Account_id: %s' % data.get('data', {}).get('account_id')
+    print 'Session id: %s' % response.cookies.get('sessionid')
 
 
 def main():
@@ -40,17 +49,22 @@ def main():
     import argparse
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('command')
+
     parser.add_argument('-H', '--host', help='host', default='127.0.0.1')
     parser.add_argument('-p', '--port', help='port', default='8000')
 
+    sub_parsers = parser.add_subparsers()
+
+    create_anonym_parser = sub_parsers.add_parser('create_anonym')
+    create_anonym_parser.set_defaults(handler='create_anonym')
+
+    auth_anonym_parser = sub_parsers.add_parser('auth_anonym')
+    auth_anonym_parser.add_argument('token')
+    auth_anonym_parser.set_defaults(handler='auth_anonym')
+
     args = parser.parse_args()
 
-    command = args.command
-
-    {
-        'create_anonym': create_anonym,
-    }.get(command, unknown_command)(args)
+    globals()[args.handler](args)
 
 if __name__ in ('__main__',):
     main()
