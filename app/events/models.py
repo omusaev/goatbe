@@ -25,6 +25,7 @@ __all__ = (
     'Participant',
     'Assignee',
     'Place',
+    'Feedback',
 )
 
 
@@ -80,6 +81,12 @@ class Event(Base, GoatBasicModelMixin):
 
     places = relationship(
         'Place',
+        backref=backref('event'),
+        cascade='all, delete-orphan',
+    )
+
+    feedbacks = relationship(
+        'Feedback',
         backref=backref('event'),
         cascade='all, delete-orphan',
     )
@@ -279,3 +286,35 @@ class Place(Base, GoatBasicModelMixin):
     @classmethod
     def format_point(cls, lng, lat):
         return 'POINT(%s %s)' % (lng, lat)
+
+
+class Feedback(Base, GoatBasicModelMixin):
+
+    __tablename__ = 'feedback'
+
+    comment = Column(Text(), nullable=True, default='', server_default='')
+    rating = Column(Integer())
+
+    account_id = Column(
+        BigInteger,
+        ForeignKey(
+            Account.id,
+            use_alter=True,
+            name='feedback_account_id',
+            ondelete='CASCADE'
+        ),
+        nullable=False
+    )
+
+    account = relationship('Account')
+
+    event_id = Column(
+        BigInteger,
+        ForeignKey(
+            Event.id,
+            use_alter=True,
+            name='feedback_event_id',
+            ondelete='CASCADE'
+        ),
+        nullable=False
+    )

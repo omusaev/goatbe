@@ -20,3 +20,4 @@ API для работы с ивентами.
    delete.rst
    leave.rst
    map_details.rst
+   feedbacks.rst
