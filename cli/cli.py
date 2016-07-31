@@ -156,6 +156,104 @@ class GoatClient(object):
 
         return self.make_request(url, data)
 
+    def short_event_details(self, args):
+        url = self.url('/events/details/short/')
+
+        data = {
+            'event_id': args.event_id,
+        }
+
+        return self.make_request(url, data)
+
+    def short_event_details_by_secret(self, args):
+        url = self.url('/events/details/short/secret/')
+
+        data = {
+            'event_id': args.event_id,
+            'event_secret': args.event_secret,
+        }
+
+        return self.make_request(url, data)
+
+    def event_list(self, args):
+        url = self.url('/events/list/')
+
+        data = {}
+
+        return self.make_request(url, data)
+
+    def cancel_event(self, args):
+        url = self.url('/events/cancel/')
+
+        data = {
+            'event_id': args.event_id,
+        }
+
+        return self.make_request(url, data)
+
+    def restore_event(self, args):
+        url = self.url('/events/restore/')
+
+        data = {
+            'event_id': args.event_id,
+        }
+
+        return self.make_request(url, data)
+
+    def finish_event(self, args):
+        url = self.url('/events/finish/')
+
+        data = {
+            'event_id': args.event_id,
+        }
+
+        return self.make_request(url, data)
+
+    def unfinish_event(self, args):
+        url = self.url('/events/unfinish/')
+
+        data = {
+            'event_id': args.event_id,
+        }
+
+        return self.make_request(url, data)
+
+    def delete_event(self, args):
+        url = self.url('/events/delete/')
+
+        data = {
+            'event_id': args.event_id,
+        }
+
+        return self.make_request(url, data)
+
+    def leave_event(self, args):
+        url = self.url('/events/leave/')
+
+        data = {
+            'event_id': args.event_id,
+        }
+
+        return self.make_request(url, data)
+
+    def map_event_details(self, args):
+        url = self.url('/events/details/map/')
+
+        data = {
+            'event_id': args.event_id,
+        }
+
+        return self.make_request(url, data)
+
+    def event_feedbacks(self, args):
+        url = self.url('/events/feedbacks/')
+
+        data = {
+            'event_id': args.event_id,
+        }
+
+        return self.make_request(url, data)
+
     def create_feedback(self, args):
         url = self.url('/feedbacks/create/')
 
@@ -195,6 +293,50 @@ def add_event_parsers(sub_parsers):
     event_details_parser = sub_parsers.add_parser('event_details')
     event_details_parser.add_argument('--event_id', type=int)
     event_details_parser.set_defaults(handler='event_details')
+
+    short_event_details_parser = sub_parsers.add_parser('short_event_details')
+    short_event_details_parser.add_argument('--event_id', type=int)
+    short_event_details_parser.set_defaults(handler='short_event_details')
+
+    short_event_details_by_secret_parser = sub_parsers.add_parser('short_event_details_by_secret')
+    short_event_details_by_secret_parser.add_argument('--event_id', type=int)
+    short_event_details_by_secret_parser.add_argument('--event_secret')
+    short_event_details_by_secret_parser.set_defaults(handler='short_event_details_by_secret')
+
+    event_list_parser = sub_parsers.add_parser('event_list')
+    event_list_parser.set_defaults(handler='event_list')
+
+    cancel_event_parser = sub_parsers.add_parser('cancel_event')
+    cancel_event_parser.add_argument('--event_id', type=int)
+    cancel_event_parser.set_defaults(handler='cancel_event')
+
+    restore_event_parser = sub_parsers.add_parser('restore_event')
+    restore_event_parser.add_argument('--event_id', type=int)
+    restore_event_parser.set_defaults(handler='restore_event')
+
+    finish_event_parser = sub_parsers.add_parser('finish_event')
+    finish_event_parser.add_argument('--event_id', type=int)
+    finish_event_parser.set_defaults(handler='finish_event')
+
+    unfinish_event_parser = sub_parsers.add_parser('unfinish_event')
+    unfinish_event_parser.add_argument('--event_id', type=int)
+    unfinish_event_parser.set_defaults(handler='unfinish_event')
+
+    delete_event_parser = sub_parsers.add_parser('delete_event')
+    delete_event_parser.add_argument('--event_id', type=int)
+    delete_event_parser.set_defaults(handler='delete_event')
+
+    leave_event_parser = sub_parsers.add_parser('leave_event')
+    leave_event_parser.add_argument('--event_id', type=int)
+    leave_event_parser.set_defaults(handler='leave_event')
+
+    map_event_details_parser = sub_parsers.add_parser('map_event_details')
+    map_event_details_parser.add_argument('--event_id', type=int)
+    map_event_details_parser.set_defaults(handler='map_event_details')
+
+    event_feedbacks_parser = sub_parsers.add_parser('event_feedbacks')
+    event_feedbacks_parser.add_argument('--event_id', type=int)
+    event_feedbacks_parser.set_defaults(handler='event_feedbacks')
 
 
 def add_feedback_parsers(sub_parsers):
