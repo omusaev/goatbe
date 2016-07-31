@@ -41,7 +41,10 @@ class GoatClient(object):
 
     def flush_session(self, args):
         import os
-        os.remove(self.SESSION_FILE)
+        try:
+            os.remove(self.SESSION_FILE)
+        except OSError:
+            return None
 
     def url(self, uri):
         return '%s%s:%s/%s%s' % (self.SCHEMA, self.host, self.port, self.VER, uri)
