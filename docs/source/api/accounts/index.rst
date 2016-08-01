@@ -10,3 +10,4 @@ API для работы с аккаунтами.
    auth_anonym.rst
    replace_anonym.rst
    logout.rst
+   update.rst

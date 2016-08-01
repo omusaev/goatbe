@@ -265,6 +265,15 @@ class GoatClient(object):
 
         return self.make_request(url, data)
 
+    def update_account(self, args):
+        url = self.url('/accounts/update/')
+
+        data = {
+            'name': args.name,
+        }
+
+        return self.make_request(url, data)
+
 
 def add_event_parsers(sub_parsers):
 
@@ -365,6 +374,13 @@ def add_auth_parsers(sub_parsers):
     auth_anonym_parser.set_defaults(handler='auth_anonym')
 
 
+def add_accounts_parsers(sub_parsers):
+
+    update_account_parser = sub_parsers.add_parser('update_account')
+    update_account_parser.add_argument('--name')
+    update_account_parser.set_defaults(handler='update_account')
+
+
 def main():
 
     import argparse
@@ -379,6 +395,7 @@ def main():
     add_auth_parsers(sub_parsers)
     add_event_parsers(sub_parsers)
     add_feedback_parsers(sub_parsers)
+    add_accounts_parsers(sub_parsers)
 
     args = parser.parse_args()
 

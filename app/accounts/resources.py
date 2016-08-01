@@ -27,6 +27,7 @@ __all__ = (
     'AuthAnonym',
     'ReplaceAnonym',
     'Logout',
+    'UpdateAccount',
 )
 
 
@@ -184,3 +185,28 @@ class Logout(BaseResource):
         self.response_data = {}
         SessionManager.delete_session(self.session)
         self.session = None
+
+
+class UpdateAccount(BaseResource):
+
+    url = '/v1/accounts/update/'
+
+    data_schema = {
+        Optional('name'): All(unicode),
+    }
+
+    validators = [
+        AuthRequiredValidator(),
+    ]
+
+    def post(self, *args, **kwargs):
+
+        account = self.account_info.account
+
+        name = self.get_param('name')
+
+        if name:
+            account.name = name
+
+        with db_session() as db:
+            db.merge(account)

@@ -39,6 +39,7 @@ INSTALLED_RESOURCES = [
     'accounts.resources.AuthAnonym',
     'accounts.resources.ReplaceAnonym',
     'accounts.resources.Logout',
+    'accounts.resources.UpdateAccount',
 
     'events.resources.EventTypes',
     'events.resources.CreateEvent',
