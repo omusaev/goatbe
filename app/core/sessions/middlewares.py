@@ -15,6 +15,7 @@ class SessionMiddleware(object):
         pass
 
     def process_resource(self, req, resp, resource, params):
+
         session_id = req.cookies.get(app_settings.SESSION_COOKIE_NAME)
         session = SessionManager.get_or_create_session(session_id)
 
@@ -33,4 +34,7 @@ class SessionMiddleware(object):
 
         SessionManager.save_session(session)
 
-        resp.set_cookie(app_settings.SESSION_COOKIE_NAME, session.id, path=app_settings.SITE_PATH, secure=False)
+        resp.set_cookie(app_settings.SESSION_COOKIE_NAME, session.id,
+                        max_age=app_settings.SESSION_TTL,
+                        path=app_settings.SITE_PATH,
+                        secure=False)
