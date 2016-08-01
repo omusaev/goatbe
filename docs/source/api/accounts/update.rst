@@ -1,11 +1,11 @@
-update details
-==============
+update
+======
 
 Изменение аттрибутов аккаунта
 
 **URL**::
 
-    /{v}/accounts/details/update/
+    /{v}/accounts/update/
 
 **Method**::
 

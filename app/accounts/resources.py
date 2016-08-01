@@ -27,7 +27,7 @@ __all__ = (
     'AuthAnonym',
     'ReplaceAnonym',
     'Logout',
-    'UpdateAccountDetails',
+    'UpdateAccount',
 )
 
 
@@ -187,9 +187,9 @@ class Logout(BaseResource):
         self.session = None
 
 
-class UpdateAccountDetails(BaseResource):
+class UpdateAccount(BaseResource):
 
-    url = '/v1/accounts/details/update/'
+    url = '/v1/accounts/update/'
 
     data_schema = {
         Optional('name'): All(unicode),
