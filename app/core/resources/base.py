@@ -58,6 +58,8 @@ class BaseResource(object):
             self.process_request(*args, **kwargs)
         except GoatBaseException as e:
             self.raised_exception = e
+        except Exception as e:
+            self.raised_exception = GoatBaseException(e.message)
 
         self.prepare_response()
 
