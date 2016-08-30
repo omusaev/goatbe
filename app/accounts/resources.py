@@ -88,6 +88,7 @@ class AuthFacebook(AuthBaseResource):
                 account = Account(
                     name=fb_name,
                     identifier=str(fb_id),
+                    avatar_url="https://graph.facebook.com/v2.7/%s/picture/?type=large" % fb_id,
                     auth_method=Account.AUTH_METHOD.FB,
                     attributes=fb_account
                 )
