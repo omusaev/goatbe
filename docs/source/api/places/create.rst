@@ -67,15 +67,30 @@ Parameter        Type  Description
 
     {
         "event_id": 1,
-        "title":"Start point",
-        "description":"Let's start!",
-        "start_at":1469049355,
-        "finish_at":1469059355
-        "order":1,
-        "point": {
-			 "lng": -74.78886216922375,
-			 "lat": 40.32829276931833,
-        }
+        "places": [
+            {
+                "title":"Start point",
+                "description":"Let's start!",
+                "start_at":1469049355,
+                "finish_at":1469059355
+                "order":1,
+                "point": {
+                     "lng": -74.78886216922375,
+                     "lat": 40.32829276931833,
+                }
+            },
+            {
+                "title":"End point",
+                "description":"Let's finish!",
+                "start_at":1469049355,
+                "finish_at":1469059355
+                "order":1,
+                "point": {
+                     "lng": -74.78886216922375,
+                     "lat": 40.32829276931833,
+                }
+            }
+        ]
     }
 
 **Пример ответа**
@@ -85,7 +100,6 @@ Parameter        Type  Description
     {
         "status": "ok",
         "data": {
-            "place_id": 1,
-            "order": 1,
+            "places_ids": [1, 2],
         }
     }
