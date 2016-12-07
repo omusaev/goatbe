@@ -395,15 +395,19 @@ class GoatClient(object):
 
         data = {
             'event_id': args.event_id,
-            'title': args.title,
-            'description': args.description,
-            'start_at': args.start_at,
-            'finish_at': args.finish_at,
-            'order': args.order,
-            'point': {
-                'lng': args.lng,
-                'lat': args.lat,
-            }
+            'places': [
+                {
+                    'title': args.title,
+                    'description': args.description,
+                    'start_at': args.start_at,
+                    'finish_at': args.finish_at,
+                    'order': args.order,
+                    'point': {
+                        'lng': args.lng,
+                        'lat': args.lat,
+                    }
+                },
+            ]
         }
 
         return self.make_request(url, data)

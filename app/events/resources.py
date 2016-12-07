@@ -1036,17 +1036,21 @@ class CreatePlace(BaseResource):
 
     url = '/v1/places/create/'
 
-    data_schema = {
-        Required('event_id'): All(int),
+    place_schema = Schema({
         Optional('title'): All(unicode, Length(min=1, max=255)),
         Optional('description'): All(unicode, Length(min=1, max=2000)),
-        Optional('start_at'): All(int, timestamp_validator),
-        Optional('finish_at'): All(int, timestamp_validator),
+        Optional('start_at'): All(timestamp_validator),
+        Optional('finish_at'): All(timestamp_validator),
         Optional('order'): All(int),
         Required('point'): {
             Required('lng'): All(float),
             Required('lat'): All(float),
         },
+    })
+
+    data_schema = {
+        Required('event_id'): All(int),
+        Required('places'): ListOf(place_schema),
     }
 
     validators = [
@@ -1059,34 +1063,32 @@ class CreatePlace(BaseResource):
     def post(self):
 
         event = self.data.get('event')
-        order = self.get_param('order')
+        places = self.get_param('places')
 
         with db_session() as db:
 
-            if order is None:
-                if event.places:
-                    order = max(p.order for p in event.places) + 1
-                else:
-                    order = 1
+            new_places = []
 
-            lng = self.get_param('point').get('lng')
-            lat = self.get_param('point').get('lat')
-            point = Place.format_point(lng, lat)
+            for place in places:
+                lng = place.get('point').get('lng')
+                lat = place.get('point').get('lat')
+                point = Place.format_point(lng, lat)
 
-            place = Place(
-                title=self.get_param('title'),
-                description=self.get_param('description'),
-                start_at=self.get_param('start_at'),
-                finish_at=self.get_param('finish_at'),
-                order=order,
-                point=point,
-                event=event,
-            )
-            db.add(place)
+                new_places.append(
+                    Place(
+                        title=place.get('title'),
+                        description=place.get('description'),
+                        start_at=place.get('start_at'),
+                        finish_at=place.get('finish_at'),
+                        order=place.get('order'),
+                        point=point,
+                        event=event,
+                    )
+                )
+                db.add_all(new_places)
 
         self.response_data = {
-            'place_id': place.id,
-            'order': order,
+            'places_ids': [p.id for p in new_places],
         }
 
 
@@ -1099,8 +1101,8 @@ class UpdatePlace(BaseResource):
         Required('place_id'): All(int),
         Optional('title'): All(unicode, Length(min=1, max=255)),
         Optional('description'): All(unicode, Length(min=1, max=2000)),
-        Optional('start_at'): All(int, timestamp_validator),
-        Optional('finish_at'): All(int, timestamp_validator),
+        Optional('start_at'): All(timestamp_validator),
+        Optional('finish_at'): All(timestamp_validator),
         Optional('order'): All(int),
         Optional('point'): {
             Required('lng'): All(float),
