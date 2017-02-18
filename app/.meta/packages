@@ -21,4 +21,4 @@ six==1.10.0
 uWSGI==2.0.13.1
 voluptuous==0.9.1
 wsgiref==0.1.2
-raven=6.0.0
+raven==6.0.0
