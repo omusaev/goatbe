@@ -131,6 +131,7 @@ Parameter        Type   Description
           "description":"Just another hike",
           "title":"Yearly extreme",
           "finish_at":1469059355,
+          "secret":"ym2e7k",
           "participants":[
              {
                 "status":"ACTIVE",

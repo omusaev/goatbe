@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
+import random
 from datetime import datetime
-import uuid
 
 import sqlalchemy as sa
 from sqlalchemy import Column, BigInteger, String, DateTime, Text, ForeignKey, Boolean, Integer
@@ -27,6 +27,20 @@ __all__ = (
     'Place',
     'Feedback',
 )
+
+
+def generate_event_secret():
+    def generator():
+        from events import EVENT_SECRET_ALPHABET, EVENT_SECRET_LENGTH
+        return ''.join(random.SystemRandom().choice(EVENT_SECRET_ALPHABET) for _ in range(EVENT_SECRET_LENGTH))
+
+    with db_session() as db:
+        secret = generator()
+
+        while db.query(Event).filter_by(secret=secret).first():
+            secret = generator()
+
+    return secret
 
 
 class Event(Base, GoatBasicModelMixin):
@@ -65,7 +79,7 @@ class Event(Base, GoatBasicModelMixin):
     type = Column(String(64), nullable=False)
     start_at = Column(DateTime, nullable=False)
     finish_at = Column(DateTime, nullable=False)
-    secret = Column(String(32), nullable=False, default=uuid.uuid4().get_hex)
+    secret = Column(String(32), nullable=False, default=generate_event_secret)
 
     steps = relationship(
         'Step',

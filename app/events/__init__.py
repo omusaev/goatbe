@@ -6,6 +6,16 @@ __all__ = (
     'EVENT_TYPES_DESCRIPTION',
 )
 
+EVENT_SECRET_ALPHABET = (
+    'a', 'b', 'c', 'd', 'e', 'f', 'g',
+    'h', 'j', 'k', 'm', 'n', 'p', 'q',
+    'r', 's', 't', 'u', 'v', 'w', 'x',
+    'y', 'z', '2', '3', '4', '5', '6',
+    '7', '8', '9'
+)
+
+EVENT_SECRET_LENGTH = 6
+
 
 EVENT_TYPES_DESCRIPTION = {
     Event.TYPE.HIKING: {

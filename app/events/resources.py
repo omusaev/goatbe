@@ -3,7 +3,7 @@
 import datetime
 
 from voluptuous import (
-    Required, Optional, All, Length, Upper, In, Schema
+    Required, Optional, All, Length, Upper, Lower, In, Schema
 )
 
 from accounts.validators import AuthRequiredValidator
@@ -490,11 +490,13 @@ class ShortEventDetails(BaseResource):
         event = self.data.get('event')
 
         event_data = {
+            'id': event.id,
             'title': event.title,
             'description': event.description,
             'status': event.status,
             'start_at': to_timestamp(event.start_at),
             'finish_at': to_timestamp(event.finish_at),
+            'secret': event.secret,
             'participants': [],
             'places': [],
         }
@@ -530,12 +532,10 @@ class ShortEventDetailsBySecret(ShortEventDetails):
     url = '/v1/events/details/short/secret/'
 
     data_schema = {
-        Required('event_id'): All(int),
-        Required('event_secret'): All(unicode, Length(min=32, max=32)),
+        Required('secret'): All(unicode, Lower, Length(max=32)),
     }
 
     validators = [
-        EventExistenceValidator(),
         EventSecretValidator(),
     ]
 
@@ -609,6 +609,7 @@ class EventList(BaseResource):
                     'status': event.status,
                     'start_at': to_timestamp(event.start_at),
                     'finish_at': to_timestamp(event.finish_at),
+                    'secret': event.secret,
                     'participant_status': participant.status,
                     'is_owner': participant.is_owner
                 }

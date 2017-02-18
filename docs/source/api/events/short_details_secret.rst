@@ -13,23 +13,24 @@ short event details by secret
 
 **Параметры запроса**
 
-================  =======  ======================  ======  ========  =======================
-Parameter         Default  Format                  Type    Required  Description
-================  =======  ======================  ======  ========  =======================
-``event_id``                                       int     true      Id ивента
-``event_secret``           Length(min=32, max=32)  string  true      Секретная строка ивента
-================  =======  ======================  ======  ========  =======================
+================  ======================  ======  ========  =======================
+Parameter         Format                  Type    Required  Description
+================  ======================  ======  ========  =======================
+``secret``        Length(max=32)          string  true      Секретная строка ивента
+================  ======================  ======  ========  =======================
 
 **Структура data**
 
 ================  ====  ==============================================
 Parameter         Type  Description
 ================  ====  ==============================================
+``id``            int   Id ивента
 ``status``        str   :doc:`Статус ивента <../other/event_statuses>`
 ``start_at``      int   Дата старта
 ``description``   str   Описание ивента
 ``title``         str   Название ивента
 ``finish_at``     int   Дата конца
+``secret``        str   Секретная строка
 ``participants``  list  Участники
 ``places``        list  Места
 ================  ====  ==============================================
@@ -81,7 +82,6 @@ Parameter        Type   Description
 * INTERNAL_ERROR
 * MISSING_PARAMETER
 * INVALID_PARAMETER
-* EVENT_NOT_FOUND
 * INVALID_EVENT_SECRET
 
 **Пример запроса**
@@ -89,8 +89,7 @@ Parameter        Type   Description
 .. code-block:: javascript
 
     {
-        "event_id": 2,
-        "event_secret": "3d34f6e82aad48c3909ea46ac2c33ccf"
+        "event_secret": "bqsg8q"
     }
 
 **Пример ответа**
@@ -100,11 +99,13 @@ Parameter        Type   Description
     {
        "status":"ok",
        "data":{
+          "id":2,
           "status":"PREPARATION",
           "start_at":1469049355,
           "description":"Just another hike",
           "title":"Yearly extreme",
           "finish_at":1469059355,
+          "secret":"bqsg8q",
           "participants":[
              {
                 "status":"ACTIVE",

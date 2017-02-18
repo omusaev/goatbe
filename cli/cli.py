@@ -178,8 +178,7 @@ class GoatClient(object):
         url = self.url('/events/details/short/secret/')
 
         data = {
-            'event_id': args.event_id,
-            'event_secret': args.event_secret,
+            'secret': args.secret,
         }
 
         return self.make_request(url, data)
@@ -491,8 +490,7 @@ def add_event_parsers(sub_parsers):
     short_event_details_parser.set_defaults(handler='short_event_details')
 
     short_event_details_by_secret_parser = sub_parsers.add_parser('short_event_details_by_secret')
-    short_event_details_by_secret_parser.add_argument('--event_id', type=int)
-    short_event_details_by_secret_parser.add_argument('--event_secret')
+    short_event_details_by_secret_parser.add_argument('--secret')
     short_event_details_by_secret_parser.set_defaults(handler='short_event_details_by_secret')
 
     event_list_parser = sub_parsers.add_parser('event_list')

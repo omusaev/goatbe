@@ -181,17 +181,17 @@ class UpdateAssigneesValidator(BaseValidator):
 
 
 class EventSecretValidator(BaseValidator):
-    '''
-    Needs EventExistenceValidator
-    '''
 
     def run(self, resource, *args, **kwargs):
+        secret = resource.get_param('secret')
 
-        event = resource.data['event']
-        secret = resource.get_param('event_secret')
+        with db_session() as db:
+            event = db.query(Event).options(joinedload('*')).filter_by(secret=secret).first()
 
-        if event.secret != secret:
-            raise InvalidEventSecretException()
+        if not event:
+            raise InvalidEventSecretException
+
+        resource.data['event'] = event
 
 
 # TODO: codestyle. Move to the logic.py

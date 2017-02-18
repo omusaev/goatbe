@@ -24,11 +24,13 @@ Parameter     Default  Type  Required  Description
 ================  ====  ==============================================
 Parameter         Type  Description
 ================  ====  ==============================================
+``id``            int   Id ивента
 ``status``        str   :doc:`Статус ивента <../other/event_statuses>`
 ``start_at``      int   Дата старта
 ``description``   str   Описание ивента
 ``title``         str   Название ивента
 ``finish_at``     int   Дата конца
+``secret``        str   Секретная строка
 ``participants``  list  Участники
 ``places``        list  Места
 ================  ====  ==============================================
@@ -100,11 +102,13 @@ Parameter        Type   Description
     {
        "status":"ok",
        "data":{
+          "id":2,
           "status":"PREPARATION",
           "start_at":1469049355,
           "description":"Just another hike",
           "title":"Yearly extreme",
           "finish_at":1469059355,
+          "secret":"ym2e7k",
           "participants":[
              {
                 "status":"ACTIVE",

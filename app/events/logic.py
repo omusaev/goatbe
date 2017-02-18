@@ -7,6 +7,7 @@ from events.models import Event, Assignee
 from management import task
 
 __all__ = (
+    'is_step_resolved',
     'calculate_event_status',
 )
 
