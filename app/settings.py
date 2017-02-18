@@ -208,12 +208,18 @@ LOGGING = {
             'backupCount': 3,
             'encoding': 'utf8',
             'filters': ['DebugLevelFilter']
-        }
+        },
+        'sentry': {
+            'level': logging.ERROR,
+            'class': 'raven.handlers.logging.SentryHandler',
+            'dsn': 'https://0cc39354458f443cb01c1a1988341a82:fb67eb0e5d5c4428b27a160a98d8f168@sentry.io/140360',
+            'filters': ['ErrorLevelFilter'],
+        },
     },
 
     'root': {
         'level': logging.DEBUG if DEBUG else logging.WARNING,
-        'handlers': ['info_file_handler', 'error_file_handler', 'warning_file_handler', 'debug_file_handler'],
+        'handlers': ['info_file_handler', 'error_file_handler', 'warning_file_handler', 'debug_file_handler', 'sentry'],
     }
 }
 

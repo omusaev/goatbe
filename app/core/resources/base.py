@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import json
+import logging
 
 from voluptuous import (
     Schema, MultipleInvalid,
@@ -13,6 +14,9 @@ from core.exceptions import (
     MissingParameterException,
     InvalidParameterException,
 )
+
+logger = logging.getLogger(__name__)
+
 
 __all__ = (
     'BaseResource',
@@ -59,6 +63,7 @@ class BaseResource(object):
         except GoatBaseException as e:
             self.raised_exception = e
         except Exception as e:
+            logger.exception(e.message)
             self.raised_exception = GoatBaseException(e.message)
 
         self.prepare_response()
