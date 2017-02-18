@@ -120,7 +120,7 @@ class EventManager(object):
 
     @staticmethod
     def update_started():
-        now = datetime.datetime.now()
+        now = datetime.now()
 
         with db_session() as db:
             db.query(Event).\
@@ -129,7 +129,7 @@ class EventManager(object):
 
     @staticmethod
     def update_finished():
-        now = datetime.datetime.now()
+        now = datetime.now()
 
         with db_session() as db:
             db.query(Event).\
