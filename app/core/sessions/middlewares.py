@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+import datetime
+
 from core.sessions.models import SessionManager
 
 import settings as app_settings
@@ -27,6 +29,7 @@ class SessionMiddleware(object):
             return
 
         session = resource.session
+        session.expire_at = datetime.datetime.now() + datetime.timedelta(seconds=app_settings.SESSION_TTL)
 
         if not session:
             resp.unset_cookie(app_settings.SESSION_COOKIE_NAME)

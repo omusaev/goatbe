@@ -9,8 +9,6 @@ from db.base import Base
 from db.helpers import db_session
 from db.mixins import GoatModelMixin
 
-import settings as app_settings
-
 __all__ = (
     'Session',
     'SessionManager',
@@ -23,11 +21,7 @@ class Session(Base, GoatModelMixin):
 
     id = Column(String(32), primary_key=True)
     data = Column(PickleType, default={})
-    expire_at = Column(
-        DateTime,
-        default=datetime.datetime.now() + datetime.timedelta(seconds=app_settings.SESSION_TTL),
-        onupdate=datetime.datetime.now() + datetime.timedelta(seconds=app_settings.SESSION_TTL)
-    )
+    expire_at = Column(DateTime)
 
     def __contains__(self, key):
         return key in self.data
