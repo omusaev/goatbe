@@ -133,7 +133,7 @@ class EventManager(object):
 
         with db_session() as db:
             db.query(Event).\
-                filter(Event.finish_at > now, Event.status.in_(Event.STATUS.READY, Event.STATUS.IN_PROGRESS)).\
+                filter(Event.finish_at > now, Event.status.in_((Event.STATUS.READY, Event.STATUS.IN_PROGRESS, ))).\
                 update({Event.status: Event.STATUS.FINISHED})
             db.query(Event).\
                 filter(Event.finish_at > now, Event.status == Event.STATUS.PREPARATION).\
