@@ -125,7 +125,7 @@ class EventManager(object):
         with db_session() as db:
             db.query(Event).\
                 filter(Event.start_at > now, Event.finish_at < now, Event.status == Event.STATUS.READY).\
-                update({Event.status: Event.STATUS.IN_PROGRESS})
+                update({Event.status: Event.STATUS.IN_PROGRESS}, synchronize_session=False)
 
     @staticmethod
     def update_finished():
@@ -134,10 +134,10 @@ class EventManager(object):
         with db_session() as db:
             db.query(Event).\
                 filter(Event.finish_at > now, Event.status.in_((Event.STATUS.READY, Event.STATUS.IN_PROGRESS, ))).\
-                update({Event.status: Event.STATUS.FINISHED})
+                update({Event.status: Event.STATUS.FINISHED}, synchronize_session=False)
             db.query(Event).\
                 filter(Event.finish_at > now, Event.status == Event.STATUS.PREPARATION).\
-                update({Event.status: Event.STATUS.NOT_COMPLETED})
+                update({Event.status: Event.STATUS.NOT_COMPLETED}, synchronize_session=False)
 
 
 class Step(Base, GoatBasicModelMixin):
