@@ -174,15 +174,6 @@ class GoatClient(object):
 
         return self.make_request(url, data)
 
-    def short_event_details_by_secret(self, args):
-        url = self.url('/events/details/short/secret/')
-
-        data = {
-            'secret': args.secret,
-        }
-
-        return self.make_request(url, data)
-
     def event_list(self, args):
         url = self.url('/events/list/')
 
@@ -235,15 +226,6 @@ class GoatClient(object):
 
         return self.make_request(url, data)
 
-    def leave_event(self, args):
-        url = self.url('/events/leave/')
-
-        data = {
-            'event_id': args.event_id,
-        }
-
-        return self.make_request(url, data)
-
     def map_event_details(self, args):
         url = self.url('/events/details/map/')
 
@@ -253,8 +235,8 @@ class GoatClient(object):
 
         return self.make_request(url, data)
 
-    def event_feedbacks(self, args):
-        url = self.url('/events/feedbacks/')
+    def feedbacks_list(self, args):
+        url = self.url('/feedbacks/list/')
 
         data = {
             'event_id': args.event_id,
@@ -360,18 +342,17 @@ class GoatClient(object):
 
         return self.make_request(url, data)
 
-    def create_participant(self, args):
-        url = self.url('/participants/create/')
+    def create_participant_self(self, args):
+        url = self.url('/participants/create/self/')
 
         data = {
-            'event_id': args.event_id,
-            'event_secret': args.event_secret,
+            'secret': args.secret,
         }
 
         return self.make_request(url, data)
 
-    def activate_participant(self, args):
-        url = self.url('/participants/activate/')
+    def activate_participant_self(self, args):
+        url = self.url('/participants/activate/self/')
 
         data = {
             'event_id': args.event_id,
@@ -385,6 +366,15 @@ class GoatClient(object):
         data = {
             'event_id': args.event_id,
             'account_id': args.account_id,
+        }
+
+        return self.make_request(url, data)
+
+    def delete_participant_self(self, args):
+        url = self.url('/participants/delete/self/')
+
+        data = {
+            'event_id': args.event_id,
         }
 
         return self.make_request(url, data)
@@ -489,10 +479,6 @@ def add_event_parsers(sub_parsers):
     short_event_details_parser.add_argument('--event_id', type=int)
     short_event_details_parser.set_defaults(handler='short_event_details')
 
-    short_event_details_by_secret_parser = sub_parsers.add_parser('short_event_details_by_secret')
-    short_event_details_by_secret_parser.add_argument('--secret')
-    short_event_details_by_secret_parser.set_defaults(handler='short_event_details_by_secret')
-
     event_list_parser = sub_parsers.add_parser('event_list')
     event_list_parser.set_defaults(handler='event_list')
 
@@ -516,17 +502,9 @@ def add_event_parsers(sub_parsers):
     delete_event_parser.add_argument('--event_id', type=int)
     delete_event_parser.set_defaults(handler='delete_event')
 
-    leave_event_parser = sub_parsers.add_parser('leave_event')
-    leave_event_parser.add_argument('--event_id', type=int)
-    leave_event_parser.set_defaults(handler='leave_event')
-
     map_event_details_parser = sub_parsers.add_parser('map_event_details')
     map_event_details_parser.add_argument('--event_id', type=int)
     map_event_details_parser.set_defaults(handler='map_event_details')
-
-    event_feedbacks_parser = sub_parsers.add_parser('event_feedbacks')
-    event_feedbacks_parser.add_argument('--event_id', type=int)
-    event_feedbacks_parser.set_defaults(handler='event_feedbacks')
 
 
 def add_feedback_parsers(sub_parsers):
@@ -553,6 +531,10 @@ def add_feedback_parsers(sub_parsers):
     delete_feedback_parser.add_argument('--event_id', type=int)
     delete_feedback_parser.add_argument('--feedback_id', type=int)
     delete_feedback_parser.set_defaults(handler='delete_feedback')
+
+    feedbacks_list_parser = sub_parsers.add_parser('feedbacks_list')
+    feedbacks_list_parser.add_argument('--event_id', type=int)
+    feedbacks_list_parser.set_defaults(handler='feedbacks_list')
 
 
 def add_auth_parsers(sub_parsers):
@@ -614,19 +596,23 @@ def add_step_parsers(sub_parsers):
 
 def add_participant_parsers(sub_parsers):
 
-    create_participant_parser = sub_parsers.add_parser('create_participant')
-    create_participant_parser.add_argument('--event_id', type=int)
-    create_participant_parser.add_argument('--event_secret')
-    create_participant_parser.set_defaults(handler='create_participant')
+    create_participant_self_parser = sub_parsers.add_parser('create_participant_self')
+    create_participant_self_parser.add_argument('--event_id', type=int)
+    create_participant_self_parser.add_argument('--secret')
+    create_participant_self_parser.set_defaults(handler='create_participant_self')
 
-    activate_participant_parser = sub_parsers.add_parser('activate_participant')
-    activate_participant_parser.add_argument('--event_id', type=int)
-    activate_participant_parser.set_defaults(handler='activate_participant')
+    activate_participant_self_parser = sub_parsers.add_parser('activate_participant_self')
+    activate_participant_self_parser.add_argument('--event_id', type=int)
+    activate_participant_self_parser.set_defaults(handler='activate_participant_self')
 
     delete_participant_parser = sub_parsers.add_parser('delete_participant')
     delete_participant_parser.add_argument('--event_id', type=int)
     delete_participant_parser.add_argument('--account_id', type=int)
     delete_participant_parser.set_defaults(handler='delete_participant')
+
+    delete_participant_self_parser = sub_parsers.add_parser('delete_participant_self')
+    delete_participant_self_parser.add_argument('--event_id', type=int)
+    delete_participant_self_parser.set_defaults(handler='delete_participant_self')
 
 
 def add_place_parsers(sub_parsers):
