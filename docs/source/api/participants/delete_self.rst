@@ -1,11 +1,11 @@
-activate participant
-====================
+delete participant self
+=======================
 
-Активация участника.
+Покинуть ивент.
 
 **URL**::
 
-    /{v}/participants/activate/
+    /{v}/participants/delete/self
 
 **Method**::
 
@@ -38,7 +38,7 @@ Parameter     Default  Type  Required  Description
 .. code-block:: javascript
 
     {
-        "event_id": 2
+        "event_id": 1
     }
 
 **Пример ответа**

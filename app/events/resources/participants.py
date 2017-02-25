@@ -77,36 +77,9 @@ class DeleteParticipant(BaseResource):
         self.response_data = {}
 
 
-class ActivateParticipant(BaseResource):
+class DeleteParticipantSelf(BaseResource):
 
-    url = '/v1/participants/activate/'
-
-    data_schema = {
-        Required('event_id'): All(int),
-    }
-
-    validators = [
-        AuthRequiredValidator(),
-        EventExistenceValidator(),
-        AccountIsEventParticipantValidator(),
-        PermissionValidator(permissions=[PERMISSION.ACTIVATE_EVENT_PARTICIPANT, ])
-    ]
-
-    def post(self):
-
-        participant = self.data.get('participant')
-
-        with db_session() as db:
-            participant.permissions = PERMISSION.DEFAULT_NOT_OWNER_SET
-            participant.status = Participant.STATUS.ACTIVE
-            db.merge(participant)
-
-        self.response_data = {}
-
-
-class LeaveEvent(BaseResource):
-
-    url = '/v1/events/leave/'
+    url = '/v1/participants/delete/self'
 
     data_schema = {
         Required('event_id'): All(int),
@@ -129,5 +102,32 @@ class LeaveEvent(BaseResource):
 
             for step in event.steps:
                 db.query(Assignee).filter(Assignee.account_id == account_id, Assignee.step_id == step.id).delete(synchronize_session=False)
+
+        self.response_data = {}
+
+
+class ActivateParticipantSelf(BaseResource):
+
+    url = '/v1/participants/activate/self'
+
+    data_schema = {
+        Required('event_id'): All(int),
+    }
+
+    validators = [
+        AuthRequiredValidator(),
+        EventExistenceValidator(),
+        AccountIsEventParticipantValidator(),
+        PermissionValidator(permissions=[PERMISSION.ACTIVATE_EVENT_PARTICIPANT, ])
+    ]
+
+    def post(self):
+
+        participant = self.data.get('participant')
+
+        with db_session() as db:
+            participant.permissions = PERMISSION.DEFAULT_NOT_OWNER_SET
+            participant.status = Participant.STATUS.ACTIVE
+            db.merge(participant)
 
         self.response_data = {}

@@ -7,6 +7,6 @@ API для работы с участниками.
    :maxdepth: 1
 
    create.rst
-   activate.rst
+   activate_self.rst
    delete.rst
-   leave.rst
+   delete_self.rst

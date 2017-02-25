@@ -160,7 +160,7 @@ class FeedbackDetails(BaseResource):
 
 class EventFeedbacks(BaseResource):
 
-    url = '/v1/events/feedbacks/'
+    url = '/v1/feedbacks/list/'
 
     data_schema = {
         Required('event_id'): All(int),

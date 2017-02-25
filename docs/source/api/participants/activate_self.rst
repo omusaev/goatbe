@@ -1,11 +1,11 @@
-leave event
-===========
+activate participant self
+=========================
 
-Покинуть ивент.
+Активация участника.
 
 **URL**::
 
-    /{v}/events/leave/
+    /{v}/participants/activate/self
 
 **Method**::
 
@@ -38,7 +38,7 @@ Parameter     Default  Type  Required  Description
 .. code-block:: javascript
 
     {
-        "event_id": 1
+        "event_id": 2
     }
 
 **Пример ответа**

@@ -1,11 +1,11 @@
-event feedbacks
-===============
+feedbacks list
+==============
 
 Отзывы об ивенте.
 
 **URL**::
 
-    /{v}/events/feedbacks/
+    /{v}/feedbacks/list/
 
 **Method**::
 
