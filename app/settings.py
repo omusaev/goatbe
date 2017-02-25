@@ -91,6 +91,7 @@ SESSION_COOKIE_NAME = 'sessionid'
 WORKERS = {
     'session_cleanup': {'sleep': 60 * 60},
     'event_status_updater': {'sleep': 60 * 60},
+    'event_participant_cleaner': {'sleep': 6 * 60 * 60},
 }
 
 FB_APP_ID = '1000652553335107'

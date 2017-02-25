@@ -4,6 +4,7 @@ import daemon
 
 import core.sessions.workers.session_cleanup as session_cleanup
 import events.workers.event_status_updater as event_status_updater
+import events.workers.event_participant_cleaner as event_participant_cleaner
 
 from management.commands import BaseCommand
 
@@ -14,6 +15,7 @@ class Command(BaseCommand):
     workers = {
         'session_cleanup': session_cleanup.Worker,
         'event_status_updater': event_status_updater.Worker,
+        'event_participant_cleaner': event_participant_cleaner.Worker,
     }
 
     options = {

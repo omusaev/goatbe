@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import random
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import sqlalchemy as sa
 from sqlalchemy import Column, BigInteger, String, DateTime, Text, ForeignKey, Boolean, Integer
@@ -138,6 +138,15 @@ class EventManager(object):
             db.query(Event).\
                 filter(Event.finish_at > now, Event.status == Event.STATUS.PREPARATION).\
                 update({Event.status: Event.STATUS.NOT_COMPLETED}, synchronize_session=False)
+
+    @staticmethod
+    def clean_inactive_participants():
+        week_ago = datetime.now() - timedelta(days=7)
+
+        with db_session() as db:
+            db.query(Participant).\
+                filter(Participant.created_at < week_ago, Participant.status == Participant.STATUS.INACTIVE).\
+                delete()
 
 
 class Step(Base, GoatBasicModelMixin):
