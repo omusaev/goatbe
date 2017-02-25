@@ -5,7 +5,7 @@ delete participant self
 
 **URL**::
 
-    /{v}/participants/delete/self
+    /{v}/participants/delete/self/
 
 **Method**::
 

@@ -10,4 +10,4 @@ API для работы с отзывами об ивентах.
    update.rst
    details.rst
    delete.rst
-   feedbacks.rst
+   list.rst

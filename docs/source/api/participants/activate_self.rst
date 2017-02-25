@@ -5,7 +5,7 @@ activate participant self
 
 **URL**::
 
-    /{v}/participants/activate/self
+    /{v}/participants/activate/self/
 
 **Method**::
 
