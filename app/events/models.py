@@ -79,7 +79,7 @@ class Event(Base, GoatBasicModelMixin):
     type = Column(String(64), nullable=False)
     start_at = Column(DateTime, nullable=False)
     finish_at = Column(DateTime, nullable=False)
-    secret = Column(String(32), nullable=False, default=generate_event_secret)
+    secret = Column(String(32), nullable=False, unique=True, default=generate_event_secret)
 
     steps = relationship(
         'Step',

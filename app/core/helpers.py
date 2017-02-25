@@ -56,7 +56,7 @@ def collect_middlewares():
 
 
 def to_timestamp(dt):
-    return time.mktime(dt.timetuple())
+    return time.mktime(dt.timetuple()) if dt else ''
 
 
 def to_datetime(ts):

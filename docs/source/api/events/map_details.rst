@@ -42,7 +42,7 @@ Parameter        Type  Description
 ``description``  str   Описание
 ``start_at``     int   Дата старта
 ``finish_at``    int   Дата финиша
-``order``        int   Подярок
+``order``        int   Порядок
 ``point``        dict  Географическая точка
 ===============  ====  ================================
 

@@ -185,10 +185,13 @@ class EventSecretValidator(BaseValidator):
     def run(self, resource, *args, **kwargs):
         secret = resource.get_param('secret')
 
-        with db_session() as db:
-            event = db.query(Event).options(joinedload('*')).filter_by(secret=secret).first()
+        event = resource.data.get('event')
 
         if not event:
+            with db_session() as db:
+                event = db.query(Event).options(joinedload('*')).filter_by(secret=secret).first()
+
+        if not event or event.secret != secret:
             raise InvalidEventSecretException
 
         resource.data['event'] = event

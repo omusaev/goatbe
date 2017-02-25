@@ -690,7 +690,7 @@ class CreateParticipant(BaseResource):
 
     data_schema = {
         Required('event_id'): All(int),
-        Required('event_secret'): All(unicode, Length(min=32, max=32)),
+        Required('secret'): All(unicode, Lower, Length(max=32)),
     }
 
     validators = [
