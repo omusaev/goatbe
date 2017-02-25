@@ -158,7 +158,7 @@ class FeedbackDetails(BaseResource):
         self.response_data = feedback_data
 
 
-class EventFeedbacks(BaseResource):
+class FeedbacksList(BaseResource):
 
     url = '/v1/feedbacks/list/'
 

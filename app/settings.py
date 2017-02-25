@@ -56,8 +56,8 @@ INSTALLED_RESOURCES = [
 
     'events.resources.DeleteParticipant',
     'events.resources.CreateParticipantSelf',
-    'events.resources.ActivateParticipant',
-    'events.resources.LeaveEvent',
+    'events.resources.ActivateParticipantSelf',
+    'events.resources.DeleteParticipantSelf',
 
     'events.resources.CreateStep',
     'events.resources.UpdateStep',
@@ -79,7 +79,7 @@ INSTALLED_RESOURCES = [
     'events.resources.UpdateFeedback',
     'events.resources.DeleteFeedback',
     'events.resources.FeedbackDetails',
-    'events.resources.EventFeedbacks',
+    'events.resources.FeedbacksList',
 
     'common.resources.ClientSettings',
 ]
