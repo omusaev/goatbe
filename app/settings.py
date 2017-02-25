@@ -49,17 +49,16 @@ INSTALLED_RESOURCES = [
     'events.resources.FinishEvent',
     'events.resources.UnfinishEvent',
     'events.resources.DeleteEvent',
-    'events.resources.LeaveEvent',
     'events.resources.EventDetails',
     'events.resources.ShortEventDetails',
     'events.resources.ShortEventDetailsBySecret',
-    'events.resources.EventFeedbacks',
     'events.resources.MapEventDetails',
     'events.resources.EventList',
 
     'events.resources.DeleteParticipant',
     'events.resources.CreateParticipant',
     'events.resources.ActivateParticipant',
+    'events.resources.LeaveEvent',
 
     'events.resources.CreateStep',
     'events.resources.UpdateStep',
@@ -81,6 +80,7 @@ INSTALLED_RESOURCES = [
     'events.resources.UpdateFeedback',
     'events.resources.DeleteFeedback',
     'events.resources.FeedbackDetails',
+    'events.resources.EventFeedbacks',
 
     'common.resources.ClientSettings',
 ]
@@ -106,6 +106,9 @@ RQ_CONNECTION = {
     'port': 6379,
     'db': 0,
 }
+
+SENTRY_ENABLED = True
+SENTRY_DSN = 'https://0cc39354458f443cb01c1a1988341a82:fb67eb0e5d5c4428b27a160a98d8f168@sentry.io/140360'
 
 
 try:
@@ -214,15 +217,18 @@ LOGGING = {
         'sentry': {
             'level': logging.ERROR,
             'class': 'raven.handlers.logging.SentryHandler',
-            'dsn': 'https://0cc39354458f443cb01c1a1988341a82:fb67eb0e5d5c4428b27a160a98d8f168@sentry.io/140360',
+            'dsn': SENTRY_DSN,
             'filters': ['ErrorLevelFilter'],
         },
     },
 
     'root': {
         'level': logging.DEBUG if DEBUG else logging.WARNING,
-        'handlers': ['info_file_handler', 'error_file_handler', 'warning_file_handler', 'debug_file_handler', 'sentry'],
+        'handlers': ['info_file_handler', 'error_file_handler', 'warning_file_handler', 'debug_file_handler'],
     }
 }
+
+if SENTRY_ENABLED:
+    LOGGING['root']['handlers'].append('sentry')
 
 logging.config.dictConfig(LOGGING)

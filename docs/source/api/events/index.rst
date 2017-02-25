@@ -18,6 +18,4 @@ API для работы с ивентами.
    finish.rst
    unfinish.rst
    delete.rst
-   leave.rst
    map_details.rst
-   feedbacks.rst

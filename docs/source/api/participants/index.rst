@@ -9,3 +9,4 @@ API для работы с участниками.
    create.rst
    activate.rst
    delete.rst
+   leave.rst
