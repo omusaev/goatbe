@@ -10,7 +10,7 @@ from db.helpers import db_session
 from events.models import Participant, Assignee
 from events.permissions import PERMISSION
 from events.validators import EventExistenceValidator, AccountIsEventParticipantValidator, PermissionValidator, \
-    EventSecretValidator
+    EventSecretValidator, AccountIsNotEventParticipantValidator
 
 
 class CreateParticipant(BaseResource):
@@ -26,6 +26,7 @@ class CreateParticipant(BaseResource):
         AuthRequiredValidator(),
         EventExistenceValidator(),
         EventSecretValidator(),
+        AccountIsNotEventParticipantValidator(),
     ]
 
     def post(self):

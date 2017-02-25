@@ -32,6 +32,7 @@ Parameter         Format                  Type    Required  Description
 * AUTH_REQUIRED
 * EVENT_NOT_FOUND
 * INVALID_EVENT_SECRET
+* USER_IS_ALREADY_EVENT_PARTICIPANT
 
 **Пример запроса**
 

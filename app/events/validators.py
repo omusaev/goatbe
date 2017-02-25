@@ -124,6 +124,21 @@ class AccountIsEventParticipantValidator(BaseValidator):
         resource.data['participant'] = participant
 
 
+class AccountIsNotEventParticipantValidator(BaseValidator):
+    '''
+    Needs EventExistenceValidator
+    '''
+
+    def run(self, resource, *args, **kwargs):
+        account_id = resource.account_info.account_id
+        event = resource.data['event']
+
+        participant = getEventParticipant(account_id, event.id)
+
+        if participant:
+            raise UserIsNotEventParticipant
+
+
 class PermissionValidator(BaseValidator):
     '''
     Needs AccountIsEventParticipantValidator
