@@ -12,6 +12,7 @@ from core.exceptions import (
     PlaceNotFoundException, PlaceIsNotInEventException,
     EventIsNotFinishedManuallyException,
     FeedbackNotFoundException, FeedbackIsNotInEventException,
+    UserIsAlreadyEventParticipant
 )
 from core.helpers import to_datetime
 from core.validators import BaseValidator
@@ -25,6 +26,7 @@ __all__ = (
     'StepExistenceValidator',
     'PlaceExistenceValidator',
     'AccountIsEventParticipantValidator',
+    'AccountIsNotEventParticipantValidator',
     'PermissionValidator',
     'UpdateAssigneesValidator',
     'EventSecretValidator',
@@ -136,7 +138,7 @@ class AccountIsNotEventParticipantValidator(BaseValidator):
         participant = getEventParticipant(account_id, event.id)
 
         if participant:
-            raise UserIsNotEventParticipant
+            raise UserIsAlreadyEventParticipant
 
 
 class PermissionValidator(BaseValidator):
