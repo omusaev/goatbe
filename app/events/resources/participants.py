@@ -7,24 +7,23 @@ from voluptuous import Required, All, Lower, Length
 from accounts.validators import AuthRequiredValidator
 from core.resources.base import BaseResource
 from db.helpers import db_session
+from events.mixins import EventShortDetailsMixin
 from events.models import Participant, Assignee
 from events.permissions import PERMISSION
-from events.validators import EventExistenceValidator, AccountIsEventParticipantValidator, PermissionValidator, \
-    EventSecretValidator, AccountIsNotEventParticipantValidator
+from events.validators import (EventExistenceValidator, AccountIsEventParticipantValidator,
+                               PermissionValidator, EventSecretValidator, AccountIsNotEventParticipantValidator)
 
 
-class CreateParticipant(BaseResource):
+class CreateParticipantSelf(BaseResource, EventShortDetailsMixin):
 
-    url = '/v1/participants/create/'
+    url = '/v1/participants/create/self'
 
     data_schema = {
-        Required('event_id'): All(int),
         Required('secret'): All(unicode, Lower, Length(max=32)),
     }
 
     validators = [
         AuthRequiredValidator(),
-        EventExistenceValidator(),
         EventSecretValidator(),
         AccountIsNotEventParticipantValidator(),
     ]
@@ -44,7 +43,7 @@ class CreateParticipant(BaseResource):
             )
             db.merge(participant)
 
-        self.response_data = {}
+        self.response_data = self.get_event_details()
 
 
 class DeleteParticipant(BaseResource):

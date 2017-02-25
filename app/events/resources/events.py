@@ -11,10 +11,11 @@ from core.helpers import to_timestamp, to_datetime
 from core.resources.base import BaseResource
 from db.helpers import db_session
 from events import EVENT_TYPES_DESCRIPTION
+from events.mixins import EventShortDetailsMixin
 from events.models import Participant, Event, Step
 from events.permissions import PERMISSION
 from events.validators import timestamp_validator, EventExistenceValidator, AccountIsEventParticipantValidator, \
-    PermissionValidator, EventFinishedManuallyValidator, EventSecretValidator
+    PermissionValidator, EventFinishedManuallyValidator
 
 
 class EventTypes(BaseResource):
@@ -304,7 +305,7 @@ class DeleteEvent(BaseResource):
         self.response_data = {}
 
 
-class ShortEventDetails(BaseResource):
+class ShortEventDetails(BaseResource, EventShortDetailsMixin):
 
     url = '/v1/events/details/short/'
 
@@ -320,58 +321,7 @@ class ShortEventDetails(BaseResource):
     ]
 
     def post(self):
-
-        event = self.data.get('event')
-
-        event_data = {
-            'id': event.id,
-            'title': event.title,
-            'description': event.description,
-            'status': event.status,
-            'start_at': to_timestamp(event.start_at),
-            'finish_at': to_timestamp(event.finish_at),
-            'secret': event.secret,
-            'participants': [],
-            'places': [],
-        }
-
-        for participant in event.participants:
-            event_data['participants'].append({
-                'account': {
-                    'name': participant.account.name,
-                    'avatar_url': participant.account.avatar_url,
-                },
-                'status': participant.status,
-            })
-
-        for place in event.places:
-            event_data['places'].append({
-                'id': place.id,
-                'title': place.title,
-                'description': place.description,
-                'start_at': to_timestamp(place.start_at),
-                'finish_at': to_timestamp(place.finish_at),
-                'order': place.order,
-                'point': {
-                    'lng': place.lng,
-                    'lat': place.lat,
-                }
-            })
-
-        self.response_data = event_data
-
-
-class ShortEventDetailsBySecret(ShortEventDetails):
-
-    url = '/v1/events/details/short/secret/'
-
-    data_schema = {
-        Required('secret'): All(unicode, Lower, Length(max=32)),
-    }
-
-    validators = [
-        EventSecretValidator(),
-    ]
+        self.response_data = self.get_event_details()
 
 
 class EventList(BaseResource):

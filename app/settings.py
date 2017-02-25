@@ -51,12 +51,11 @@ INSTALLED_RESOURCES = [
     'events.resources.DeleteEvent',
     'events.resources.EventDetails',
     'events.resources.ShortEventDetails',
-    'events.resources.ShortEventDetailsBySecret',
     'events.resources.MapEventDetails',
     'events.resources.EventList',
 
     'events.resources.DeleteParticipant',
-    'events.resources.CreateParticipant',
+    'events.resources.CreateParticipantSelf',
     'events.resources.ActivateParticipant',
     'events.resources.LeaveEvent',
 

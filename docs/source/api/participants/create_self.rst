@@ -1,11 +1,11 @@
-short event details by secret
-=============================
+create participant self
+=======================
 
-Короткая информация по ивенту с доступом по секретной строке.
+Создание участника.
 
 **URL**::
 
-    /{v}/events/details/short/secret/
+    /{v}/participants/create/self/
 
 **Method**::
 
@@ -13,11 +13,11 @@ short event details by secret
 
 **Параметры запроса**
 
-================  ======================  ======  ========  =======================
-Parameter         Format                  Type    Required  Description
-================  ======================  ======  ========  =======================
-``secret``        Length(max=32)          string  true      Секретная строка ивента
-================  ======================  ======  ========  =======================
+==========  ==============  ======  ========  =======================
+Parameter   Format          Type    Required  Description
+==========  ==============  ======  ========  =======================
+``secret``  Length(max=32)  string  true      Секретная строка ивента
+==========  ==============  ======  ========  =======================
 
 **Структура data**
 
@@ -82,14 +82,16 @@ Parameter        Type   Description
 * INTERNAL_ERROR
 * MISSING_PARAMETER
 * INVALID_PARAMETER
+* AUTH_REQUIRED
 * INVALID_EVENT_SECRET
+* USER_IS_ALREADY_EVENT_PARTICIPANT
 
 **Пример запроса**
 
 .. code-block:: javascript
 
     {
-        "event_secret": "bqsg8q"
+        "secret": "3d34f6e"
     }
 
 **Пример ответа**
@@ -105,7 +107,7 @@ Parameter        Type   Description
           "description":"Just another hike",
           "title":"Yearly extreme",
           "finish_at":1469059355,
-          "secret":"bqsg8q",
+          "secret":"ym2e7k",
           "participants":[
              {
                 "status":"ACTIVE",
