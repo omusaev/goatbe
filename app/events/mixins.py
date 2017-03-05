@@ -1,12 +1,26 @@
 # -*- coding: utf-8 -*-
 
+from sqlalchemy import inspect
+from sqlalchemy.orm import joinedload
+
 from core.helpers import to_timestamp
+from db.helpers import db_session
 
-class EventShortDetailsMixin(object):
+from events.models import Event
 
-    def get_event_details(self):
+
+class EventDetailsMixin(object):
+
+    def short_event_details(self):
 
         event = self.data.get('event')
+
+        state = inspect(event)
+
+        if set(['participants', 'places']) & state.unloaded:
+            with db_session() as db:
+                event = db.query(Event).options(joinedload('*')).get(event.id)
+                self.data['event'] = event
 
         event_data = {
             'id': event.id,

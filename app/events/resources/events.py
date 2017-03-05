@@ -4,14 +4,14 @@ from __future__ import absolute_import
 
 import datetime
 
-from voluptuous import Required, All, Length, Optional, Upper, In, Lower
+from voluptuous import Required, All, Length, Optional, Upper, In
 
 from accounts.validators import AuthRequiredValidator
 from core.helpers import to_timestamp, to_datetime
 from core.resources.base import BaseResource
 from db.helpers import db_session
 from events import EVENT_TYPES_DESCRIPTION
-from events.mixins import EventShortDetailsMixin
+from events.mixins import EventDetailsMixin
 from events.models import Participant, Event, Step
 from events.permissions import PERMISSION
 from events.validators import timestamp_validator, EventExistenceValidator, AccountIsEventParticipantValidator, \
@@ -46,7 +46,7 @@ class EventTypes(BaseResource):
         self.response_data = response_data
 
 
-class CreateEvent(BaseResource):
+class CreateEvent(BaseResource, EventDetailsMixin):
 
     url = '/v1/events/create/'
 
@@ -101,9 +101,8 @@ class CreateEvent(BaseResource):
             )
             db.add(participant)
 
-        self.response_data = {
-            'event_id': event.id,
-        }
+        self.data['event'] = event
+        self.response_data = self.short_event_details()
 
 
 class UpdateEvent(BaseResource):
@@ -305,7 +304,7 @@ class DeleteEvent(BaseResource):
         self.response_data = {}
 
 
-class ShortEventDetails(BaseResource, EventShortDetailsMixin):
+class ShortEventDetails(BaseResource, EventDetailsMixin):
 
     url = '/v1/events/details/short/'
 
@@ -321,7 +320,7 @@ class ShortEventDetails(BaseResource, EventShortDetailsMixin):
     ]
 
     def post(self):
-        self.response_data = self.get_event_details()
+        self.response_data = self.short_event_details()
 
 
 class EventList(BaseResource):
