@@ -167,7 +167,7 @@ class DeleteStep(BaseResource):
 
     def post(self):
 
-        step = self.get_param('step')
+        step = self.data.get('step')
 
         with db_session() as db:
             db.delete(step)

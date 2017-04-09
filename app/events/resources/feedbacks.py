@@ -118,7 +118,7 @@ class DeleteFeedback(BaseResource):
 
     def post(self):
 
-        feedback = self.get_param('feedback')
+        feedback = self.data.get('feedback')
 
         with db_session() as db:
             db.delete(feedback)

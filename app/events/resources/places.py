@@ -158,7 +158,7 @@ class DeletePlace(BaseResource):
 
     def post(self):
 
-        place = self.get_param('place')
+        place = self.data.get('place')
 
         with db_session() as db:
             db.delete(place)
