@@ -11,16 +11,16 @@ from events.models import Event
 
 class EventDetailsMixin(object):
 
-    def short_event_details(self):
+    def short_event_details(self, event=None):
 
-        event = self.data.get('event')
+        if event is None:
+            event = self.data.get('event')
 
         state = inspect(event)
 
-        if set(['participants', 'places']) & state.unloaded:
+        if set(['participants', 'places', 'steps']) & state.unloaded:
             with db_session() as db:
                 event = db.query(Event).options(joinedload('*')).get(event.id)
-                self.data['event'] = event
 
         event_data = {
             'id': event.id,
@@ -31,17 +31,43 @@ class EventDetailsMixin(object):
             'finish_at': to_timestamp(event.finish_at),
             'secret': event.secret,
             'participants': [],
+            'steps': [],
             'places': [],
         }
 
         for participant in event.participants:
             event_data['participants'].append({
                 'account': {
+                    'id': participant.account.id,
                     'name': participant.account.name,
                     'avatar_url': participant.account.avatar_url,
                 },
                 'status': participant.status,
+                'permissions': participant.permissions,
+                'is_owner': participant.is_owner,
             })
+
+        for step in event.steps:
+            full_step = {
+                'id': step.id,
+                'title': step.title,
+                'description': step.description,
+                'type': step.type,
+                'order': step.order,
+                'assignees': [],
+            }
+
+            for assignee in step.assignees:
+                full_step['assignees'].append({
+                    'account': {
+                        'id': assignee.account.id,
+                        'name': assignee.account.name,
+                        'avatar_url': assignee.account.avatar_url,
+                    },
+                    'resolution': assignee.resolution,
+                })
+
+            event_data['steps'].append(full_step)
 
         for place in event.places:
             event_data['places'].append({
