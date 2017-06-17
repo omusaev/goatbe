@@ -71,11 +71,25 @@ class CreatePlace(BaseResource):
                         event=event,
                     )
                 )
-                db.add_all(new_places)
+
+            db.add_all(new_places)
 
         self.response_data = {
             'places_ids': [p.id for p in new_places],
         }
+
+
+class RecreatePlace(CreatePlace):
+
+    url = '/v1/places/recreate/'
+
+    def post(self):
+        event = self.data.get('event')
+
+        with db_session() as db:
+            db.query(Place).filter(Place.event_id == event.id).delete(synchronize_session=False)
+
+        super(RecreatePlace, self).post()
 
 
 class UpdatePlace(BaseResource):

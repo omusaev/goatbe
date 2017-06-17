@@ -69,6 +69,7 @@ INSTALLED_RESOURCES = [
     'events.resources.UpdateAssigneesResolution',
 
     'events.resources.CreatePlace',
+    'events.resources.RecreatePlace',
     'events.resources.UpdatePlace',
     'events.resources.DeletePlace',
     'events.resources.PlaceDetails',

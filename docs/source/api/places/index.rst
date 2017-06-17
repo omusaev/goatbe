@@ -7,6 +7,7 @@ API для работы с местами ивентов.
    :maxdepth: 1
 
    create.rst
+   recreate.rst
    update.rst
    details.rst
    delete.rst

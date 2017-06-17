@@ -412,6 +412,31 @@ class GoatClient(object):
 
         self._make_request(url, data)
 
+    def recreate_place(self, event_id, title, lng, lat,
+                       description=None, order=None,
+                       start_at=time.mktime(datetime.datetime.now().timetuple()),
+                       finish_at=time.mktime((datetime.datetime.now() + datetime.timedelta(days=1)).timetuple())):
+        url = self._url('/places/recreate/')
+
+        data = {
+            'event_id': event_id,
+            'places': [
+                {
+                    'title': title,
+                    'description': description,
+                    'start_at': start_at,
+                    'finish_at': finish_at,
+                    'order': order,
+                    'point': {
+                        'lng': lng,
+                        'lat': lat,
+                    }
+                },
+            ]
+        }
+
+        self._make_request(url, data)
+
     def update_place(self, event_id, place_id, title=None, lng=None, lat=None,
                      description=None, order=None, start_at=None, finish_at=None):
         url = self._url('/places/update/')
