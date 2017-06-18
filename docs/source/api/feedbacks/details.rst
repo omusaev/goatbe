@@ -22,15 +22,15 @@ Parameter        Default  Type  Required  Description
 
 **Структура data**
 
-===============  ====  ================================
-Parameter        Type  Description
-===============  ====  ================================
-``id``           int   Id места
-``comment``      str   Комментарий
-``rating``       int   Оценка
-``account_id``   int   ID аккаунта
-``created_at``   int   Дата создания
-===============  ====  ================================
+==================  ====  ================================
+Parameter           Type  Description
+==================  ====  ================================
+``id``              int   Id места
+``comment``         str   Комментарий
+``rating``          int   Оценка
+``participant_id``  int   ID участника
+``created_at``      int   Дата создания
+==================  ====  ================================
 
 
 **Возможные ошибки**
@@ -64,7 +64,7 @@ Parameter        Type  Description
 			"id":1,
 			"comment":"It was great!",
 			"rating":5,
-			"account_id":1,
+			"participant_id":1,
 			"created_at":1469049355
 	  }
    }

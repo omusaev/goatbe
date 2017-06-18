@@ -5,10 +5,12 @@ from __future__ import absolute_import
 from voluptuous import Required, All, Lower, Length
 
 from accounts.validators import AuthRequiredValidator
+from core.exceptions import UserIsNotEventParticipant
 from core.resources.base import BaseResource
 from db.helpers import db_session
+from events.logic import get_participant_by_id
 from events.mixins import EventDetailsMixin
-from events.models import Participant, Assignee
+from events.models import Participant
 from events.permissions import PERMISSION
 from events.validators import (EventExistenceValidator, AccountIsEventParticipantValidator,
                                PermissionValidator, EventSecretValidator, AccountIsNotEventParticipantValidator)
@@ -52,7 +54,7 @@ class DeleteParticipant(BaseResource):
 
     data_schema = {
         Required('event_id'): All(int),
-        Required('account_id'): All(int),
+        Required('participant_id'): All(int),
     }
 
     validators = [
@@ -65,13 +67,14 @@ class DeleteParticipant(BaseResource):
     def post(self):
 
         event = self.data.get('event')
-        account_id = self.get_param('account_id')
+        participant_id = self.get_param('participant_id')
+        participant = get_participant_by_id(participant_id, event.id)
+
+        if not participant:
+            raise UserIsNotEventParticipant
 
         with db_session() as db:
-            db.query(Participant).filter(Participant.account_id == account_id, Participant.event_id == event.id).delete(synchronize_session=False)
-
-            for step in event.steps:
-                db.query(Assignee).filter(Assignee.account_id == account_id, Assignee.step_id == step.id).delete(synchronize_session=False)
+            db.delete(participant)
 
         self.response_data = {}
 
@@ -93,14 +96,10 @@ class DeleteParticipantSelf(BaseResource):
 
     def post(self):
 
-        event = self.data.get('event')
-        account_id = self.account_info.account_id
+        participant = self.data.get('participant')
 
         with db_session() as db:
-            db.query(Participant).filter(Participant.account_id == account_id, Participant.event_id == event.id).delete(synchronize_session=False)
-
-            for step in event.steps:
-                db.query(Assignee).filter(Assignee.account_id == account_id, Assignee.step_id == step.id).delete(synchronize_session=False)
+            db.delete(participant)
 
         self.response_data = {}
 

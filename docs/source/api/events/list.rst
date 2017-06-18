@@ -37,11 +37,23 @@ Parameter               Type  Description
 ===============  ====  =======================================================
 Parameter        Type  Description
 ===============  ====  =======================================================
+``id``           int   Id участника
 ``status``       str   :doc:`Статус <../other/participant_statuses>`
 ``is_owner``     bool  Является ли участник владельцем ивента
 ``account``      dict  Пользователь
 ``permissions``  list  Список :doc:`прав <../other/permissions>` участника
 ===============  ====  =======================================================
+
+
+``account`` имеют следующую структуру.
+
+==============  ====  ========================
+Parameter       Type  Description
+==============  ====  ========================
+``id``          int   Id пользователя
+``name``        str   Имя пользователя
+``avatar_url``  str   url аватара пользователя
+==============  ====  ========================
 
 Элементы ``steps`` имеют следующую структуру.
 
@@ -58,22 +70,12 @@ Parameter        Type  Description
 
 Элементы ``assignees`` имеют следующую структуру.
 
-==============  ====  ================================================
-Parameter       Type  Description
-==============  ====  ================================================
-``resolution``  str   :doc:`Резолюция <../other/assignee_resolutions>`
-``account``     dict  Пользователь
-==============  ====  ================================================
-
-``account`` имеют следующую структуру.
-
-==============  ====  ========================
-Parameter       Type  Description
-==============  ====  ========================
-``id``          int   Id пользователя
-``name``        str   Имя пользователя
-``avatar_url``  str   url аватара пользователя
-==============  ====  ========================
+==================  ====  ================================================
+Parameter           Type  Description
+==================  ====  ================================================
+``resolution``      str   :doc:`Резолюция <../other/assignee_resolutions>`
+``participant_id``  int   Id участника
+==================  ====  ================================================
 
 Элементы ``places`` имеют следующую структуру.
 
@@ -109,119 +111,111 @@ Parameter        Type   Description
 
     {
        "status":"ok",
-       "data":[
-           {
-              "id":1,
-              "status":"PREPARATION",
-              "start_at":1469049355,
-              "description":"Just another hike",
-              "title":"Yearly extreme",
-              "finish_at":1469059355,
-              "secret":"ym2e7k",
-              "participants":[
-                 {
-                    "status":"ACTIVE",
-                    "is_owner":true,
-                    "account":{
-                       "id":15,
-                       "name":"Jerry",
-                       "avatar_url":"http://avatars.com/123.png"
-                    },
-                    "permissions":[
-                       "update_event_details",
-                       "read_event_details",
-                       "delete_event"
-                    ]
-                 },
-                 {
-                    "status":"ACTIVE",
-                    "is_owner":false,
-                    "account":{
-                       "id":16,
-                       "name":"Tom",
-                       "avatar_url":"http://avatars.com/456.png"
-                    },
-                    "permissions":[
-                       "invite_event_participant",
-                       "delete_event_participant"
-                    ]
-                 },
-                 {
-                    "status":"INACTIVE",
-                    "is_owner":false,
-                    "account_id":17,
-                    "permissions":[
-                       "create_event_step",
-                       "create_step_assignee"
-                    ]
-                 }
-              ],
-              "steps":[
-                 {
-                    "assignees":[
-                       {
-                          "resolution":"OPEN",
-                          "account":{
-                             "id":15,
-                             "name":"Jerry",
-                             "avatar_url":"http://avatars.com/123.png"
-                          }
-                       },
-                       {
-                          "resolution":"SKIPPED",
-                          "account":{
-                             "id":16,
-                             "name":"Tom",
-                             "avatar_url":"http://avatars.com/456.png"
-                          }
-                       }
-                    ],
-                    "id":1,
-                    "type":"COMMON",
-                    "order":1,
-                    "description":"Надо бы заполнить информацию",
-                    "title":"Заполнить информацию о походе"
-                 },
-                 {
-                    "assignees":[
-                       {
-                          "resolution":"RESOLVED",
-                          "account_id":15
-                       }
-                    ],
-                    "id":2,
-                    "type":"BACKPACK",
-                    "order":2,
-                    "description":"Надо бы составить списочек",
-                    "title":"Составить список снаряжения"
-                 }
-              ],
-              "places": [
-                  {
-                     "id":1,
-                     "title":"Start point",
-                     "description":"Let's start!",
-                     "start_at":1469049355,
-                     "finish_at":1469059355,
-                     "order":1,
-                     "point": {
-                         "lng": -74.78886216922375,
-                         "lat": 40.32829276931833
-                      }
-                  },
-                  {
-                      "id":2,
-                      "title":"Finish point",
-                      "description":"Let's finish!",
-                      "start_at":1470049355,
-                      "finish_at":1470049355,
-                      "order":2,
-                      "point": {
-                          "lng": -75.78886216922375,
-                          "lat": 41.32829276931833
-                      }
-                  }
-              ]
-            }
-       ]
+       "data":[{
+          "id":1,
+          "status":"PREPARATION",
+          "start_at":1469049355,
+          "description":"Just another hike",
+          "title":"Yearly extreme",
+          "finish_at":1469059355,
+          "secret":"ym2e7k",
+          "participants":[
+             {
+                "id":1,
+                "status":"ACTIVE",
+                "is_owner":true,
+                "account":{
+                   "id":15,
+                   "name":"Jerry",
+                   "avatar_url":"http://avatars.com/123.png"
+                },
+                "permissions":[
+                   "update_event_details",
+                   "read_event_details",
+                   "delete_event"
+                ]
+             },
+             {
+                "id":2,
+                "status":"ACTIVE",
+                "is_owner":false,
+                "account":{
+                   "id":16,
+                   "name":"Tom",
+                   "avatar_url":"http://avatars.com/456.png"
+                },
+                "permissions":[
+                   "invite_event_participant",
+                   "delete_event_participant"
+                ]
+             },
+             {
+                "id":3,
+                "is_owner":false,
+                "account_id":17,
+                "permissions":[
+                   "create_event_step",
+                   "create_step_assignee"
+                ]
+             }
+          ],
+          "steps":[
+             {
+                "assignees":[
+                   {
+                      "resolution":"OPEN",
+                      "partitipant_id":1,
+                   },
+                   {
+                      "resolution":"SKIPPED",
+                      "partitipant_id":2,
+                   }
+                ],
+                "id":1,
+                "type":"COMMON",
+                "order":1,
+                "description":"Надо бы заполнить информацию",
+                "title":"Заполнить информацию о походе"
+             },
+             {
+                "assignees":[
+                   {
+                      "resolution":"RESOLVED",
+                      "partitipant_id":1,
+                   }
+                ],
+                "id":2,
+                "type":"BACKPACK",
+                "order":2,
+                "description":"Надо бы составить списочек",
+                "title":"Составить список снаряжения"
+             }
+          ],
+		  "places": [
+		      {
+		  	     "id":1,
+		  	     "title":"Start point",
+		  	     "description":"Let's start!",
+		  	     "start_at":1469049355,
+		  	     "finish_at":1469059355,
+		  	     "order":1,
+		  	     "point": {
+				     "lng": -74.78886216922375,
+                     "lat": 40.32829276931833
+		  	      }
+		      },
+		      {
+		  	      "id":2,
+		  	      "title":"Finish point",
+		  	      "description":"Let's finish!",
+		  	      "start_at":1470049355,
+		  	      "finish_at":1470049355,
+		  	      "order":2,
+		  	      "point": {
+					  "lng": -75.78886216922375,
+					  "lat": 41.32829276931833
+		  	      }
+		      }
+		  ]
+		}]
     }

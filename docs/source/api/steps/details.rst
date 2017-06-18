@@ -35,22 +35,13 @@ Parameter        Type  Description
 
 Элементы ``assignees`` имеют следующую структуру.
 
-==============  ====  ================================================
-Parameter       Type  Description
-==============  ====  ================================================
-``resolution``  str   :doc:`Резолюция <../other/assignee_resolutions>`
-``account``     dict  Пользователь
-==============  ====  ================================================
+==================  ====  ================================================
+Parameter           Type  Description
+==================  ====  ================================================
+``resolution``      str   :doc:`Резолюция <../other/assignee_resolutions>`
+``participant_id``  int   Id участника
+==================  ====  ================================================
 
-``account`` имеют следующую структуру.
-
-==============  ====  ========================
-Parameter       Type  Description
-==============  ====  ========================
-``id``          int   Id пользователя
-``name``        str   Имя пользователя
-``avatar_url``  str   url аватара пользователя
-==============  ====  ========================
 
 **Возможные ошибки**
 
@@ -83,19 +74,11 @@ Parameter       Type  Description
          "assignees":[
             {
                "resolution":"OPEN",
-               "account":{
-                  "id":15,
-                  "name":"Jerry",
-                  "avatar_url":"http://avatars.com/123.png"
-               }
+               "participant_id":1
             },
             {
                "resolution":"SKIPPED",
-               "account":{
-                  "id":16,
-                  "name":"Tom",
-                  "avatar_url":"http://avatars.com/456.png"
-               }
+               "participant_id":2
             }
          ],
          "id":1,

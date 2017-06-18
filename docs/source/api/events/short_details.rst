@@ -13,11 +13,11 @@ short event details
 
 **Параметры запроса**
 
-============  =======  ====  ========  ===========
-Parameter     Default  Type  Required  Description
-============  =======  ====  ========  ===========
-``event_id``           int   true      Id ивента
-============  =======  ====  ========  ===========
+===============  =======  =======  ========  ===========
+Parameter        Default  Type     Required  Description
+===============  =======  =======  ========  ===========
+``event_id``              int      true      Id ивента
+===============  =======  =======  ========  ===========
 
 **Структура data**
 
@@ -41,11 +41,23 @@ Parameter               Type  Description
 ===============  ====  =======================================================
 Parameter        Type  Description
 ===============  ====  =======================================================
+``id``           int   Id участника
 ``status``       str   :doc:`Статус <../other/participant_statuses>`
 ``is_owner``     bool  Является ли участник владельцем ивента
 ``account``      dict  Пользователь
 ``permissions``  list  Список :doc:`прав <../other/permissions>` участника
 ===============  ====  =======================================================
+
+
+``account`` имеют следующую структуру.
+
+==============  ====  ========================
+Parameter       Type  Description
+==============  ====  ========================
+``id``          int   Id пользователя
+``name``        str   Имя пользователя
+``avatar_url``  str   url аватара пользователя
+==============  ====  ========================
 
 Элементы ``steps`` имеют следующую структуру.
 
@@ -62,22 +74,12 @@ Parameter        Type  Description
 
 Элементы ``assignees`` имеют следующую структуру.
 
-==============  ====  ================================================
-Parameter       Type  Description
-==============  ====  ================================================
-``resolution``  str   :doc:`Резолюция <../other/assignee_resolutions>`
-``account``     dict  Пользователь
-==============  ====  ================================================
-
-``account`` имеют следующую структуру.
-
-==============  ====  ========================
-Parameter       Type  Description
-==============  ====  ========================
-``id``          int   Id пользователя
-``name``        str   Имя пользователя
-``avatar_url``  str   url аватара пользователя
-==============  ====  ========================
+==================  ====  ================================================
+Parameter           Type  Description
+==================  ====  ================================================
+``resolution``      str   :doc:`Резолюция <../other/assignee_resolutions>`
+``participant_id``  int   Id участника
+==================  ====  ================================================
 
 Элементы ``places`` имеют следующую структуру.
 
@@ -101,7 +103,6 @@ Parameter        Type   Description
 ``lng``          float  Долгота
 ``lat``        	 float  Широта
 ===============  =====  ================================
-
 
 **Возможные ошибки**
 
@@ -128,7 +129,7 @@ Parameter        Type   Description
     {
        "status":"ok",
        "data":{
-          "id":2,
+          "id":1,
           "status":"PREPARATION",
           "start_at":1469049355,
           "description":"Just another hike",
@@ -137,6 +138,7 @@ Parameter        Type   Description
           "secret":"ym2e7k",
           "participants":[
              {
+                "id":1,
                 "status":"ACTIVE",
                 "is_owner":true,
                 "account":{
@@ -151,6 +153,7 @@ Parameter        Type   Description
                 ]
              },
              {
+                "id":2,
                 "status":"ACTIVE",
                 "is_owner":false,
                 "account":{
@@ -164,7 +167,7 @@ Parameter        Type   Description
                 ]
              },
              {
-                "status":"INACTIVE",
+                "id":3,
                 "is_owner":false,
                 "account_id":17,
                 "permissions":[
@@ -178,19 +181,11 @@ Parameter        Type   Description
                 "assignees":[
                    {
                       "resolution":"OPEN",
-                      "account":{
-                         "id":15,
-                         "name":"Jerry",
-                         "avatar_url":"http://avatars.com/123.png"
-                      }
+                      "partitipant_id":1,
                    },
                    {
                       "resolution":"SKIPPED",
-                      "account":{
-                         "id":16,
-                         "name":"Tom",
-                         "avatar_url":"http://avatars.com/456.png"
-                      }
+                      "partitipant_id":2,
                    }
                 ],
                 "id":1,
@@ -203,7 +198,7 @@ Parameter        Type   Description
                 "assignees":[
                    {
                       "resolution":"RESOLVED",
-                      "account_id":15
+                      "partitipant_id":1,
                    }
                 ],
                 "id":2,

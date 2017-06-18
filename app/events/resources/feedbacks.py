@@ -34,7 +34,7 @@ class CreateFeedback(BaseResource):
 
     def post(self):
 
-        account_id = self.account_info.account_id
+        participant = self.data.get('participant')
 
         event = self.data.get('event')
         comment = self.get_param('comment')
@@ -46,7 +46,7 @@ class CreateFeedback(BaseResource):
                 comment=comment,
                 rating=rating,
                 event=event,
-                account_id=account_id,
+                participant_id=participant.id,
             )
             db.add(feedback)
 
@@ -71,10 +71,16 @@ class UpdateFeedback(BaseResource):
         EventExistenceValidator(),
         AccountIsEventParticipantValidator(),
         FeedbackExistenceValidator(),
+
         PermissionValidator(
-            permissions=[PERMISSION.UPDATE_ANOTHERS_EVENT_FEEDBACK, ],
-            ownership={'entity': 'feedback'}
+            permissions=[PERMISSION.UPDATE_ANOTHERS_EVENT_FEEDBACK, ]
         )
+
+        # TODO check participant_id instead of account_id
+        # PermissionValidator(
+        #     permissions=[PERMISSION.UPDATE_ANOTHERS_EVENT_FEEDBACK, ],
+        #     ownership={'entity': 'feedback'}
+        # )
     ]
 
     def post(self):
@@ -109,10 +115,8 @@ class DeleteFeedback(BaseResource):
         AuthRequiredValidator(),
         EventExistenceValidator(),
         AccountIsEventParticipantValidator(),
-        (),
         PermissionValidator(
-            permissions=[PERMISSION.DELETE_ANOTHERS_EVENT_FEEDBACK, ],
-            ownership={'entity': 'feedback'}
+            permissions=[PERMISSION.DELETE_ANOTHERS_EVENT_FEEDBACK, ]
         )
     ]
 
@@ -151,7 +155,7 @@ class FeedbackDetails(BaseResource):
             'id': feedback.id,
             'comment': feedback.comment,
             'rating': feedback.rating,
-            'account_id': feedback.account_id,
+            'participant_id': feedback.participant_id,
             'created_at': to_timestamp(feedback.created_at),
         }
 
@@ -186,7 +190,7 @@ class FeedbacksList(BaseResource):
                 'id': feedback.id,
                 'comment': feedback.comment,
                 'rating': feedback.rating,
-                'account_id': feedback.account_id,
+                'participant_id': feedback.participant_id,
                 'created_at': to_timestamp(feedback.created_at),
             })
 

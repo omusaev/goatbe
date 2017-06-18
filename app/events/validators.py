@@ -17,6 +17,7 @@ from core.exceptions import (
 from core.helpers import to_datetime
 from core.validators import BaseValidator
 from db.helpers import db_session
+from events.logic import get_participant_by_account_id
 from events.models import Event, Participant, Step, Place, Feedback
 from events.permissions import PERMISSION
 
@@ -28,7 +29,6 @@ __all__ = (
     'AccountIsEventParticipantValidator',
     'AccountIsNotEventParticipantValidator',
     'PermissionValidator',
-    'UpdateAssigneesValidator',
     'EventSecretValidator',
     'getEventParticipant',
     'ChangePlacesOrderValidator',
@@ -118,7 +118,7 @@ class AccountIsEventParticipantValidator(BaseValidator):
         account_id = resource.account_info.account_id
         event = resource.data['event']
 
-        participant = getEventParticipant(account_id, event.id)
+        participant = get_participant_by_account_id(account_id, event.id)
 
         if not participant:
             raise UserIsNotEventParticipant
@@ -135,7 +135,7 @@ class AccountIsNotEventParticipantValidator(BaseValidator):
         account_id = resource.account_info.account_id
         event = resource.data['event']
 
-        participant = getEventParticipant(account_id, event.id)
+        participant = get_participant_by_account_id(account_id, event.id)
 
         if participant:
             raise UserIsAlreadyEventParticipant
@@ -168,35 +168,6 @@ class PermissionValidator(BaseValidator):
             raise PermissionDeniedException
 
 
-class UpdateAssigneesValidator(BaseValidator):
-    '''
-    Needs AccountIsEventParticipantValidator
-    '''
-
-    def run(self, resource, *args, **kwargs):
-
-        new_ids = resource.get_param('assign_accounts_ids')
-        old_ids = resource.get_param('unassign_accounts_ids')
-
-        if new_ids and old_ids and set(new_ids) & set(old_ids):
-            raise InvalidParameterException('assign_accounts_ids and unassign_accounts_ids have core ids')
-
-        if new_ids:
-            # TODO: do not use other validators
-            PermissionValidator(permissions=[PERMISSION.CREATE_STEP_ASSIGNEE, ]).run(resource, *args, **kwargs)
-
-            event = resource.data.get('event')
-
-            with db_session() as db:
-                # TODO: only ACTIVE participants
-                participants_count = db.query(Participant).filter(Participant.account_id.in_(new_ids), Participant.event_id == event.id).count()
-                if participants_count != len(new_ids):
-                    raise InvalidParameterException('Some of assign_accounts_ids not in event')
-
-        if old_ids:
-            PermissionValidator(permissions=[PERMISSION.DELETE_STEP_ASSIGNEE, ]).run(resource, *args, **kwargs)
-
-
 class EventSecretValidator(BaseValidator):
 
     def run(self, resource, *args, **kwargs):
@@ -212,15 +183,6 @@ class EventSecretValidator(BaseValidator):
             raise InvalidEventSecretException
 
         resource.data['event'] = event
-
-
-# TODO: codestyle. Move to the logic.py
-def getEventParticipant(account_id, event_id):
-
-    with db_session() as db:
-        participant = db.query(Participant).filter_by(account_id=account_id, event_id=event_id).first()
-
-    return participant or None
 
 
 class ChangePlacesOrderValidator(BaseValidator):

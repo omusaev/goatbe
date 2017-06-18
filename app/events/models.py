@@ -186,7 +186,7 @@ class Step(Base, GoatBasicModelMixin):
     )
 
 
-class Participant(Base, GoatModelMixin):
+class Participant(Base, GoatBasicModelMixin):
 
     __tablename__ = 'participant'
 
@@ -224,12 +224,25 @@ class Participant(Base, GoatModelMixin):
         primary_key=True,
         nullable=False
     )
+
+    assignees = relationship(
+        'Assignee',
+        backref=backref('participant'),
+        cascade='all, delete-orphan',
+    )
+
+    feedbacks = relationship(
+        'Feedback',
+        backref=backref('participant'),
+        cascade='all, delete-orphan',
+    )
+
     status = Column(String(255), nullable=False, default=STATUS.ACTIVE, server_default=STATUS.ACTIVE)
     permissions = Column(JSON)
     is_owner = Column(Boolean, nullable=False, default=False, server_default=sa.sql.expression.false())
 
 
-class Assignee(Base, GoatModelMixin):
+class Assignee(Base, GoatBasicModelMixin):
 
     __tablename__ = 'assignee'
 
@@ -244,19 +257,17 @@ class Assignee(Base, GoatModelMixin):
             SKIPPED,
         )
 
-    account_id = Column(
+    participant_id = Column(
         BigInteger,
         ForeignKey(
-            Account.id,
+            Participant.id,
             use_alter=True,
-            name='assignee_account_id',
+            name='assignee_participant_id',
             ondelete='CASCADE'
         ),
         primary_key=True,
         nullable=False
     )
-
-    account = relationship('Account')
 
     step_id = Column(
         BigInteger,
@@ -318,18 +329,16 @@ class Feedback(Base, GoatBasicModelMixin):
     comment = Column(Text(), nullable=True, default='', server_default='')
     rating = Column(Integer())
 
-    account_id = Column(
+    participant_id = Column(
         BigInteger,
         ForeignKey(
-            Account.id,
+            Participant.id,
             use_alter=True,
-            name='feedback_account_id',
+            name='feedback_participant_id',
             ondelete='CASCADE'
         ),
         nullable=False
     )
-
-    account = relationship('Account')
 
     event_id = Column(
         BigInteger,

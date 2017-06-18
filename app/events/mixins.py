@@ -37,6 +37,7 @@ class EventDetailsMixin(object):
 
         for participant in event.participants:
             event_data['participants'].append({
+                'id': participant.id,
                 'account': {
                     'id': participant.account.id,
                     'name': participant.account.name,
@@ -59,11 +60,7 @@ class EventDetailsMixin(object):
 
             for assignee in step.assignees:
                 full_step['assignees'].append({
-                    'account': {
-                        'id': assignee.account.id,
-                        'name': assignee.account.name,
-                        'avatar_url': assignee.account.avatar_url,
-                    },
+                    'participant_id': assignee.participant_id,
                     'resolution': assignee.resolution,
                 })
 

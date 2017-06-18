@@ -368,12 +368,12 @@ class GoatClient(object):
 
         self._make_request(url, data)
 
-    def delete_participant(self, event_id, account_id):
+    def delete_participant(self, event_id, participant_id):
         url = self._url('/participants/delete/')
 
         data = {
             'event_id': event_id,
-            'account_id': account_id,
+            'participant_id': participant_id,
         }
 
         self._make_request(url, data)
@@ -484,7 +484,22 @@ class GoatClient(object):
 
         self._make_request(url, data)
 
-    # TODO: add assignees
+    def update_assignees(self, event_id, step_id, assign_id, unassign_id=None):
+        url = self._url('/assignees/update/')
+
+        data = {
+            'event_id': event_id,
+            'step_id': step_id,
+            'assign_participant_ids': [assign_id],
+        }
+
+        if unassign_id:
+            data.update({
+                'unassign_participant_ids': [unassign_id],
+            })
+
+        self._make_request(url, data)
+
     # TODO: add order steps
     # TODO: add order places
 

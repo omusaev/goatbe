@@ -13,12 +13,12 @@ delete participant
 
 **Параметры запроса**
 
-==============  =======  ====  ========  ===========
-Parameter       Default  Type  Required  Description
-==============  =======  ====  ========  ===========
-``event_id``             int   true      Id ивента
-``account_id``           int   true      Id аккаунта
-==============  =======  ====  ========  ===========
+==================  =======  ====  ========  ===========
+Parameter           Default  Type  Required  Description
+==================  =======  ====  ========  ===========
+``event_id``                 int   true      Id ивента
+``participant_id``           int   true      Id участника
+==================  =======  ====  ========  ===========
 
 **Структура data**
 
@@ -40,7 +40,7 @@ Parameter       Default  Type  Required  Description
 
     {
         "event_id": 1,
-        "account_id": 2
+        "participant_id": 2
     }
 
 **Пример ответа**

@@ -23,12 +23,12 @@ Parameter        Default  Type              Required  Description
 
 Формат resolution
 
-==============  =======  ====  ========  ================================================
-Parameter       Default  Type  Required  Description
-==============  =======  ====  ========  ================================================
-``account_id``           int   true      Id аккунта
-``resolution``           str   true      :doc:`Резолюция <../other/assignee_resolutions>`
-==============  =======  ====  ========  ================================================
+==================  =======  ====  ========  ================================================
+Parameter           Default  Type  Required  Description
+==================  =======  ====  ========  ================================================
+``participant_id``           int   true      Id участника
+``resolution``               str   true      :doc:`Резолюция <../other/assignee_resolutions>`
+==================  =======  ====  ========  ================================================
 
 **Структура data**
 
@@ -44,7 +44,6 @@ Parameter       Default  Type  Required  Description
 * USER_IS_NOT_EVENT_PARTICIPANT
 * STEP_NOT_FOUND
 * STEP_IS_NOT_IN_EVENT
-* ASSIGNEE_NOT_FOUND
 * PERMISSION_DENIED
 
 **Пример запроса**
@@ -56,11 +55,11 @@ Parameter       Default  Type  Required  Description
         "step_id": 2,
         "resolutions": [
             {
-                "account_id": 12,
+                "participant_id": 12,
                 "resolution": "RESOLVED"
             },
             {
-                "account_id": 13,
+                "participant_id": 13,
                 "resolution": "OPEN"
             }
         ]

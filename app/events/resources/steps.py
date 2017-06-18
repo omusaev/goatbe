@@ -137,11 +137,7 @@ class StepDetails(BaseResource):
 
         for assignee in step.assignees:
             step_data['assignees'].append({
-                'account': {
-                    'id': assignee.account.id,
-                    'name': assignee.account.name,
-                    'avatar_url': assignee.account.avatar_url,
-                },
+                'participant_id': assignee.participant_id,
                 'resolution': assignee.resolution,
             })
 
