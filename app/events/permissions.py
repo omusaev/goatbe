@@ -34,6 +34,12 @@ class PERMISSION(object):
     REORDER_EVENT_PLACES = 'reorder_event_places'
     READ_PLACE_DETAILS = 'read_place_details'
 
+    CREATE_EVENT_PLAN_ITEM = 'create_event_plan_item'
+    DELETE_EVENT_PLAN_ITEM = 'delete_event_plan_item'
+    UPDATE_EVENT_PLAN_ITEM = 'update_event_plan_item'
+    REORDER_EVENT_PLAN_ITEMS = 'reorder_event_plan_items'
+    READ_PLAN_ITEM_DETAILS = 'read_plan_item_details'
+
     CREATE_EVENT_FEEDBACK = 'create_event_feedback'
     UPDATE_ANOTHERS_EVENT_FEEDBACK = 'update_anothers_event_feedback'
     DELETE_ANOTHERS_EVENT_FEEDBACK = 'delete_anothers_event_feedback'
@@ -68,6 +74,11 @@ class PERMISSION(object):
         CREATE_EVENT_FEEDBACK,
         DELETE_ANOTHERS_EVENT_FEEDBACK,
         READ_EVENT_FEEDBACKS,
+        CREATE_EVENT_PLAN_ITEM,
+        DELETE_EVENT_PLAN_ITEM,
+        UPDATE_EVENT_PLAN_ITEM,
+        REORDER_EVENT_PLAN_ITEMS,
+        READ_PLAN_ITEM_DETAILS,
     ]
 
     DEFAULT_OWNER_SET = ALL
@@ -90,6 +101,11 @@ class PERMISSION(object):
         READ_PLACE_DETAILS,
         CREATE_EVENT_FEEDBACK,
         READ_EVENT_FEEDBACKS,
+        CREATE_EVENT_PLAN_ITEM,
+        DELETE_EVENT_PLAN_ITEM,
+        UPDATE_EVENT_PLAN_ITEM,
+        REORDER_EVENT_PLAN_ITEMS,
+        READ_PLAN_ITEM_DETAILS,
     ]
 
     DEFAULT_INACTIVE_SET = [

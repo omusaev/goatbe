@@ -52,6 +52,7 @@ INSTALLED_RESOURCES = [
     'events.resources.EventDetails',
     'events.resources.ShortEventDetails',
     'events.resources.MapEventDetails',
+    'events.resources.PlanEventDetails',
     'events.resources.EventList',
 
     'events.resources.DeleteParticipant',
@@ -75,6 +76,12 @@ INSTALLED_RESOURCES = [
     'events.resources.PlaceDetails',
     'events.resources.ChangePlacesOrder',
     'events.resources.MapPlaces',
+    
+    'events.resources.CreatePlanItem',
+    'events.resources.UpdatePlanItem',
+    'events.resources.DeletePlanItem',
+    'events.resources.PlanItemDetails',
+    'events.resources.ChangePlanItemsOrder',
 
     'events.resources.CreateFeedback',
     'events.resources.UpdateFeedback',
