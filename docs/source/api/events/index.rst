@@ -18,3 +18,4 @@ API для работы с ивентами.
    unfinish.rst
    delete.rst
    map_details.rst
+   plan_details.rst

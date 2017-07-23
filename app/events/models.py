@@ -26,6 +26,7 @@ __all__ = (
     'Participant',
     'Assignee',
     'Place',
+    'PlanItem',
     'Feedback',
 )
 
@@ -96,6 +97,12 @@ class Event(Base, GoatBasicModelMixin):
 
     places = relationship(
         'Place',
+        backref=backref('event'),
+        cascade='all, delete-orphan',
+    )
+
+    plan_items = relationship(
+        'PlanItem',
         backref=backref('event'),
         cascade='all, delete-orphan',
     )
@@ -325,6 +332,45 @@ class Place(Base, GoatBasicModelMixin):
     @property
     def lat(self):
         return self.geom_point.y
+
+    @classmethod
+    def format_point(cls, lng, lat):
+        return 'POINT(%s %s)' % (lng, lat)
+
+
+class PlanItem(Base, GoatBasicModelMixin):
+
+    __tablename__ = 'plan_item'
+
+    title = Column(String(255), nullable=False, default='', server_default='')
+    description = Column(Text(), nullable=False, default='', server_default='')
+    point = Column(Geography(geometry_type='POINT', srid=4326))
+    start_at = Column(DateTime)
+    finish_at = Column(DateTime)
+    order = Column(Integer())
+
+    event_id = Column(
+        BigInteger,
+        ForeignKey(
+            Event.id,
+            use_alter=True,
+            name='plan_item_event_id',
+            ondelete='CASCADE'
+        ),
+        nullable=False
+    )
+
+    @property
+    def geom_point(self):
+        return wkb_loads(bytes(self.point.data)) if self.point else None
+
+    @property
+    def lng(self):
+        return self.geom_point.x if self.geom_point else None
+
+    @property
+    def lat(self):
+        return self.geom_point.y if self.geom_point else None
 
     @classmethod
     def format_point(cls, lng, lat):

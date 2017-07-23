@@ -243,6 +243,15 @@ class GoatClient(object):
 
         self._make_request(url, data)
 
+    def plan_event_details(self, event_id):
+        url = self._url('/events/details/plan/')
+
+        data = {
+            'event_id': event_id,
+        }
+
+        self._make_request(url, data)
+
     def feedbacks_list(self, event_id):
         url = self._url('/feedbacks/list/')
 
@@ -484,6 +493,72 @@ class GoatClient(object):
 
         self._make_request(url, data)
 
+    def create_plan_item(self, event_id, title,
+                         lng=None, lat=None,
+                         description=None, order=None,
+                         start_at=time.mktime(datetime.datetime.now().timetuple()),
+                         finish_at=time.mktime((datetime.datetime.now() + datetime.timedelta(days=1)).timetuple())):
+        url = self._url('/plan_items/create/')
+
+        data = {
+            'event_id': event_id,
+            'plan_items': [
+                {
+                    'title': title,
+                    'description': description,
+                    'start_at': start_at,
+                    'finish_at': finish_at,
+                    'order': order,
+                    'point': {
+                        'lng': lng,
+                        'lat': lat,
+                    }
+                },
+            ]
+        }
+
+        self._make_request(url, data)
+
+    def update_plan_item(self, event_id, plan_item_id, title=None, lng=None, lat=None,
+                         description=None, order=None, start_at=None, finish_at=None):
+        url = self._url('/plan_items/update/')
+
+        data = {
+            'event_id': event_id,
+            'plan_item_id': plan_item_id,
+            'title': title,
+            'description': description,
+            'start_at': start_at,
+            'finish_at': finish_at,
+            'order': order,
+            'point': {
+                'lng': lng,
+                'lat': lat,
+            }
+        }
+
+        self._make_request(url, data)
+
+    def plan_item_details(self, event_id, plan_item_id):
+        url = self._url('/plan_items/details/')
+
+        data = {
+            'event_id': event_id,
+            'plan_item_id': plan_item_id,
+        }
+
+        self._make_request(url, data)
+
+    def delete_plan_item(self,  event_id, plan_item_id):
+        url = self._url('/plan_items/delete/')
+
+        data = {
+            'event_id': event_id,
+            'plan_item_id': plan_item_id,
+        }
+
+        self._make_request(url, data)
+
     def update_assignees(self, event_id, step_id, assign_id, unassign_id=None):
         url = self._url('/assignees/update/')
 
@@ -502,6 +577,7 @@ class GoatClient(object):
 
     # TODO: add order steps
     # TODO: add order places
+    # TODO: add order plan_items
 
 
 def main():

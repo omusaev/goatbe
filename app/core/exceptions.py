@@ -24,6 +24,8 @@ __all__ = (
     'InvalidAccountStateException',
     'PlaceNotFoundException',
     'PlaceIsNotInEventException',
+    'PlanItemNotFoundException',
+    'PlanItemIsNotInEventException',
     'EventIsNotFinishedManuallyException',
     'FeedbackNotFoundException',
     'FeedbackIsNotInEventException',
@@ -162,6 +164,18 @@ class PlaceIsNotInEventException(GoatBaseException):
 
     error_code = 'PLACE_IS_NOT_IN_EVENT'
     message = 'Place is not in event'
+
+
+class PlanItemNotFoundException(GoatBaseException):
+
+    error_code = 'PLAN_ITEM_NOT_FOUND'
+    message = 'Plan item not found'
+
+
+class PlanItemIsNotInEventException(GoatBaseException):
+
+    error_code = 'PLAN_ITEM_IS_NOT_IN_EVENT'
+    message = 'Plan item is not in event'
 
 
 class EventIsNotFinishedManuallyException(GoatBaseException):

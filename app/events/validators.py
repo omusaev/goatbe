@@ -7,31 +7,33 @@ from voluptuous import Invalid
 from core.exceptions import (
     EventNotFoundException, UserIsNotEventParticipant,
     StepNotFoundException, PermissionDeniedException,
-    StepIsNotInEventException, InvalidParameterException,
+    StepIsNotInEventException,
     InvalidEventStatusException, InvalidEventSecretException,
     PlaceNotFoundException, PlaceIsNotInEventException,
     EventIsNotFinishedManuallyException,
     FeedbackNotFoundException, FeedbackIsNotInEventException,
-    UserIsAlreadyEventParticipant
+    UserIsAlreadyEventParticipant,
+    PlanItemIsNotInEventException, PlanItemNotFoundException
 )
 from core.helpers import to_datetime
 from core.validators import BaseValidator
 from db.helpers import db_session
 from events.logic import get_participant_by_account_id
-from events.models import Event, Participant, Step, Place, Feedback
-from events.permissions import PERMISSION
+from events.models import Event, Step, Place, Feedback, PlanItem
 
 __all__ = (
     'timestamp_validator',
     'EventExistenceValidator',
     'StepExistenceValidator',
     'PlaceExistenceValidator',
+    'PlanItemExistenceValidator',
     'AccountIsEventParticipantValidator',
     'AccountIsNotEventParticipantValidator',
     'PermissionValidator',
     'EventSecretValidator',
     'getEventParticipant',
     'ChangePlacesOrderValidator',
+    'ChangePlanItemsOrderValidator',
     'ChangeStepsOrderValidator',
     'EventFinishedManuallyValidator',
     'FeedbackExistenceValidator',
@@ -107,6 +109,27 @@ class PlaceExistenceValidator(BaseValidator):
             raise PlaceIsNotInEventException
 
         resource.data['place'] = place
+
+
+class PlanItemExistenceValidator(BaseValidator):
+    '''
+    Needs EventExistenceValidator
+    '''
+
+    def run(self, resource, *args, **kwargs):
+        plan_item_id = resource.get_param('plan_item_id')
+        event = resource.data['event']
+
+        with db_session() as db:
+            plan_item = db.query(PlanItem).options(joinedload('*')).get(plan_item_id)
+
+        if not plan_item:
+            raise PlanItemNotFoundException
+
+        if plan_item.event_id != event.id:
+            raise PlanItemIsNotInEventException
+
+        resource.data['plan_item'] = plan_item
 
 
 class AccountIsEventParticipantValidator(BaseValidator):
@@ -205,6 +228,28 @@ class ChangePlacesOrderValidator(BaseValidator):
             places.append((place, order, ))
 
         resource.data['places'] = places
+
+
+class ChangePlanItemsOrderValidator(BaseValidator):
+
+    def run(self, resource, *args, **kwargs):
+
+        orders = resource.get_param('orders')
+        plan_items = []
+
+        for order_info in orders:
+            plan_item_id = order_info.get('id')
+            order = order_info.get('order')
+
+            with db_session() as db:
+                plan_item = db.query(PlanItem).options(joinedload('*')).get(plan_item_id)
+
+            if not plan_item:
+                raise PlanItemNotFoundException
+
+            plan_items.append((plan_item, order, ))
+
+        resource.data['places'] = plan_items
 
 
 class ChangeStepsOrderValidator(BaseValidator):
