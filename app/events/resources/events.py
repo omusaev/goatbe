@@ -97,7 +97,6 @@ class CreateEvent(BaseResource, EventDetailsMixin):
                 account=account,
                 event=event,
                 is_owner=True,
-                permissions=PERMISSION.DEFAULT_OWNER_SET,
             )
             db.add(participant)
 

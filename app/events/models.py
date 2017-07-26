@@ -5,7 +5,6 @@ from datetime import datetime, timedelta
 
 import sqlalchemy as sa
 from sqlalchemy import Column, BigInteger, String, DateTime, Text, ForeignKey, Boolean, Integer
-from sqlalchemy.dialects.postgresql import JSON
 from sqlalchemy.orm import relationship, backref
 
 from geoalchemy2 import Geography
@@ -15,7 +14,9 @@ from shapely.wkb import loads as wkb_loads
 from accounts.models import Account
 from db.base import Base
 from db.helpers import db_session
-from db.mixins import GoatModelMixin, GoatBasicModelMixin
+from db.mixins import GoatBasicModelMixin
+
+from events.permissions import PERMISSION
 
 
 __all__ = (
@@ -238,8 +239,16 @@ class Participant(Base, GoatBasicModelMixin):
     )
 
     status = Column(String(255), nullable=False, default=STATUS.ACTIVE, server_default=STATUS.ACTIVE)
-    permissions = Column(JSON)
     is_owner = Column(Boolean, nullable=False, default=False, server_default=sa.sql.expression.false())
+
+    @property
+    def permissions(self):
+        if self.is_owner:
+            return PERMISSION.DEFAULT_OWNER_SET
+        if self.status == Participant.STATUS.ACTIVE:
+            return PERMISSION.DEFAULT_NOT_OWNER_SET
+        if self.status == Participant.STATUS.INACTIVE:
+            return PERMISSION.DEFAULT_INACTIVE_SET
 
 
 class Assignee(Base, GoatBasicModelMixin):

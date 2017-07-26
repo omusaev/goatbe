@@ -41,7 +41,6 @@ class CreateParticipantSelf(BaseResource, EventDetailsMixin):
                 event=event,
                 is_owner=False,
                 status=Participant.STATUS.INACTIVE,
-                permissions=PERMISSION.DEFAULT_INACTIVE_SET,
             )
             db.merge(participant)
 
