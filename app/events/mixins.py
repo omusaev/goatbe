@@ -33,6 +33,7 @@ class EventDetailsMixin(object):
             'participants': [],
             'steps': [],
             'places': [],
+            'plan_items': [],
         }
 
         for participant in event.participants:
@@ -79,5 +80,24 @@ class EventDetailsMixin(object):
                     'lat': place.lat,
                 }
             })
+
+        for plan_item in event.plan_items:
+            plan_item_data = {
+                'id': plan_item.id,
+                'title': plan_item.title,
+                'description': plan_item.description,
+                'start_at': to_timestamp(plan_item.start_at),
+                'finish_at': to_timestamp(plan_item.finish_at),
+                'order': plan_item.order,
+                'point': None
+            }
+
+            if plan_item.geom_point:
+                plan_item_data['point'] = {
+                    'lng': plan_item.lng,
+                    'lat': plan_item.lat,
+                }
+
+            event_data['plan_items'].append(plan_item_data)
 
         return event_data
