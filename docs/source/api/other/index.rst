@@ -11,6 +11,7 @@ other
    language_codes.rst
    event_statuses.rst
    step_types.rst
+   account_types.rst
    participant_statuses.rst
    assignee_resolutions.rst
    settings.rst

@@ -18,7 +18,7 @@ class EventDetailsMixin(object):
 
         state = inspect(event)
 
-        if set(['participants', 'places', 'steps']) & state.unloaded:
+        if set(['participants', 'places', 'steps', 'plan_items']) & state.unloaded:
             with db_session() as db:
                 event = db.query(Event).options(joinedload('*')).get(event.id)
 
@@ -43,6 +43,12 @@ class EventDetailsMixin(object):
                     'id': participant.account.id,
                     'name': participant.account.name,
                     'avatar_url': participant.account.avatar_url,
+                    'identities': [
+                        {
+                            'auth_method': participant.account.auth_method,
+                            'identifier': participant.account.identifier,
+                        }
+                    ],
                 },
                 'status': participant.status,
                 'permissions': participant.permissions,

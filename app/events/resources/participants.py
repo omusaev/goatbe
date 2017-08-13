@@ -123,7 +123,6 @@ class ActivateParticipantSelf(BaseResource):
         participant = self.data.get('participant')
 
         with db_session() as db:
-            participant.permissions = PERMISSION.DEFAULT_NOT_OWNER_SET
             participant.status = Participant.STATUS.ACTIVE
             db.merge(participant)
 

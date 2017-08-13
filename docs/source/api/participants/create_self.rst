@@ -48,16 +48,25 @@ Parameter        Type  Description
 ``permissions``  list  Список :doc:`прав <../other/permissions>` участника
 ===============  ====  =======================================================
 
-
 ``account`` имеют следующую структуру.
 
-==============  ====  ========================
+==============  ====  ===================================
 Parameter       Type  Description
-==============  ====  ========================
+==============  ====  ===================================
 ``id``          int   Id пользователя
 ``name``        str   Имя пользователя
 ``avatar_url``  str   url аватара пользователя
-==============  ====  ========================
+``identities``  list  Список идентификаторов пользователя
+==============  ====  ===================================
+
+Элементы ``identities`` имеют следующую структуру.
+
+===============  ====  ===============================================================
+Parameter        Type  Description
+===============  ====  ===============================================================
+``auth_method``  str   Тип :doc:`идентификатора <../other/account_types>` пользователя
+``identifier``   str   Идентификатор пользователя
+===============  ====  ===============================================================
 
 Элементы ``steps`` имеют следующую структуру.
 
@@ -143,7 +152,13 @@ Parameter        Type   Description
                 "account":{
                    "id":15,
                    "name":"Jerry",
-                   "avatar_url":"http://avatars.com/123.png"
+                   "avatar_url":"http://avatars.com/123.png",
+                   'identities':[
+                      {
+                         'auth_method': 'FB',
+                         'identifier': 'r3y56u5j4'
+                      }
+                   ]
                 },
                 "permissions":[
                    "update_event_details",
@@ -158,7 +173,13 @@ Parameter        Type   Description
                 "account":{
                    "id":16,
                    "name":"Tom",
-                   "avatar_url":"http://avatars.com/456.png"
+                   "avatar_url":"http://avatars.com/456.png",
+                   'identities':[
+                      {
+                         'auth_method': 'ANONYM',
+                         'identifier': 'fjpow930n3'
+                      }
+                   ]
                 },
                 "permissions":[
                    "invite_event_participant",
@@ -168,7 +189,16 @@ Parameter        Type   Description
              {
                 "id":3,
                 "is_owner":false,
-                "account_id":17,
+                "account":{
+                   "id":17,
+                   "name":"Tom",
+                   "avatar_url":"http://avatars.com/456.png",
+                   'identities':[
+                      {
+                         'auth_method': 'ANONYM',
+                         'identifier': 'fjpow930n3'
+                      }
+                   ]
                 "permissions":[
                    "create_event_step",
                    "create_step_assignee"
