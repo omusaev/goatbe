@@ -101,8 +101,8 @@ WORKERS = {
     'event_participant_cleaner': {'sleep': 6 * 60 * 60},
 }
 
-FB_APP_ID = '1000652553335107'
-FB_APP_SECRET = 'f7b5a32a886d31b3cfd6d22d55e75d4c'
+FB_APP_ID = 'CHANGE_ME'
+FB_APP_SECRET = 'CHANGE_ME'
 
 CLIENT_SETTINGS = {
     'REGISTRATION_SKIP_ENABLED': True,
