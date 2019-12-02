@@ -7,7 +7,7 @@ import os
 PROJECT_ROOT = os.path.dirname(os.path.realpath(__file__))
 LOG_PATH = '%s/logs/' % PROJECT_ROOT
 
-SITE_HOST = '162.243.219.249'
+SITE_HOST = 'CHANGE_ME'
 SITE_PATH = '/'
 SITE_URL = '%s%s' % (SITE_HOST, SITE_PATH)
 
@@ -16,9 +16,9 @@ DEBUG = False
 DATABASE = {
     'DIALECT': 'postgresql',
     'DRIVER': 'psycopg2',
-    'USERNAME': 'goat',
-    'PASSWORD': '[GEjcV9Fy9HK.[zz',
-    'DATABASE': 'goat',
+    'USERNAME': 'CHANGE_ME',
+    'PASSWORD': 'CHANGE_ME',
+    'DATABASE': 'CHANGE_ME',
     'HOST': 'localhost',
     'PORT': '5432'
 }
@@ -115,7 +115,7 @@ RQ_CONNECTION = {
 }
 
 SENTRY_ENABLED = True
-SENTRY_DSN = 'https://0cc39354458f443cb01c1a1988341a82:fb67eb0e5d5c4428b27a160a98d8f168@sentry.io/140360'
+SENTRY_DSN = 'CHANGE_ME'
 
 
 try:
